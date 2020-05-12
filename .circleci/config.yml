@@ -5,9 +5,23 @@ orbs:
   # Declare a dependency on the orbs  
   eslint: arrai/eslint@2.0.0
 # Orchestrate or schedule a set of jobs
+jobs:
+  build:
+    docker:
+        - image: 'circleci/node:latest'
+    steps:
+      - checkout
+      - run: echo 'hello world'
+
+  test:
+    docker:
+        - image: 'circleci/node:latest'
+    steps:
+      - checkout
+      - run: echo 'hello test' 
+
 workflows:
-  build-test-deploy:
-    # Run the build/run job in its own container
-
-
-  
+    build-test:
+        jobs:
+            -build
+            -test
