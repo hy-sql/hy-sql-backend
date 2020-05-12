@@ -1,13 +1,8 @@
-const express = require('express')
-const app = express()
-
-app.use(express.json())
-
-app.get('/', (req, res) => {
-    res.send('<h1>Hello World!</h1>')
-})
+const app = require('./app')
+const http = require('http')
+const server = http.createServer(app)
 
 const PORT = 3001
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log('hello world!')
 })

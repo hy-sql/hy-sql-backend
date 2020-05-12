@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "\"echo \\\"No test spesified\\\" && exit 1\"",
+    "dev": "nodemon index.js",
+    "test": "cross-env NODE_ENV=test jest --verbose --detectOpenHandles",
     "lint": "eslint .",
     "testlint": "eslint . --fix"
   },
@@ -24,9 +25,19 @@
   },
   "homepage": "https://github.com/hy-sql/hy-sql#readme",
   "dependencies": {
+    "cross-env": "^7.0.2",
     "express": "^4.17.1"
   },
   "devDependencies": {
-    "eslint": "^7.0.0"
+    "eslint": "^7.0.0",
+    "jest": "^26.0.1",
+    "nodemon": "^2.0.3",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   }
 }
