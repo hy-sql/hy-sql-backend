@@ -8,9 +8,6 @@ orbs:
 workflows:
   build-test-deploy:
     # Run the build/run job in its own container
-    jobs:
-      -run:
-        name: Lint code
-        command: npm run lint
+
 
   
