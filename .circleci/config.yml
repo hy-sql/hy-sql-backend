@@ -13,15 +13,7 @@ jobs:
             - checkout
             - run: echo 'hello world'
 
-    test:
-        docker:
-            - image: 'circleci/node:latest'
-        steps:
-            - checkout
-            - run: echo 'hello test' 
-
 workflows:
     build_and_test:
         jobs:
             - build
-            - test
