@@ -8,7 +8,7 @@
     "dev": "nodemon index.js",
     "test": "cross-env NODE_ENV=test jest --verbose --detectOpenHandles",
     "lint": "eslint .",
-    "testlint": "eslint . --fix"
+    "fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
@@ -18,7 +18,7 @@
     "backend",
     "hysql"
   ],
-  "author": "OT-NumbaOneTeam",
+  "author": "HY-Sql OHTU-team",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/hy-sql/hy-sql/issues"
