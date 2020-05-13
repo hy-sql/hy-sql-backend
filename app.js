@@ -7,7 +7,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/ping/', (req, res) => {
-    const json = {value: 'pong'}
+    const json = { value: 'pong' }
     res.json(json)
 })
 module.exports = app
