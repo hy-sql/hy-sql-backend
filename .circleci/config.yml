@@ -11,6 +11,7 @@ jobs:
             - checkout
             - run: npm install
             - run: npm run lint
+            - run: npm run test
             - run: echo 'hello world'
 
 workflows:
