@@ -1,79 +1,20 @@
 /* eslint-disable no-unused-vars */
 const validator = require('validator')
+const Command = require('../commands/Command')
 
-let fullCommand =
-    'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);'
+let command =
+    'CREATE TABLEA Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);'
 
-const parseFullCommand = (fullCommand) => {
-    const fullCommandAsStringList = fullCommand.trim().split(/[\s]|(?<=\()/)
+const parseCommand = (input) => {
+    console.log(input)
 
-    console.log(fullCommandAsStringList)
+    const command = Command(input) || null
 
-    if (commandIsCreateTable(fullCommandAsStringList)) {
-        return parseCreateTableCommand(fullCommandAsStringList)
-    }
+    if (!command) throw new Error('INVALID COMMAND')
 
-    return { commandError: 'INVALID command' }
+    command.execute()
+
+    return 'SUCCESS'
 }
 
-const parseCreateTableCommand = (fullCommandAsStringList) => {
-    let error = false
-    const errorMessages = {}
-
-    const tableName = fullCommandAsStringList[2]
-
-    if (!validateTableName(tableName)) {
-        error = true
-        errorMessages.tableNameError = 'Invalid table name'
-    }
-
-    const columns = fullCommandAsStringList.slice(3)
-
-    if (!validateColumns(columns)) {
-        error = true
-        errorMessages.tableNameError = 'Invalid columns format'
-    }
-
-    const data = parseColumns(columns)
-
-    return !error ? data : errorMessages
-}
-
-const validateTableName = (tableName) => {
-    if (
-        !validator.isAlphanumeric(tableName) ||
-        !validator.isAlpha(
-            tableName.charAt(0) || validator.isLength(tableName, { max: 64 })
-        )
-    ) {
-        return false
-    }
-
-    return true
-}
-
-const commandIsCreateTable = (fullCommandAsStringList) => {
-    return fullCommandAsStringList.slice(0, 2).join(' ') === 'CREATE TABLE'
-}
-
-const commandIsInsertInto = (fullCommandAsStringList) => {
-    // TODO
-    return true
-}
-
-const commandIsSelect = (fullCommandAsStringList) => {
-    //TODO
-    return true
-}
-
-const validateColumns = (columns) => {
-    // TODO
-    return true
-}
-
-const parseColumns = (columns) => {
-    // TODO
-    return columns
-}
-
-console.log(parseFullCommand(fullCommand))
+console.log(parseCommand(command))
