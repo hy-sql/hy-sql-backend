@@ -4,22 +4,10 @@ const CreateTableCommand = require('./createTableCommand')
 const InsertIntoCommand = require('./insertIntoCommand')
 const SelectAllCommand = require('./selectAllCommand')
 
+const commands = [CreateTableCommand, InsertIntoCommand, SelectAllCommand]
+
 const Command = (fullCommandAsStringList) => {
-    const commands = [CreateTableCommand, InsertIntoCommand, SelectAllCommand]
-
-    let commandToReturn = null
-
-    console.log(fullCommandAsStringList)
-
-    commands.forEach((c) => {
-        if (c.isCommand(fullCommandAsStringList)) {
-            console.log('is command')
-            commandToReturn = c
-            return
-        }
-    })
-
-    return commandToReturn
+    return commands.find((c) => c.isCommand(fullCommandAsStringList))
 }
 
 module.exports = Command
