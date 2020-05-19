@@ -1,29 +1,27 @@
 /* eslint-disable indent */
 /* eslint-disable no-unused-vars */
-const CreateTableCommand = require('./CreateTableCommand')
-const InsertIntoCommand = require('./InsertIntoCommand')
-const SelectAllCommand = require('./SelectAllCommand')
+const CreateTableCommand = require('./createTableCommand')
+const InsertIntoCommand = require('./insertIntoCommand')
+const SelectAllCommand = require('./selectAllCommand')
+
+let testInput =
+    'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);'
 
 const Command = (input) => {
-  const fullCommandAsStringList = input
-    .trim()
-    .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+    const commands = [CreateTableCommand, InsertIntoCommand, SelectAllCommand]
 
-  console.log(fullCommandAsStringList)
+    const fullCommandAsStringList = input
+        .trim()
+        .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-  switch (true) {
-    case fullCommandAsStringList.slice(0, 2).join(' ') === 'CREATE TABLE':
-      return CreateTableCommand(fullCommandAsStringList)
+    console.log(fullCommandAsStringList)
 
-    case fullCommandAsStringList.slice(0, 2).join(' ') === 'INSERT INTO':
-      return InsertIntoCommand(fullCommandAsStringList)
-
-    case fullCommandAsStringList.slice(0, 2).join(' ') === 'SELECT *':
-      return SelectAllCommand(fullCommandAsStringList)
-
-    default:
-      return null
-  }
+    commands.forEach((c) => {
+        if (c.isCommand(fullCommandAsStringList))
+            c.execute(fullCommandAsStringList)
+    })
 }
+
+Command(testInput)
 
 module.exports = Command
