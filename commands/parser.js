@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-const validator = require('validator')
 const Command = require('../commands/Command')
 
 let command =
@@ -12,7 +11,9 @@ const parseCommand = (input) => {
 
     const command = Command(fullCommandAsStringList)
 
-    command ? command.execute(fullCommandAsStringList) : console.log('error')
+    return command
+        ? console.log(command.execute(fullCommandAsStringList))
+        : console.log('error')
 }
 
 parseCommand(command)
