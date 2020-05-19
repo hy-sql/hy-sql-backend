@@ -1,57 +1,58 @@
 {
-  "name": "hy-sql",
-  "version": "1.0.0",
-  "description": "SQL opetustyökalun backend",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "cross-env NODE_ENV=test jest --verbose --detectOpenHandles",
-    "testcoverage": "jest --coverage",
-    "lint": "eslint .",
-    "fix": "eslint . --fix"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hy-sql/hy-sql.git"
-  },
-  "keywords": [
-    "backend",
-    "hysql"
-  ],
-  "author": "HY-Sql OHTU-team",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/hy-sql/hy-sql/issues"
-  },
-  "homepage": "https://github.com/hy-sql/hy-sql#readme",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "cross-env": "^7.0.2",
-    "express": "^4.17.1"
-  },
-  "devDependencies": {
-    "eslint": "^7.0.0",
-    "husky": "^4.2.5",
-    "jest": "^26.0.1",
-    "lint-staged": "^10.2.2",
-    "nodemon": "^2.0.3",
-    "prettier": "^2.0.5",
-    "supertest": "^4.0.2"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "coveragePathIgnorePatterns": [
-      "/node_modules/"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
+    "name": "hy-sql",
+    "version": "1.0.0",
+    "description": "SQL opetustyökalun backend",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "dev": "nodemon index.js",
+        "test": "cross-env NODE_ENV=test jest --verbose --detectOpenHandles",
+        "testcoverage": "jest --coverage",
+        "lint": "eslint .",
+        "fix": "eslint . --fix"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/hy-sql/hy-sql.git"
+    },
+    "keywords": [
+        "backend",
+        "hysql"
+    ],
+    "author": "HY-Sql OHTU-team",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/hy-sql/hy-sql/issues"
+    },
+    "homepage": "https://github.com/hy-sql/hy-sql#readme",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "cross-env": "^7.0.2",
+        "express": "^4.17.1",
+        "validator": "^13.0.0"
+    },
+    "devDependencies": {
+        "eslint": "^7.0.0",
+        "husky": "^4.2.5",
+        "jest": "^26.0.1",
+        "lint-staged": "^10.2.2",
+        "nodemon": "^2.0.3",
+        "prettier": "^2.0.5",
+        "supertest": "^4.0.2"
+    },
+    "jest": {
+        "testEnvironment": "node",
+        "coveragePathIgnorePatterns": [
+            "/node_modules/"
+        ]
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.js": "eslint --cache --fix",
+        "*.{js,css,md}": "prettier --write"
     }
-  },
-  "lint-staged": {
-    "*.js": "eslint --cache --fix",
-    "*.{js,css,md}": "prettier --write"
-  }
 }
