@@ -12,9 +12,7 @@ const parseCommand = (input) => {
 
     const command = Command(fullCommandAsStringList)
 
-    console.log(command)
-
-    command.execute(fullCommandAsStringList)
+    command ? command.execute(fullCommandAsStringList) : console.log('error')
 }
 
 console.log(parseCommand(command))
