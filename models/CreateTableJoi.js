@@ -37,4 +37,4 @@ const object = {
 
 const result = CreateTable.validate(object, { abortEarly: false })
 
-console.log(JSON.stringify(result.error, null, 2))
+console.log(result.error)
