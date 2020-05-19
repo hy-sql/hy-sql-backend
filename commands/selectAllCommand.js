@@ -1,20 +1,24 @@
 /* eslint-disable no-unused-vars */
+const selectAllSchema = require('../models/SelectAllSchema')
+
 const isCommand = (fullCommandAsStringList) =>
     fullCommandAsStringList.slice(0, 2).join(' ') === 'SELECT *'
 
 const execute = (fullCommandAsStringList) => {
-    console.log('SELECT *')
-    console.log(fullCommandAsStringList)
+    console.log('Input of SELECT * execute:', fullCommandAsStringList)
 
-    // validate list minsize here and return error if too small
     const command = parseCommand(fullCommandAsStringList)
 
-    /* validate here when joi validation completed and if errors return error
-   */
+    const validationResult = selectAllSchema.validate(command)
+    console.log('Validation result:', validationResult)
 
-    // return command or error
+    // check correct format of returned data
+    return validationResult.error
+        ? validationResult.error
+        : validationResult.value
 }
 
+// Any need to handle missing values for correct error recognition?
 const parseCommand = (fullCommandAsStringList) => {
     const command = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
@@ -23,7 +27,7 @@ const parseCommand = (fullCommandAsStringList) => {
         finalSemicolon: fullCommandAsStringList[4],
     }
 
-    console.log(command)
+    console.log('Parsed command:', command)
 
     return command
 }
