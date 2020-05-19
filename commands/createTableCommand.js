@@ -1,11 +1,15 @@
 /* eslint-disable no-unused-vars */
+const CreateTableSchema = require('../models/CreateTableSchema')
 
 const isCommand = (fullCommandAsStringList) =>
     fullCommandAsStringList.slice(0, 2).join(' ') === 'CREATE TABLE'
 
 const execute = (fullCommandAsStringList) => {
-    // console.log(fullCommandAsStringList)
-    return parseCommand(fullCommandAsStringList)
+    const parsedCommand = parseCommand(fullCommandAsStringList)
+
+    const result = CreateTableSchema.validate(parsedCommand)
+
+    return !result.error ? parsedCommand : result.error
 }
 
 const parseCommand = (fullCommandAsStringList) => {
