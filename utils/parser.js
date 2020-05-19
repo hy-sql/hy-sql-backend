@@ -3,7 +3,7 @@ const validator = require('validator')
 const Command = require('../commands/Command')
 
 let command =
-    'CREATE TABLEA Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);'
+  'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);'
 
 const parseCommand = (input) => {
     console.log(input)
@@ -12,9 +12,7 @@ const parseCommand = (input) => {
 
     if (!command) throw new Error('INVALID COMMAND')
 
-    command.execute()
-
-    return 'SUCCESS'
+    return command.execute()
 }
 
 console.log(parseCommand(command))
