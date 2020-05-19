@@ -5,6 +5,8 @@ const isCommand = (fullCommandAsStringList) =>
     fullCommandAsStringList.slice(0, 2).join(' ') === 'CREATE TABLE'
 
 const execute = (fullCommandAsStringList) => {
+    console.log(fullCommandAsStringList)
+    console.log('working')
     parseCommand(fullCommandAsStringList)
 }
 
@@ -13,9 +15,8 @@ const parseCommand = (fullCommandAsStringList) => {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
         tableName: fullCommandAsStringList[2],
         openingBracket: fullCommandAsStringList[3],
-        columns: fullCommandAsStringList.slice(
-            4,
-            fullCommandAsStringList.length - 2
+        columns: parseColumns(
+            fullCommandAsStringList.slice(4, fullCommandAsStringList.length - 2)
         ),
         closingBracket:
             fullCommandAsStringList[fullCommandAsStringList.length - 2],
@@ -24,6 +25,10 @@ const parseCommand = (fullCommandAsStringList) => {
     }
 
     console.log(command)
+}
+
+const parseColumns = (columnsAsStringList) => {
+    console.log(columnsAsStringList)
 }
 
 module.exports = { isCommand, execute }

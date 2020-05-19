@@ -4,24 +4,22 @@ const CreateTableCommand = require('./createTableCommand')
 const InsertIntoCommand = require('./insertIntoCommand')
 const SelectAllCommand = require('./selectAllCommand')
 
-let testInput =
-    'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);'
-
-const Command = (input) => {
+const Command = (fullCommandAsStringList) => {
     const commands = [CreateTableCommand, InsertIntoCommand, SelectAllCommand]
 
-    const fullCommandAsStringList = input
-        .trim()
-        .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+    let commandToReturn = null
 
     console.log(fullCommandAsStringList)
 
     commands.forEach((c) => {
-        if (c.isCommand(fullCommandAsStringList))
-            c.execute(fullCommandAsStringList)
+        if (c.isCommand(fullCommandAsStringList)) {
+            console.log('is command')
+            commandToReturn = c
+            return
+        }
     })
-}
 
-Command(testInput)
+    return commandToReturn
+}
 
 module.exports = Command
