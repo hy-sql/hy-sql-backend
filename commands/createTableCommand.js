@@ -6,7 +6,6 @@ const isCommand = (fullCommandAsStringList) =>
 
 const execute = (fullCommandAsStringList) => {
     console.log(fullCommandAsStringList)
-    console.log('working')
     parseCommand(fullCommandAsStringList)
 }
 
@@ -29,6 +28,7 @@ const parseCommand = (fullCommandAsStringList) => {
 
 const parseColumns = (columnsAsStringList) => {
     console.log(columnsAsStringList)
+    return 'TODO'
 }
 
 module.exports = { isCommand, execute }

@@ -15,4 +15,4 @@ const parseCommand = (input) => {
     command ? command.execute(fullCommandAsStringList) : console.log('error')
 }
 
-console.log(parseCommand(command))
+parseCommand(command)
