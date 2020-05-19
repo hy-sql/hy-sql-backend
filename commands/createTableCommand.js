@@ -1,12 +1,15 @@
 /* eslint-disable no-unused-vars */
-const validator = require('validator')
+const CreateTableSchema = require('../models/CreateTableSchema')
 
 const isCommand = (fullCommandAsStringList) =>
     fullCommandAsStringList.slice(0, 2).join(' ') === 'CREATE TABLE'
 
 const execute = (fullCommandAsStringList) => {
-    console.log(fullCommandAsStringList)
-    parseCommand(fullCommandAsStringList)
+    const parsedCommand = parseCommand(fullCommandAsStringList)
+
+    const result = CreateTableSchema.validate(parsedCommand)
+
+    return !result.error ? parsedCommand : result.error
 }
 
 const parseCommand = (fullCommandAsStringList) => {
@@ -23,12 +26,28 @@ const parseCommand = (fullCommandAsStringList) => {
             fullCommandAsStringList[fullCommandAsStringList.length - 1],
     }
 
-    console.log(command)
+    return command
 }
 
 const parseColumns = (columnsAsStringList) => {
-    console.log(columnsAsStringList)
-    return 'TODO'
+    const separatedColumnsAsStringList = columnsAsStringList
+        .join(' ')
+        .split(', ')
+
+    console.log(separatedColumnsAsStringList)
+
+    const columns = separatedColumnsAsStringList
+        .map((c) => c.split(' '))
+        .map((item) => {
+            console.log(item)
+            return {
+                name: item[0],
+                type: item[1].toUpperCase(),
+                primaryKey: item.slice(2).join(' ').trim() === 'PRIMARY KEY',
+            }
+        })
+
+    return columns
 }
 
 module.exports = { isCommand, execute }

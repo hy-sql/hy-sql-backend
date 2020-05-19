@@ -1,4 +1,4 @@
-const State = require('../models/state')
+const State = require('../models/State')
 
 test('CREATE TABLE creates new table to list', () => {
     const initArray = []
