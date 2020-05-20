@@ -3,7 +3,11 @@ const Joi = require('@hapi/joi')
 const ColumnsSchema = Joi.object({
     name: Joi.string().alphanum().max(64).required().messages({}),
 
-    type: Joi.string().valid('INTEGER', 'TEXT').required().messages({}),
+    type: Joi.string()
+        .valid('INTEGER', 'TEXT')
+        .insensitive()
+        .required()
+        .messages({}),
 
     primaryKey: Joi.boolean().required().messages({}),
 })
