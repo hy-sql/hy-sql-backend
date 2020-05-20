@@ -1,29 +1,33 @@
 const Joi = require('@hapi/joi')
 
 const ColumnsSchema = Joi.object({
-    name: Joi.string().alphanum().max(64).required(),
+    name: Joi.string().alphanum().max(64).required().messages({}),
 
-    type: Joi.string().valid('INTEGER', 'TEXT'),
+    type: Joi.string().valid('INTEGER', 'TEXT').required().messages({}),
 
-    primaryKey: Joi.boolean(),
+    primaryKey: Joi.boolean().required().messages({}),
 })
 
+/* TODO?
+ const ConstraintsSchema = Joi.object({})
+*/
+
 const CreateTableSchema = Joi.object({
-    name: Joi.string().valid('CREATE TABLE').insensitive().required().messages({
-        'any.only': 'Command must be "CREATE TABLE"',
-    }),
+    name: Joi.string()
+        .valid('CREATE TABLE')
+        .insensitive()
+        .required()
+        .messages({}),
 
-    tableName: Joi.string().alphanum().max(64).required().messages({
-        'string.base': 'this is not a string',
-    }),
+    tableName: Joi.string().alphanum().max(64).required().messages({}),
 
-    openingBracket: Joi.string().valid('(').required(),
+    openingBracket: Joi.string().valid('(').required().messages({}),
 
-    columns: Joi.array().items(ColumnsSchema),
+    columns: Joi.array().items(ColumnsSchema).required(),
 
-    closingBracket: Joi.string().valid(')').required(),
+    closingBracket: Joi.string().valid(')').required().messages({}),
 
-    finalSemicolon: Joi.string().valid(';').required(),
+    finalSemicolon: Joi.string().valid(';').required().messages({}),
 })
 
 module.exports = { CreateTableSchema, ColumnsSchema }
