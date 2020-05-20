@@ -18,8 +18,6 @@ const parseCommand = (state, input) => {
 
     const result = command.execute(fullCommandAsStringList)
 
-    console.log('result', result)
-
     state.createTable(result)
 
     console.log('tables', state.tables[0])
