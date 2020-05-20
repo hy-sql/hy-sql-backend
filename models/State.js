@@ -27,9 +27,13 @@ class State {
             (element) => element.name === command.tableName
         )
         let newtablelist = [...this.tablelist]
-        //TODO update wanted columns
         const newRowObject = {
             id: newtablelist[tableIndex].rows.length + 1,
+        }
+        for (let i = 0; i < command.columns.length; i++) {
+            const column = command.columns[i]
+            const value = command.values[i]
+            newRowObject[column] = value
         }
         newtablelist[tableIndex].rows.push(newRowObject)
         this.tablelist = newtablelist
