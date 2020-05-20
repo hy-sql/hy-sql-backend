@@ -11,12 +11,12 @@ class State {
         if (command.name !== 'CREATE TABLE') {
             return 'Wrong command type'
         }
-        const newObject = {
+        const newTable = {
             name: command.tableName,
             columns: command.columns,
             rows: [],
         }
-        this.tablelist.push(newObject)
+        this.tablelist.push(newTable)
     }
 
     insertIntoTable(command) {
@@ -27,15 +27,15 @@ class State {
             (element) => element.name === command.tableName
         )
         let newtablelist = [...this.tablelist]
-        const newRowObject = {
+        const newRow = {
             id: newtablelist[tableIndex].rows.length + 1,
         }
         for (let i = 0; i < command.columns.length; i++) {
             const column = command.columns[i]
             const value = command.values[i]
-            newRowObject[column] = value
+            newRow[column] = value
         }
-        newtablelist[tableIndex].rows.push(newRowObject)
+        newtablelist[tableIndex].rows.push(newRow)
         this.tablelist = newtablelist
     }
 
@@ -44,7 +44,7 @@ class State {
             return 'Wrong command type'
         }
         const tableIndex = this.tablelist.findIndex(
-            (element) => element.name === command.tableName
+            (table) => table.name === command.tableName
         )
         return this.tablelist[tableIndex].rows
     }
