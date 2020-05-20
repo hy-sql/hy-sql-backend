@@ -26,10 +26,12 @@
     },
     "homepage": "https://github.com/hy-sql/hy-sql#readme",
     "dependencies": {
+        "@hapi/joi": "^17.1.1",
         "cors": "^2.8.5",
         "cross-env": "^7.0.2",
         "express": "^4.17.1",
-        "validator": "^13.0.0"
+        "validator": "^13.0.0",
+        "yup": "^0.28.5"
     },
     "devDependencies": {
         "eslint": "^7.0.0",
