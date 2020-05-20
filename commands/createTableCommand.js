@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars */
-const { CreateTableSchema, Columns } = require('../models/CreateTableSchema')
+const { CreateTableSchema } = require('../models/CreateTableSchema')
 
 const isCommand = (fullCommandAsStringList) =>
-    fullCommandAsStringList.slice(0, 2).join(' ') === 'CREATE TABLE'
+    fullCommandAsStringList.slice(0, 2).join(' ').toUpperCase() ===
+    'CREATE TABLE'
 
 const execute = (fullCommandAsStringList) => {
     const parsedCommand = parseCommand(fullCommandAsStringList)
@@ -30,24 +31,34 @@ const parseCommand = (fullCommandAsStringList) => {
 }
 
 const parseColumns = (columnsAsStringList) => {
+    if (!columnsAsStringList) return null
+
     const separatedColumnsAsStringList = columnsAsStringList
         .join(' ')
         .split(', ')
 
-    console.log(separatedColumnsAsStringList)
-
     const columns = separatedColumnsAsStringList
         .map((c) => c.split(' '))
         .map((item) => {
-            console.log(item)
             return {
                 name: item[0],
-                type: item[1].toUpperCase(),
-                primaryKey: item.slice(2).join(' ').trim() === 'PRIMARY KEY',
+                type: item[1] ? item[1].toUpperCase() : null,
+                primaryKey: parsePrimaryKey(item.slice(2)),
             }
         })
 
     return columns
 }
 
-module.exports = { isCommand, execute }
+const parsePrimaryKey = (stringArray) => {
+    if (!Array.isArray(stringArray) || !stringArray.length) return false
+    const test = stringArray.join(' ').trim().toUpperCase()
+
+    if (test === 'PRIMARY KEY') {
+        return true
+    } else {
+        return null
+    }
+}
+
+module.exports = { isCommand, execute, parseCommand, parseColumns }
