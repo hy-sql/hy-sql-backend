@@ -40,7 +40,6 @@ const parseColumns = (columnsAsStringList) => {
     const columns = separatedColumnsAsStringList
         .map((c) => c.split(' '))
         .map((item) => {
-            console.log(item)
             return {
                 name: item[0],
                 type: item[1] ? item[1].toUpperCase() : null,
