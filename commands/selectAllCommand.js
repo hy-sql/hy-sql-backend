@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const selectAllSchema = require('../models/SelectAllSchema')
 
 const isCommand = (fullCommandAsStringList) =>
@@ -24,13 +23,9 @@ const execute = (fullCommandAsStringList) => {
 }
 
 const parseCommand = (fullCommandAsStringList) => {
-    const name = fullCommandAsStringList.slice(0, 2).join(' ')
-
     const command = {
-        name: name ? name.toUpperCase() : name,
-        from: fullCommandAsStringList[2]
-            ? fullCommandAsStringList[2].toUpperCase()
-            : fullCommandAsStringList,
+        name: fullCommandAsStringList.slice(0, 2).join(' '),
+        from: fullCommandAsStringList[2],
         tableName: fullCommandAsStringList[3],
         finalSemicolon: fullCommandAsStringList[4],
     }

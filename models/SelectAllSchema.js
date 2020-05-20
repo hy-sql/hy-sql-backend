@@ -1,17 +1,26 @@
 const Joi = require('@hapi/joi')
 
-// TODO: Add custom messages to errors and more rules
-// Case-insensitivity in keywords
-// _ in tablenames in addition to alphanumeric characters
-
 const SelectAllSchema = Joi.object({
-    name: Joi.string().required().valid('SELECT *').messages({}),
+    name: Joi.string().required().valid('SELECT *').insensitive().messages({
+        'any.only': 'Query must begin with SELECT *',
+        'any.required': 'Query must begin with SELECT *',
+    }),
 
-    from: Joi.string().required().valid('FROM').messages({}),
+    from: Joi.string().required().valid('FROM').insensitive().messages({
+        'any.only': 'SELECT * must be followed by FROM',
+        'any.required': 'SELECT * must be followed by FROM',
+    }),
 
-    tableName: Joi.string().required().pattern(/^\w+$/).messages({}),
+    tableName: Joi.string().required().pattern(/^\w+$/).messages({
+        'any.required': 'Query must contain a table name',
+        'string.pattern.base':
+            'Table name should only contain one or more alphanumeric characters and underscores',
+    }),
 
-    finalSemicolon: Joi.string().required().valid(';').messages({}),
+    finalSemicolon: Joi.string().required().valid(';').messages({
+        'any.only': 'Query must end with ;',
+        'any.required': 'Query must end with ;',
+    }),
 })
 
 module.exports = SelectAllSchema

@@ -69,7 +69,7 @@ app.get('/', (req, res) => {
 
     // Following few lines to be removed before merge, here for testing purposes
     console.log('------ 7 true, invalid')
-    const query7 = 'SELECT *'
+    const query7 = 'SELECT * FROM'
         .trim()
         .replace(/\s\s+/g, ' ')
         .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
