@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-const CreateTableSchema = require('../models/CreateTableSchema')
+const { CreateTableSchema, Columns } = require('../models/CreateTableSchema')
 
 const isCommand = (fullCommandAsStringList) =>
     fullCommandAsStringList.slice(0, 2).join(' ') === 'CREATE TABLE'
