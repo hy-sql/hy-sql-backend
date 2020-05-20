@@ -8,9 +8,6 @@ class State {
     }
 
     createTable(command) {
-        if (command.name !== 'CREATE TABLE') {
-            return 'Wrong command type'
-        }
         const newTable = {
             name: command.tableName,
             columns: command.columns,
@@ -20,9 +17,6 @@ class State {
     }
 
     insertIntoTable(command) {
-        if (command.name !== 'INSERT INTO') {
-            return 'Wrong command type'
-        }
         const tableIndex = this.tablelist.findIndex(
             (element) => element.name === command.tableName
         )
@@ -40,9 +34,6 @@ class State {
     }
 
     selectAllFromTable(command) {
-        if (command.name !== 'SELECT *') {
-            return 'Wrong command type'
-        }
         const tableIndex = this.tablelist.findIndex(
             (table) => table.name === command.tableName
         )
