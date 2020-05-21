@@ -18,7 +18,7 @@ const parseCommand = (state, input) => {
 
     const result = command.execute(fullCommandAsStringList)
 
-    state.createTable(result)
+    state.updateState(result)
 
     console.log('tables', state.tables[0])
 

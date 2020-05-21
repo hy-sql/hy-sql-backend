@@ -7,6 +7,23 @@ class State {
         return this.tablelist
     }
 
+    updateState(parsedCommand) {
+        switch (parsedCommand.name) {
+            case 'CREATE TABLE':
+                this.createTable(parsedCommand)
+                break
+            case 'INSERT INTO':
+                this.insertIntoTable(parsedCommand)
+                break
+            case 'SELECT *':
+                this.selectAllFromTable(parsedCommand)
+                break
+            default:
+                console.log('sth went wrong')
+                break
+        }
+    }
+
     createTable(command) {
         const newTable = {
             name: command.tableName,
