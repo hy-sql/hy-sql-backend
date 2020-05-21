@@ -17,7 +17,7 @@ const parseCommand = (state, input) => {
 
     const result = command.execute(fullCommandAsStringList)
 
-    state.createTable(result)
+    state.updateState(result)
 
     return command ? console.log(result) : console.log('error')
 }
