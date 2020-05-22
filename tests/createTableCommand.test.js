@@ -1,5 +1,4 @@
 const createTableCommand = require('../commands/createTableCommand')
-const { CreateTableSchema } = require('../models/CreateTableSchema')
 
 describe.each([
     'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
@@ -25,9 +24,14 @@ describe.each([
             fullCommandAsStringList
         )
 
-        const result = CreateTableSchema.validate(parsedCommand)
+        expect(parsedCommand.value).toBeDefined()
+        expect(parsedCommand.value).toHaveProperty('name')
+        expect(parsedCommand.value).toHaveProperty('openingBracket')
+        expect(parsedCommand.value).toHaveProperty('columns')
+        expect(parsedCommand.value).toHaveProperty('closingBracket')
+        expect(parsedCommand.value).toHaveProperty('finalSemicolon')
 
-        expect(result.error).toBeFalsy()
+        expect(parsedCommand.error).toBeFalsy()
     })
 })
 
@@ -49,9 +53,7 @@ describe.each([
             fullCommandAsStringList
         )
 
-        const result = CreateTableSchema.validate(parsedCommand)
-
-        expect(result.error).toBeTruthy()
+        expect(parsedCommand.error).toBeTruthy()
     })
 })
 
