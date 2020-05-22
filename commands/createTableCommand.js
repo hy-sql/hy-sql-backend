@@ -5,16 +5,8 @@ const isCommand = (fullCommandAsStringList) =>
     fullCommandAsStringList.slice(0, 2).join(' ').toUpperCase() ===
     'CREATE TABLE'
 
-const execute = (fullCommandAsStringList) => {
-    const parsedCommand = parseCommand(fullCommandAsStringList)
-
-    const result = CreateTableSchema.validate(parsedCommand)
-
-    return !result.error ? parsedCommand : result.error
-}
-
 const parseCommand = (fullCommandAsStringList) => {
-    const command = {
+    const parsedCommand = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
         tableName: fullCommandAsStringList[2],
         openingBracket: fullCommandAsStringList[3],
@@ -27,7 +19,7 @@ const parseCommand = (fullCommandAsStringList) => {
             fullCommandAsStringList[fullCommandAsStringList.length - 1],
     }
 
-    return command
+    return CreateTableSchema.validate(parsedCommand)
 }
 
 const parseColumns = (columnsAsStringList) => {
@@ -61,4 +53,4 @@ const parsePrimaryKey = (stringArray) => {
     }
 }
 
-module.exports = { isCommand, execute, parseCommand, parseColumns }
+module.exports = { isCommand, parseCommand }
