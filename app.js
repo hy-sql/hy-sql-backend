@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const morgan = require('morgan')
+const queryRouter = require('./controllers/query')
 
 morgan.token('body', function (request) { return JSON.stringify(request.body) })
 
@@ -17,4 +18,7 @@ app.get('/api/ping/', (req, res) => {
     const json = { value: 'pong' }
     res.json(json)
 })
+
+app.use('/api/query', queryRouter)
+
 module.exports = app
