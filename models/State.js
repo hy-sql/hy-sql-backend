@@ -7,40 +7,52 @@ class State {
         return this.tablelist
     }
 
-    createTable(command) {
-        if (command.name !== 'CREATE TABLE') {
-            return 'Wrong command type'
+    updateState(parsedCommand) {
+        switch (parsedCommand.name) {
+            case 'CREATE TABLE':
+                this.createTable(parsedCommand)
+                break
+            case 'INSERT INTO':
+                this.insertIntoTable(parsedCommand)
+                break
+            case 'SELECT *':
+                this.selectAllFromTable(parsedCommand)
+                break
+            default:
+                console.log('sth went wrong')
+                break
         }
-        const newObject = {
+    }
+
+    createTable(command) {
+        const newTable = {
             name: command.tableName,
             columns: command.columns,
             rows: [],
         }
-        this.tablelist.push(newObject)
+        this.tablelist.push(newTable)
     }
 
     insertIntoTable(command) {
-        if (command.name !== 'INSERT INTO') {
-            return 'Wrong command type'
-        }
         const tableIndex = this.tablelist.findIndex(
             (element) => element.name === command.tableName
         )
         let newtablelist = [...this.tablelist]
-        //TODO update wanted columns
-        const newRowObject = {
+        const newRow = {
             id: newtablelist[tableIndex].rows.length + 1,
         }
-        newtablelist[tableIndex].rows.push(newRowObject)
+        for (let i = 0; i < command.columns.length; i++) {
+            const column = command.columns[i]
+            const value = command.values[i]
+            newRow[column] = value
+        }
+        newtablelist[tableIndex].rows.push(newRow)
         this.tablelist = newtablelist
     }
 
     selectAllFromTable(command) {
-        if (command.name !== 'SELECT *') {
-            return 'Wrong command type'
-        }
         const tableIndex = this.tablelist.findIndex(
-            (element) => element.name === command.tableName
+            (table) => table.name === command.tableName
         )
         return this.tablelist[tableIndex].rows
     }

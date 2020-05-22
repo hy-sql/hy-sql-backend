@@ -3,14 +3,13 @@ const Command = require('../commands/Command')
 const State = require('../models/State')
 
 let command =
-    'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);'
+    'CREATE TABLE Tuotteet    (id INTEGER PRIMARY KEY,    nimi TEXT,    hinta INTEGER);'
 
 const parseCommand = (state, input) => {
     const fullCommandAsStringList = input
         .trim()
+        .replace(/\s\s+/g, ' ')
         .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
-
-    console.log(fullCommandAsStringList)
 
     const command = Command(fullCommandAsStringList)
 
@@ -18,11 +17,7 @@ const parseCommand = (state, input) => {
 
     const result = command.execute(fullCommandAsStringList)
 
-    console.log('result', result)
-
-    state.createTable(result)
-
-    console.log('tables', state.tables[0])
+    state.updateState(result)
 
     return command ? console.log(result) : console.log('error')
 }
