@@ -42,12 +42,16 @@ describe.each([
         })
 
         test('execute returns command object successfully', () => {
-            expect(selectAllCommand.execute(command)).toHaveProperty('name')
-            expect(selectAllCommand.execute(command)).toHaveProperty('from')
-            expect(selectAllCommand.execute(command)).toHaveProperty(
+            expect(selectAllCommand.execute(command).value).toHaveProperty(
+                'name'
+            )
+            expect(selectAllCommand.execute(command).value).toHaveProperty(
+                'from'
+            )
+            expect(selectAllCommand.execute(command).value).toHaveProperty(
                 'tableName'
             )
-            expect(selectAllCommand.execute(command)).toHaveProperty(
+            expect(selectAllCommand.execute(command).value).toHaveProperty(
                 'finalSemicolon'
             )
         })
