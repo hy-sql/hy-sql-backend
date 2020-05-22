@@ -4,9 +4,17 @@ const State = require('../models/State')
 const executer = (request, response, next) => {
     const state = new State([])
 
-    const { commandArray } = request.body
+    const commandArray = request.body.commandArray
 
-    commandArray.forEach((input) => {
+    const resultArray = []
+
+    let noErrors = true
+
+    for (let input of commandArray) {
+        if (!noErrors) {
+            break
+        }
+
         const singleCommandAsStringArray = input
             .trim()
             .replace(/\s\s+/g, ' ')
@@ -16,22 +24,41 @@ const executer = (request, response, next) => {
             c.isCommand(singleCommandAsStringArray)
         )
 
-        if (!command) return new Error('command not found')
+        if (!command) {
+            resultArray.push(
+                'Query was not recognised as any existing valid query'
+            )
+            noErrors = false
+        } else {
+            const parsedCommand = command.parseCommand(
+                singleCommandAsStringArray
+            )
 
-        console.log(singleCommandAsStringArray)
+            // Optimaalisesti olisi siirtää validaatiovirheet omaan virhekäsittelijään
+            if (parsedCommand.error) {
+                // koko error olion sijaan vain sen sisältämä viesti
+                resultArray.push(
+                    `${parsedCommand.value.name} -query execution failed: ${parsedCommand.error.details[0].message}`
+                )
+                noErrors = false
+            } else {
+                /* state voisi palauttaa udateState metodista esim. create table ja insert intolla
+                'x - query was executed successfully'
+                tai tarkemman onnistumisviestin kuten 'Table x created successfully'
+                ja selectillä palauttaakin jo tulostaulut, jolloin tämä palautus tallennettaisiin resultArrayhin.
+                Olisi informatiivisemmat onnistumisviestit/tulostaulut.
+                */
+                state.updateState(parsedCommand.value)
+                resultArray.push(
+                    `${parsedCommand.value.name} -query was executed successfully`
+                )
+            }
+        }
+    }
 
-        const parsedCommand = command.parseCommand(singleCommandAsStringArray)
+    console.log('resultArray:', resultArray)
 
-        // Optimaalisesti olisi siirtää validaatiovirheet omaan virhekäsittelijään
-        if (parsedCommand.error)
-            return response.status(400).send(parsedCommand.error)
-
-        state.updateState(parsedCommand.value)
-    })
-
-    console.log(state)
-
-    request.state = state
+    request.resultArray = resultArray
 
     next()
 }

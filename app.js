@@ -21,7 +21,7 @@ app.get('/api/ping/', (req, res) => {
 })
 
 app.post('/test', (req, res) => {
-    return res.status(200).json(req.state)
+    return res.status(200).json(req.resultArray)
 })
 
 module.exports = app
