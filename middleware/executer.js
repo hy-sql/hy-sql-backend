@@ -4,7 +4,7 @@ const State = require('../models/State')
 const executer = (request, response, next) => {
     const state = new State([])
 
-    const commandArray = request.body
+    const { commandArray } = request.body
 
     commandArray.forEach((input) => {
         const singleCommandAsStringArray = input
@@ -22,8 +22,12 @@ const executer = (request, response, next) => {
         if (parsedCommand.error)
             return response.status(400).send(parsedCommand.error)
 
-        state.updateState(parsedCommand)
+        state.updateState(parsedCommand.value)
     })
+
+    console.log(state)
+
+    request.state = state
 
     next()
 }

@@ -1,0 +1,6 @@
+POST http://localhost:3001/test
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet    (id INTEGER PRIMARY KEY,    nimi TEXT,    hinta INTEGER);"]
+}
