@@ -7,9 +7,8 @@ const isCommand = (fullCommandAsStringList) =>
 const execute = (fullCommandAsStringList) => {
     const parsedCommand = parseCommand(fullCommandAsStringList)
     if (parsedCommand.error) return parsedCommand.error
-    const result = InsertIntoSchema.validate(parsedCommand)
 
-    return !result.error ? parsedCommand : result.error
+    return InsertIntoSchema.validate(parsedCommand)
 }
 
 const parseCommand = (fullCommandAsStringList) => {
