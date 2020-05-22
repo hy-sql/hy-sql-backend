@@ -1,10 +1,9 @@
-/* eslint-disable no-unused-vars */
 const Command = require('../commands/Command')
 const State = require('../models/State')
 
 let command =
     'CREATE TABLE Tuotteet    (id INTEGER PRIMARY KEY,    nimi TEXT,    hinta INTEGER);'
-
+//'INSERT INTO Tuotteet (nimi, hinta) (\'tuotenimi\', 13);'
 const parseCommand = (state, input) => {
     const fullCommandAsStringList = input
         .trim()
