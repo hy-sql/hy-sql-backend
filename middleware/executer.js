@@ -16,6 +16,10 @@ const executer = (request, response, next) => {
             c.isCommand(singleCommandAsStringArray)
         )
 
+        if (!command) return new Error('command not found')
+
+        console.log(singleCommandAsStringArray)
+
         const parsedCommand = command.parseCommand(singleCommandAsStringArray)
 
         // Optimaalisesti olisi siirtää validaatiovirheet omaan virhekäsittelijään
