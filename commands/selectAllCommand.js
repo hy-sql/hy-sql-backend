@@ -6,9 +6,7 @@ const isCommand = (fullCommandAsStringList) =>
 const execute = (fullCommandAsStringList) => {
     const parsedCommand = parseCommand(fullCommandAsStringList)
 
-    const validationResult = selectAllSchema.validate(parsedCommand)
-
-    return validationResult.error ? validationResult.error : parsedCommand
+    return selectAllSchema.validate(parsedCommand)
 }
 
 const parseCommand = (fullCommandAsStringList) => {

@@ -8,9 +8,7 @@ const isCommand = (fullCommandAsStringList) =>
 const execute = (fullCommandAsStringList) => {
     const parsedCommand = parseCommand(fullCommandAsStringList)
 
-    const result = CreateTableSchema.validate(parsedCommand)
-
-    return !result.error ? parsedCommand : result.error
+    return CreateTableSchema.validate(parsedCommand)
 }
 
 const parseCommand = (fullCommandAsStringList) => {
