@@ -4,19 +4,19 @@ const queryRouter = require('express').Router()
 //                  ja palauttaa merkkijonoja sisältävän JSON objektin { result: ['...', ...] }
 
 queryRouter.post('/', (req, res) => {
-  const body = req.body
+    const body = req.body
 
-  if (!body.query) {
-    return res.status(400).json({
-      error: 'query missing'
-    })
-  }
+    if (!body.query) {
+        return res.status(400).json({
+            error: 'query missing'
+        })
+    }
 
-  const query = {
-    query: body.query
-  }
+    const query = {
+        query: body.query
+    }
 
-  res.json(query)
+    res.json(query)
 })
 
 module.exports = queryRouter
