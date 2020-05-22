@@ -1,0 +1,9 @@
+post http://localhost:3001/api/query/
+Content-type: application/json
+
+{
+    "query": [
+        "CREATE TABLE Nimet (nimi text);",
+        "CREATE TABLE Luvut (numero integer);"
+    ]
+}
