@@ -7,7 +7,7 @@ queryRouter.post('/', (req, res) => {
 
     if (!body.query) {
         return res.status(400).json({
-            error: 'query missing'
+            error: 'query missing',
         })
     }
 
@@ -18,8 +18,8 @@ queryRouter.post('/', (req, res) => {
     const state = new State([])
 
     try {
-        for (command of commandArray) {
-            result = parseCommand(state, command)
+        for (let command of commandArray) {
+            let result = parseCommand(state, command)
             resultArray.push(result)
         }
     } catch (error) {
@@ -29,10 +29,12 @@ queryRouter.post('/', (req, res) => {
     console.log(resultArray)
 
     // mitä palautetaan käyttäjälle?
-    commandArray.length === resultArray.length ? console.log('SQL OK') : console.log('SQL ERROR')
+    commandArray.length === resultArray.length
+        ? console.log('SQL OK')
+        : console.log('SQL ERROR')
 
     const queryObj = {
-        query: body.query
+        query: body.query,
     }
     res.json(queryObj)
 })
