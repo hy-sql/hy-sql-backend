@@ -12,10 +12,6 @@ const ColumnsSchema = Joi.object({
     primaryKey: Joi.boolean().required().messages({}),
 })
 
-/* TODO?
- const ConstraintsSchema = Joi.object({})
-*/
-
 const CreateTableSchema = Joi.object({
     name: Joi.string()
         .valid('CREATE TABLE')
@@ -23,7 +19,7 @@ const CreateTableSchema = Joi.object({
         .required()
         .messages({}),
 
-    tableName: Joi.string().alphanum().max(64).required().messages({}),
+    tableName: Joi.string().pattern(/^\w+$/).max(64).required().messages({}),
 
     openingBracket: Joi.string().valid('(').required().messages({}),
 

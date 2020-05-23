@@ -50,9 +50,9 @@ const parseColumns = (columnsAsStringList) => {
 
 const parsePrimaryKey = (stringArray) => {
     if (!Array.isArray(stringArray) || !stringArray.length) return false
-    const test = stringArray.join(' ').trim().toUpperCase()
+    const value = stringArray.join(' ').trim().toUpperCase()
 
-    if (test === 'PRIMARY KEY') {
+    if (value === 'PRIMARY KEY') {
         return true
     } else {
         return null
