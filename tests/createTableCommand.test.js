@@ -27,7 +27,7 @@ describe.each([
 
         const result = CreateTableSchema.validate(parsedCommand)
 
-        expect(result.error).toBeFalsy()
+        expect(result.error).not.toBeDefined()
     })
 })
 
@@ -51,7 +51,7 @@ describe.each([
 
         const result = CreateTableSchema.validate(parsedCommand)
 
-        expect(result.error).toBeTruthy()
+        expect(result.error).toBeDefined()
     })
 })
 
