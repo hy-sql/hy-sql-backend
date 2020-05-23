@@ -14,12 +14,13 @@ queryRouter.post('/', (req, res) => {
     // TODO: array validatation
     // body.query = [ 'CREATE TABLE Nimet (nimi text);', 'CREATE TABLE Luvut (numero integer);' ]
     const commandArray = body.query
+    var command
     let resultArray = []
     const state = new State([])
 
     try {
         for (command of commandArray) {
-            result = parseCommand(state, command)
+            var result = parseCommand(state, command)
             resultArray.push(result)
         }
     } catch (error) {
