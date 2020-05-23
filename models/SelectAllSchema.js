@@ -11,7 +11,7 @@ const SelectAllSchema = Joi.object({
         'any.required': 'SELECT * must be followed by FROM',
     }),
 
-    tableName: Joi.string().required().pattern(/^\w+$/).messages({
+    tableName: Joi.string().required().pattern(/^\w+$/).max(64).messages({
         'any.required': 'Query must contain a table name',
         'string.pattern.base':
             'Table name should only contain one or more alphanumeric characters and underscores',
