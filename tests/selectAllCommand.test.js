@@ -80,14 +80,5 @@ describe.each([
         test('fails validation after parsed to command object', () => {
             expect(selectAllSchema.validate(parsedCommand).error).toBeDefined()
         })
-
-        test('execute does not return command object', () => {
-            expect(selectAllCommand.execute(command)).not.toHaveProperty(
-                'tableName'
-            )
-            expect(selectAllCommand.execute(command)).not.toHaveProperty(
-                'finalSemicolon'
-            )
-        })
     })
 })
