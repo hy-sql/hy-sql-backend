@@ -21,9 +21,15 @@ const parseCommand = (fullCommandAsStringList) => {
                 'INSERT INTO needs a VALUES keyword before the actual values to be inserted',
         }
 
-    const columnList = cleanStringArray(
+    /*const columnList = cleanStringArray(
         fullCommandAsStringList.slice(4, anchorLocation - 1)
-    )
+    )*/
+    const columnList = []
+    cleanStringArray(
+        fullCommandAsStringList.slice(4, anchorLocation - 1)
+    ).forEach((col) => {
+        columnList.push({ name: col })
+    })
 
     const command = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
@@ -47,7 +53,6 @@ const parseCommand = (fullCommandAsStringList) => {
         finalSemicolon:
             fullCommandAsStringList[fullCommandAsStringList.length - 1],
     }
-
     return command
 }
 
@@ -57,15 +62,19 @@ const cleanStringArray = (columnsAsStringList) => {
 
 const addAttributesToValuesArray = (columnList, stringArray) => {
     const taulukko = []
-    stringArray.forEach((value, index) => {
+    stringArray.forEach((value, index) =>
         value.match('[0-9]')
             ? taulukko.push({
-                column: columnList[index],
+                column: columnList[index].name,
                 value,
                 type: 'INTEGER',
             })
-            : taulukko.push({ column: columnList[index], value, type: 'TEXT' })
-    })
+            : taulukko.push({
+                column: columnList[index].name,
+                value,
+                type: 'TEXT',
+            })
+    )
     return taulukko
 }
 

@@ -1,5 +1,9 @@
 const Joi = require('@hapi/joi')
 
+const ColumnsSchema = Joi.object({
+    name: Joi.string().pattern(/^\w+$/).max(64).required().messages({}),
+})
+
 const InsertIntoSchema = Joi.object({
     name: Joi.string()
         .min(3)
@@ -17,7 +21,7 @@ const InsertIntoSchema = Joi.object({
 
     columnsOpeningBracket: Joi.string().valid('(').required(),
 
-    columns: Joi.array().min(1).required().messages({
+    columns: Joi.array().min(1).items(ColumnsSchema).required().messages({
         'array.base': 'this is not an array',
         'array.min': 'there should be at least one column',
     }),
