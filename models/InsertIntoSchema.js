@@ -1,7 +1,25 @@
 const Joi = require('@hapi/joi')
 
 const ColumnsSchema = Joi.object({
+    //name: Joi.string().pattern(/^\w+$/).max(64).invalid(null).required().messages({}),
     name: Joi.string().pattern(/^\w+$/).max(64).required().messages({}),
+})
+
+const ValuesSchema = Joi.object({
+    column: Joi.string()
+        .pattern(/^\w+$/)
+        .min(1)
+        .max(64)
+        .required()
+        .messages({}),
+
+    value: Joi.string().pattern(/^\w+$/).min(1).max(64).required().messages({}),
+
+    type: Joi.string()
+        .valid('INTEGER', 'TEXT')
+        .insensitive()
+        .required()
+        .messages({}),
 })
 
 const InsertIntoSchema = Joi.object({
@@ -28,14 +46,18 @@ const InsertIntoSchema = Joi.object({
 
     columnsClosingBracket: Joi.string().valid(')').required(),
 
-    anchorKeyword: Joi.string().valid('VALUES').required(),
+    anchorKeyword: Joi.string().valid('VALUES').insensitive().required(),
 
     valuesOpeningBracket: Joi.string().valid('(').required(),
 
-    values: Joi.array().min(1).required().messages({
-        'array.base': 'this is not an array',
-        'array.min': 'there should be at least one value',
-    }),
+    values: Joi.array()
+        .items(ValuesSchema)
+        .min(Joi.ref('columns.length'))
+        .required()
+        .messages({
+            'array.base': 'this is not an array',
+            'array.min': 'there should be at least one value',
+        }),
 
     valuesClosingBracket: Joi.string().valid(')').required(),
 
