@@ -2,11 +2,10 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const morgan = require('morgan')
-const queryRouter = require('./controllers/query')
-const pingRouter = require('./controllers/ping')
+const executer = require('./middleware/executer')
 
-morgan.token('body', function (request) {
-    return JSON.stringify(request.body)
+morgan.token('body', function (req) {
+    return JSON.stringify(req.body)
 })
 
 app.use(express.json())
@@ -16,17 +15,24 @@ app.use(
         ':method :url :status :res[content-length] - :response-time ms :body'
     )
 )
+app.use('/api/query', executer)
 
-const unknownEndpoint = (request, response) => {
-    response.status(404).send({ error: 'unknown endpoint' })
+const unknownEndpoint = (req, res) => {
+    res.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.get('/', (req, res) => {
     res.send('<h1>Hello World!</h1>')
 })
 
-app.use('/api/ping', pingRouter)
-app.use('/api/query', queryRouter)
+app.get('/api/ping/', (req, res) => {
+    const json = { value: 'pong' }
+    res.json(json)
+})
+
+app.post('/api/query', (req, res) => {
+    return res.status(200).json(req.resultArray)
+})
 
 app.use(unknownEndpoint)
 

@@ -1,9 +1,9 @@
-post http://localhost:3001/api/query/
-Content-type: application/json
+POST http://localhost:3001/api/query
+Content-Type: application/json
 
 {
-    "query": [
-        "CREATE TABLE Nimet (nimi text);",
-        "CREATE TABLE Luvut (numero integer);"
-    ]
+  "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "SELECT * FROM Tuotteet;"
+  ]
 }
