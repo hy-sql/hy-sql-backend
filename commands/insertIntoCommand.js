@@ -4,13 +4,6 @@ const isCommand = (fullCommandAsStringList) =>
     fullCommandAsStringList.slice(0, 2).join(' ').toUpperCase() ===
     'INSERT INTO'
 
-const execute = (fullCommandAsStringList) => {
-    const parsedCommand = parseCommand(fullCommandAsStringList)
-    if (parsedCommand.error) return parsedCommand.error
-
-    return InsertIntoSchema.validate(parsedCommand)
-}
-
 const parseCommand = (fullCommandAsStringList) => {
     let anchorLocation = fullCommandAsStringList
         .join(' ')
@@ -37,7 +30,7 @@ const parseCommand = (fullCommandAsStringList) => {
         columnList.push({ name: col })
     })
 
-    const command = {
+    const parsedCommand = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
         tableName: fullCommandAsStringList[2],
         columnsOpeningBracket:
@@ -72,7 +65,10 @@ const parseCommand = (fullCommandAsStringList) => {
         finalSemicolon:
             fullCommandAsStringList[fullCommandAsStringList.length - 1],
     }
-    return command
+
+    if (parsedCommand.error) return parsedCommand.error
+
+    return InsertIntoSchema.validate(parsedCommand)
 }
 
 const cleanStringArray = (columnsAsStringList) => {
@@ -87,17 +83,17 @@ const addAttributesToValuesArray = (columnList, stringArray) => {
     stringArray.forEach((value, index) =>
         value.match('[0-9]')
             ? taulukko.push({
-                  column: columnList[index] ? columnList[index].name : null,
-                  value,
-                  type: 'INTEGER',
-              })
+                column: columnList[index] ? columnList[index].name : null,
+                value,
+                type: 'INTEGER',
+            })
             : taulukko.push({
-                  column: columnList[index] ? columnList[index].name : null,
-                  value: value.replace(/'/g, ' ').trim(),
-                  type: 'TEXT',
-              })
+                column: columnList[index] ? columnList[index].name : null,
+                value: value.replace(/'/g, ' ').trim(),
+                type: 'TEXT',
+            })
     )
     return taulukko
 }
 
-module.exports = { isCommand, execute, parseCommand }
+module.exports = { isCommand, parseCommand }

@@ -25,9 +25,7 @@ describe.each([
             fullCommandAsStringList
         )
 
-        const result = InsertIntoSchema.validate(parsedCommand)
-
-        expect(result.error).not.toBeDefined()
+        expect(parsedCommand.error).not.toBeDefined()
     })
 })
 

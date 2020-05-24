@@ -1,5 +1,4 @@
 const selectAllCommand = require('../commands/selectAllCommand')
-const selectAllSchema = require('../models/SelectAllSchema')
 
 describe.each(['SELEC * FROM Taulu;', 'SELECT a FROM Taulu;'])(
     'Query not beginning with SELECT *',
@@ -29,31 +28,20 @@ describe.each([
             .replace(/\s\s+/g, ' ')
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-        const parsedCommand = selectAllCommand.parseCommand(command)
-
         test('is recognised as SELECT * -command', () => {
             expect(selectAllCommand.isCommand(command)).toBeTruthy()
         })
 
-        test('passes validation after parsed to command object', () => {
-            expect(
-                selectAllSchema.validate(parsedCommand).error
-            ).toBeUndefined()
-        })
+        test('is parsed and validated succesfully', () => {
+            const parsedCommand = selectAllCommand.parseCommand(command)
 
-        test('execute returns command object successfully', () => {
-            expect(selectAllCommand.execute(command).value).toHaveProperty(
-                'name'
-            )
-            expect(selectAllCommand.execute(command).value).toHaveProperty(
-                'from'
-            )
-            expect(selectAllCommand.execute(command).value).toHaveProperty(
-                'tableName'
-            )
-            expect(selectAllCommand.execute(command).value).toHaveProperty(
-                'finalSemicolon'
-            )
+            expect(parsedCommand.value).toBeDefined()
+            expect(parsedCommand.value).toHaveProperty('name')
+            expect(parsedCommand.value).toHaveProperty('from')
+            expect(parsedCommand.value).toHaveProperty('tableName')
+            expect(parsedCommand.value).toHaveProperty('finalSemicolon')
+
+            expect(selectAllCommand.parseCommand(command).error).toBeUndefined()
         })
     })
 })
@@ -71,14 +59,12 @@ describe.each([
             .replace(/\s\s+/g, ' ')
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-        const parsedCommand = selectAllCommand.parseCommand(command)
-
         test('is recognised as SELECT * -command', () => {
             expect(selectAllCommand.isCommand(command)).toBeTruthy()
         })
 
         test('fails validation after parsed to command object', () => {
-            expect(selectAllSchema.validate(parsedCommand).error).toBeDefined()
+            expect(selectAllCommand.parseCommand(command).error).toBeDefined()
         })
     })
 })

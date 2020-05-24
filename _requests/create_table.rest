@@ -1,0 +1,32 @@
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet    (id INTEGER PRIMARY KEY,    nimi TEXT,    hinta INTEGER);",
+  "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);"
+  ]
+}
+
+###
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet    (id INTEGER PRIMARY KEY,    nimi TEXT,    hinta INTEGER);",
+  "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+  "SELECT * FROM Tuotteet;"
+  ]
+}
+
+### Testing invalid query:
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet    (id INTEGER PRIMARY KEY,    nimi TEXT,    hinta INTEGER);",
+  "SELECT * FROM Tuotteet",
+  "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);"
+  ]
+}
