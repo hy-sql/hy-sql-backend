@@ -52,7 +52,7 @@ const InsertIntoSchema = Joi.object({
 
     values: Joi.array()
         .items(ValuesSchema)
-        .min(Joi.ref('columns.length'))
+        .min(Joi.ref('columns.length')) //jos näitä on enemmän kuin kenttiä, ylimääräisten column on undefined => validaatiovirhe
         .required()
         .messages({
             'array.base': 'this is not an array',

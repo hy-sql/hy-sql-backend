@@ -56,22 +56,38 @@ describe.each([
         expect(result.error).toBeDefined()
     })
 })
-/*
+
 describe.each([
-  'CREATE TABLAE Tuotteet id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
-  'creatAe table tuotteet (id integer primary, nimi text, hinta integer);',
-  'create taBle! tuoTTeet id inTEger primary KEY, NIMI text, hintA inTEger);',
-  '   create taBle_    tuoTTeet (id     primary KEY, NIMI    text, hintA    inTEger);',
+    'INSERT ITNO Tuotteet (id, nimi, hinta) VALUES (1, \'nauris\', 3);',
+    'INseerT INTO Tuotteet (id, nimi, hinta) VALUES (1, \'nauris\', 3);',
+    'INSERT INTO! Tuotteet (id, nimi, hinta) VALUES (1, \'nauris\', 3);',
+    '    INSERT_INTO Tuotteet (id, nimi, hinta) VALUES (1, \'nauris\', 3);',
 ])('invalid command name testing', (command) => {
-  const fullCommandAsStringList = command
-      .trim()
-      .replace(/\s\s+/g, ' ')
-      .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+    const fullCommandAsStringList = command
+        .trim()
+        .replace(/\s\s+/g, ' ')
+        .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-  test('valid command is recognized and true returned', () => {
-      const result = createTableCommand.isCommand(fullCommandAsStringList)
+    test('invalid command is NOT recognized and false returned', () => {
+        const result = insertIntoCommand.isCommand(fullCommandAsStringList)
 
-      expect(result).toBeFalsy()
-  })
+        expect(result).toBeFalsy()
+    })
 })
-*/
+describe.each(['INSERT INTO Tuotteet (id, nimi, hinta) (1, \'nauris\', 3);'])(
+    'missing VALUES keyword testing',
+    (command) => {
+        const fullCommandAsStringList = command
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+
+        test('missing VALUES keyword returns an error', () => {
+            const parsedCommand = insertIntoCommand.parseCommand(
+                fullCommandAsStringList
+            )
+
+            expect(parsedCommand.error).toBeDefined()
+        })
+    }
+)
