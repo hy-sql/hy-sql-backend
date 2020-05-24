@@ -24,7 +24,8 @@ const executer = (request, response, next) => {
         const singleCommandAsStringArray = input
             .trim()
             .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(?=;)/)
 
         const command = commands.find((c) =>
             c.isCommand(singleCommandAsStringArray)
