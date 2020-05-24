@@ -48,18 +48,27 @@ const parseCommand = (fullCommandAsStringList) => {
                 ? ')'
                 : undefined,
         anchorKeyword: fullCommandAsStringList[anchorLocation],
-        valuesOpeningBracket: fullCommandAsStringList[anchorLocation + 1],
+        valuesOpeningBracket:
+            fullCommandAsStringList[anchorLocation + 1] &&
+            fullCommandAsStringList[anchorLocation + 1] === '('
+                ? '('
+                : undefined,
         values: addAttributesToValuesArray(
             columnList,
             cleanStringArray(
                 fullCommandAsStringList.slice(
-                    anchorLocation + 2,
+                    fullCommandAsStringList[anchorLocation + 1] &&
+                        fullCommandAsStringList[anchorLocation + 1] === '('
+                        ? anchorLocation + 2
+                        : anchorLocation + 1,
                     fullCommandAsStringList.length - 2
                 )
             )
         ),
         valuesClosingBracket:
-            fullCommandAsStringList[fullCommandAsStringList.length - 2],
+            fullCommandAsStringList[fullCommandAsStringList.length - 2] === ')'
+                ? ')'
+                : undefined,
         finalSemicolon:
             fullCommandAsStringList[fullCommandAsStringList.length - 1],
     }
