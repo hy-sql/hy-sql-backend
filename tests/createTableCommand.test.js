@@ -31,7 +31,7 @@ describe.each([
         expect(parsedCommand.value).toHaveProperty('closingBracket')
         expect(parsedCommand.value).toHaveProperty('finalSemicolon')
 
-        expect(parsedCommand.error).toBeFalsy()
+        expect(parsedCommand.error).not.toBeDefined()
     })
 })
 
@@ -53,7 +53,7 @@ describe.each([
             fullCommandAsStringList
         )
 
-        expect(parsedCommand.error).toBeTruthy()
+        expect(parsedCommand.error).toBeDefined()
     })
 })
 
