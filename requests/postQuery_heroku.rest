@@ -1,6 +1,6 @@
 ### Valid queries
 
-POST http://localhost:3001/api/query
+POST https://hy-sql.herokuapp.com/api/query
 Content-Type: application/json
 
 {
@@ -12,7 +12,7 @@ Content-Type: application/json
 
 ### Valid queries demonstrating keyword case-insensitive
 
-POST http://localhost:3001/api/query
+POST https://hy-sql.herokuapp.com/api/query
 Content-Type: application/json
 
 {
@@ -24,7 +24,7 @@ Content-Type: application/json
 
 ### Unrecognisable first query
 
-POST http://localhost:3001/api/query
+POST https://hy-sql.herokuapp.com/api/query
 Content-Type: application/json
 
 {
@@ -36,7 +36,7 @@ Content-Type: application/json
 
 ### Invalid CREATE TABLE -query
 
-POST http://localhost:3001/api/query
+POST https://hy-sql.herokuapp.com/api/query
 Content-Type: application/json
 
 {
@@ -48,7 +48,7 @@ Content-Type: application/json
 
 ### Invalid SELECT * -query
 
-POST http://localhost:3001/api/query
+POST https://hy-sql.herokuapp.com/api/query
 Content-Type: application/json
 
 {
@@ -60,7 +60,7 @@ Content-Type: application/json
 
 ### Invalid INSERT INTO -query
 
-POST http://localhost:3001/api/query
+POST https://hy-sql.herokuapp.com/api/query
 Content-Type: application/json
 
 {
