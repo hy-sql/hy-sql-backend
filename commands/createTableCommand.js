@@ -5,7 +5,7 @@ const parseCommand = (fullCommandAsStringList) => {
     const parsedCommand = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
         tableName: fullCommandAsStringList[2],
-        openingBracket: fullCommandAsStringList.indexOf('(') > 0,
+        openingBracket: fullCommandAsStringList[3],
         columns: parseColumns(
             fullCommandAsStringList.slice(
                 fullCommandAsStringList.indexOf('(') + 1,
@@ -66,8 +66,6 @@ const parseColumnConstraints = (constraintsAsStringArray) => {
         .split(primaryKey)
         .map((c) => c.trim())
         .filter(Boolean)
-
-    console.log(separatedConstraintsAsStringList)
 
     return separatedConstraintsAsStringList
 }

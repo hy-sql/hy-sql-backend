@@ -2,7 +2,7 @@ const Joi = require('@hapi/joi')
 
 const ColumnsSchema = Joi.object({
     name: Joi.string()
-        .pattern(/[;]./, { invert: true })
+        .pattern(/[;]/, { invert: true })
         .pattern(/^\w+$/)
         .max(64)
         .required()
@@ -11,8 +11,8 @@ const ColumnsSchema = Joi.object({
         }),
 
     type: Joi.string()
-        .pattern(/[;]./, { invert: true })
-        .valid('INTEGER', 'TEXT')
+        .pattern(/[;]/, { invert: true })
+        .pattern(/^INTEGER$|^TEXT$/)
         .insensitive()
         .required()
         .messages({
@@ -54,7 +54,13 @@ const CreateTableSchema = Joi.object({
             'string.pattern.invert.base': 'Semicolon not allowed here',
         }),
 
-    openingBracket: Joi.boolean().valid(true).required().messages({}),
+    openingBracket: Joi.string()
+        .pattern(/[;]/, { invert: true })
+        .pattern(/^\($/)
+        .required()
+        .messages({
+            'string.pattern.invert.base': 'Semicolon not allowed here',
+        }),
 
     columns: Joi.array().items(ColumnsSchema).required(),
 

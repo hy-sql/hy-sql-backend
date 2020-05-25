@@ -14,8 +14,11 @@ const parser = (request, response, next) => {
             .trim()
             .replace(/\s\s+/g, ' ')
             .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(?=;)/)
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
     )
+
+    console.log(splitCommandArray)
 
     const parsedCommands = splitCommandArray.map((c) => commands.isCommand(c))
 

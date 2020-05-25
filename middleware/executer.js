@@ -16,7 +16,7 @@ const executer = (request, response, next) => {
 
         if (!command) {
             resultArray.push(
-                `${command.value.name} -query execution failed: ${command.error.details[0].message}`
+                'Query was not recognised as any existing valid query'
             )
             noErrors = false
         } else {
@@ -28,38 +28,29 @@ const executer = (request, response, next) => {
                 )
                 noErrors = false
             } else {
-                // Optimaalisesti olisi siirtää validaatiovirheet omaan virhekäsittelijään
-                if (command.error) {
-                    // koko error olion sijaan vain sen sisältämä viesti
-                    resultArray.push(
-                        `${command.value.name} -query execution failed: ${command.error.details[0].message}`
-                    )
-                    noErrors = false
-                } else {
-                    /* state voisi palauttaa udateState metodista esim. create table ja insert intolla
+                /* state voisi palauttaa udateState metodista esim. create table ja insert intolla
                 'x - query was executed successfully'
                 tai tarkemman onnistumisviestin kuten 'Table x created successfully'
                 ja selectillä palauttaakin jo tulostaulut, jolloin tämä palautus tallennettaisiin resultArrayhin.
                 Olisi informatiivisemmat onnistumisviestit/tulostaulut.
                 */
-                    state.updateState(command.value)
-                    resultArray.push(
-                        `${command.value.name} -query was executed successfully`
-                    )
-                }
+                state.updateState(command.value)
+                resultArray.push(
+                    `${command.value.name} -query was executed successfully`
+                )
             }
         }
-
-        console.log('resultArray:', resultArray)
-        console.log('stateArray:', state)
-
-        request.resultArray = {
-            resultArray,
-            state,
-        }
-
-        next()
     }
+
+    console.log('resultArray:', resultArray)
+    console.log('stateArray:', state)
+
+    request.resultArray = {
+        resultArray,
+        state,
+    }
+
+    next()
 }
 
 module.exports = executer
