@@ -9,15 +9,19 @@ const parseCommand = (fullCommandAsStringList) => {
     const parsedCommand = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
         tableName: fullCommandAsStringList[2],
-        openingBracket: fullCommandAsStringList[3],
+        openingBracket: fullCommandAsStringList.indexOf('(') > 0,
         columns: parseColumns(
-            fullCommandAsStringList.slice(4, fullCommandAsStringList.length - 2)
+            fullCommandAsStringList.slice(
+                fullCommandAsStringList.indexOf('(') + 1,
+                fullCommandAsStringList.indexOf(')')
+            )
         ),
-        closingBracket:
-            fullCommandAsStringList[fullCommandAsStringList.length - 2],
+        closingBracket: fullCommandAsStringList.indexOf(')') > 0,
         finalSemicolon:
             fullCommandAsStringList[fullCommandAsStringList.length - 1],
     }
+
+    console.log(parsedCommand)
 
     return CreateTableSchema.validate(parsedCommand)
 }
@@ -32,6 +36,7 @@ const parseColumns = (columnsAsStringList) => {
     const columns = separatedColumnsAsStringList
         .map((c) => c.split(' '))
         .map((item) => {
+            console.log(separatedColumnsAsStringList)
             return {
                 name: item[0],
                 type: item[1] ? item[1].toUpperCase() : null,

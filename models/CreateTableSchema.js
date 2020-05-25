@@ -1,7 +1,7 @@
 const Joi = require('@hapi/joi')
 
 const ColumnsSchema = Joi.object({
-    name: Joi.string().alphanum().max(64).required().messages({}),
+    name: Joi.string().pattern(/^\w+$/).max(64).required().messages({}),
 
     type: Joi.string()
         .valid('INTEGER', 'TEXT')
@@ -21,11 +21,11 @@ const CreateTableSchema = Joi.object({
 
     tableName: Joi.string().pattern(/^\w+$/).max(64).required().messages({}),
 
-    openingBracket: Joi.string().valid('(').required().messages({}),
+    openingBracket: Joi.boolean().valid(true).required().messages({}),
 
     columns: Joi.array().items(ColumnsSchema).required(),
 
-    closingBracket: Joi.string().valid(')').required().messages({}),
+    closingBracket: Joi.boolean().valid(true).required().messages({}),
 
     finalSemicolon: Joi.string().valid(';').required().messages({}),
 })
