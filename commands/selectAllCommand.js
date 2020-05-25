@@ -1,8 +1,5 @@
 const selectAllSchema = require('../models/SelectAllSchema')
 
-const isCommand = (fullCommandAsStringList) =>
-    fullCommandAsStringList.slice(0, 2).join(' ').toUpperCase() === 'SELECT *'
-
 const parseCommand = (fullCommandAsStringList) => {
     const parsedCommand = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
@@ -14,4 +11,4 @@ const parseCommand = (fullCommandAsStringList) => {
     return selectAllSchema.validate(parsedCommand)
 }
 
-module.exports = { isCommand, parseCommand }
+module.exports = { parseCommand }

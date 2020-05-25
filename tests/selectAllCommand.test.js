@@ -1,4 +1,5 @@
 const selectAllCommand = require('../commands/selectAllCommand')
+const commands = require('../commands')
 
 describe.each(['SELEC * FROM Taulu;', 'SELECT a FROM Taulu;'])(
     'Query not beginning with SELECT *',
@@ -10,7 +11,7 @@ describe.each(['SELEC * FROM Taulu;', 'SELECT a FROM Taulu;'])(
                 .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
             test('is not reconised as SELECT * -command', () => {
-                expect(selectAllCommand.isCommand(command)).toBeFalsy()
+                expect(commands.isCommand(command)).toBeFalsy()
             })
         })
     }
@@ -29,7 +30,7 @@ describe.each([
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
         test('is recognised as SELECT * -command', () => {
-            expect(selectAllCommand.isCommand(command)).toBeTruthy()
+            expect(commands.isCommand(command)).toBeTruthy()
         })
 
         test('is parsed and validated succesfully', () => {
@@ -60,7 +61,7 @@ describe.each([
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
         test('is recognised as SELECT * -command', () => {
-            expect(selectAllCommand.isCommand(command)).toBeTruthy()
+            expect(commands.isCommand(command)).toBeTruthy()
         })
 
         test('fails validation after parsed to command object', () => {

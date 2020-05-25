@@ -1,9 +1,5 @@
 const { InsertIntoSchema } = require('../models/InsertIntoSchema')
 
-const isCommand = (fullCommandAsStringList) =>
-    fullCommandAsStringList.slice(0, 2).join(' ').toUpperCase() ===
-    'INSERT INTO'
-
 const parseCommand = (fullCommandAsStringList) => {
     let anchorLocation = fullCommandAsStringList
         .join(' ')
@@ -96,4 +92,4 @@ const addAttributesToValuesArray = (columnList, stringArray) => {
     return taulukko
 }
 
-module.exports = { isCommand, parseCommand }
+module.exports = { parseCommand }
