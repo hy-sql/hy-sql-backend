@@ -21,8 +21,6 @@ const parseCommand = (fullCommandAsStringList) => {
             fullCommandAsStringList[fullCommandAsStringList.length - 1],
     }
 
-    console.log(parsedCommand)
-
     return CreateTableSchema.validate(parsedCommand)
 }
 
@@ -36,7 +34,6 @@ const parseColumns = (columnsAsStringList) => {
     const columns = separatedColumnsAsStringList
         .map((c) => c.split(' '))
         .map((item) => {
-            console.log(separatedColumnsAsStringList)
             return {
                 name: item[0],
                 type: item[1] ? item[1].toUpperCase() : null,

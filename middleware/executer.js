@@ -1,4 +1,5 @@
 const commands = require('../commands')
+const CommandSchema = require('../models/CommandSchema')
 const State = require('../models/State')
 
 const executer = (request, response, next) => {
@@ -11,6 +12,12 @@ const executer = (request, response, next) => {
     }
 
     const commandArray = request.body.commandArray
+
+    console.log(commandArray)
+
+    const result = CommandSchema.validate(commandArray)
+
+    console.log(result)
 
     const resultArray = []
 
