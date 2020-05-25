@@ -1,27 +1,58 @@
 const Joi = require('@hapi/joi')
 
 const ColumnsSchema = Joi.object({
-    name: Joi.string().pattern(/^\w+$/).max(64).required().messages({}),
+    name: Joi.string()
+        .pattern(/[;]./, { invert: true })
+        .pattern(/^\w+$/)
+        .max(64)
+        .required()
+        .messages({
+            'string.pattern.invert.base': 'Semicolon not allowed here',
+        }),
 
     type: Joi.string()
-        .valid('INTEGER', 'TEXT')
         .pattern(/[;]./, { invert: true })
+        .valid('INTEGER', 'TEXT')
         .insensitive()
         .required()
-        .messages({}),
+        .messages({
+            'string.pattern.invert.base': 'Semicolon not allowed here',
+        }),
 
-    primaryKey: Joi.boolean().required().messages({}),
+    constraints: Joi.array()
+        .items(
+            Joi.string()
+                .pattern(/[;]/, { invert: true })
+                .pattern(/^PRIMARY KEY$/)
+                .insensitive()
+                .optional()
+                .messages({
+                    'string.pattern.invert.base': 'Semicolon not allowed here',
+                })
+        )
+        .messages({
+            'string.pattern.invert.base': 'Semicolon not allowed here',
+        }),
 })
 
 const CreateTableSchema = Joi.object({
     name: Joi.string()
-        .valid('CREATE TABLE')
         .pattern(/[;]./, { invert: true })
+        .valid('CREATE TABLE')
         .insensitive()
         .required()
-        .messages({}),
+        .messages({
+            'string.pattern.invert.base': 'Semicolon not allowed here',
+        }),
 
-    tableName: Joi.string().pattern(/^\w+$/).max(64).required().messages({}),
+    tableName: Joi.string()
+        .pattern(/[;]./, { invert: true })
+        .pattern(/^\w+$/)
+        .max(64)
+        .required()
+        .messages({
+            'string.pattern.invert.base': 'Semicolon not allowed here',
+        }),
 
     openingBracket: Joi.boolean().valid(true).required().messages({}),
 

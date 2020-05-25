@@ -1,10 +1,6 @@
 /* eslint-disable no-unused-vars */
 const { CreateTableSchema } = require('../models/CreateTableSchema')
 
-const isCommand = (fullCommandAsStringList) =>
-    fullCommandAsStringList.slice(0, 2).join(' ').toUpperCase() ===
-    'CREATE TABLE'
-
 const parseCommand = (fullCommandAsStringList) => {
     const parsedCommand = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
@@ -41,22 +37,39 @@ const parseColumns = (columnsAsStringList) => {
             return {
                 name: item[0],
                 type: item[1] ? item[1].toUpperCase() : null,
-                primaryKey: parsePrimaryKey(item.slice(2)),
+                constraints: parseColumnConstraints(item.slice(2)),
             }
         })
 
     return columns
 }
 
-const parsePrimaryKey = (stringArray) => {
-    if (!Array.isArray(stringArray) || !stringArray.length) return false
-    const value = stringArray.join(' ').trim().toUpperCase()
+const parseColumnConstraints = (constraintsAsStringArray) => {
+    console.log(constraintsAsStringArray)
 
-    if (value === 'PRIMARY KEY') {
-        return true
-    } else {
-        return null
-    }
+    // const constraints = new RegExp(
+    //     [
+    //         '(?<=CHECK)|(?=CHECK)',
+    //         '(?<=NOT NULL)|(?=NOT NULL)|',
+    //         '(?<=UNIQUE)|(?=UNIQUE)',
+    //         '(?<=PRIMARY KEY)|(?=PRIMARY KEY)|',
+    //         '(?<=FOREIGN KEY)|(?=FOREIGN KEY)|',
+    //         '(?<=INDEX)|(?=INDEX)',
+    //     ].join('')
+    // )
+
+    const primaryKey = new RegExp(['(?<=PRIMARY KEY)|(?=PRIMARY KEY)'].join(''))
+
+    const separatedConstraintsAsStringList = constraintsAsStringArray
+        .join(' ')
+        .toUpperCase()
+        .split(primaryKey)
+        .map((c) => c.trim())
+        .filter(Boolean)
+
+    console.log(separatedConstraintsAsStringList)
+
+    return separatedConstraintsAsStringList
 }
 
-module.exports = { isCommand, parseCommand }
+module.exports = { parseCommand }
