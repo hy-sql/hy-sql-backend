@@ -1,10 +1,6 @@
 /* eslint-disable no-unused-vars */
 const { CreateTableSchema } = require('../models/CreateTableSchema')
 
-const isCommand = (fullCommandAsStringList) =>
-    fullCommandAsStringList.slice(0, 2).join(' ').toUpperCase() ===
-    'CREATE TABLE'
-
 const parseCommand = (fullCommandAsStringList) => {
     const parsedCommand = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
@@ -53,4 +49,4 @@ const parsePrimaryKey = (stringArray) => {
     }
 }
 
-module.exports = { isCommand, parseCommand }
+module.exports = { parseCommand }

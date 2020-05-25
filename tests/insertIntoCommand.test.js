@@ -1,5 +1,6 @@
 const insertIntoCommand = require('../commands/insertIntoCommand')
 const { InsertIntoSchema } = require('../models/InsertIntoSchema')
+const commands = require('../commands')
 
 describe.each([
     'INSERT INTO Tuotteet (id, nimi, hinta) VALUES (1, \'nauris\', 3);',
@@ -15,7 +16,7 @@ describe.each([
         .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
     test('valid command is recognized and true returned', () => {
-        const result = insertIntoCommand.isCommand(fullCommandAsStringList)
+        const result = commands.isCommand(fullCommandAsStringList)
 
         expect(result).toBeTruthy()
     })
@@ -67,7 +68,7 @@ describe.each([
         .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
     test('invalid command is NOT recognized and false returned', () => {
-        const result = insertIntoCommand.isCommand(fullCommandAsStringList)
+        const result = commands.isCommand(fullCommandAsStringList)
 
         expect(result).toBeFalsy()
     })

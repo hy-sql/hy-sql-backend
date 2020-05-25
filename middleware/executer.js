@@ -1,35 +1,18 @@
-const commands = require('../commands')
 const State = require('../models/State')
 
 const executer = (request, response, next) => {
     const state = new State([])
 
-    if (!request.body.commandArray) {
-        return response.status(400).json({
-            error: 'commandArray missing',
-        })
-    }
-
-    const commandArray = request.body.commandArray
+    const parsedCommands = request.parsedCommands
 
     const resultArray = []
 
     let noErrors = true
 
-    for (let input of commandArray) {
+    for (let command of parsedCommands) {
         if (!noErrors) {
             break
         }
-
-        const singleCommandAsStringArray = input
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(?=;)/)
-
-        const command = commands.find((c) =>
-            c.isCommand(singleCommandAsStringArray)
-        )
 
         if (!command) {
             resultArray.push(
@@ -37,15 +20,11 @@ const executer = (request, response, next) => {
             )
             noErrors = false
         } else {
-            const parsedCommand = command.parseCommand(
-                singleCommandAsStringArray
-            )
-
             // Optimaalisesti olisi siirtää validaatiovirheet omaan virhekäsittelijään
-            if (parsedCommand.error) {
+            if (command.error) {
                 // koko error olion sijaan vain sen sisältämä viesti
                 resultArray.push(
-                    `${parsedCommand.value.name} -query execution failed: ${parsedCommand.error.details[0].message}`
+                    `${command.value.name} -query execution failed: ${command.error.details[0].message}`
                 )
                 noErrors = false
             } else {
@@ -55,9 +34,9 @@ const executer = (request, response, next) => {
                 ja selectillä palauttaakin jo tulostaulut, jolloin tämä palautus tallennettaisiin resultArrayhin.
                 Olisi informatiivisemmat onnistumisviestit/tulostaulut.
                 */
-                state.updateState(parsedCommand.value)
+                state.updateState(command.value)
                 resultArray.push(
-                    `${parsedCommand.value.name} -query was executed successfully`
+                    `${command.value.name} -query was executed successfully`
                 )
             }
         }
