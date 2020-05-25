@@ -38,8 +38,26 @@ test('INSERT INTO creates row and updates id', () => {
     const insertCommand = {
         name: 'INSERT INTO',
         tableName: 'Tuotteet',
-        columns: ['nimi', 'hinta'],
-        values: ['tuote', 10],
+        columns: [
+            {
+                name: 'nimi',
+            },
+            {
+                name: 'hinta',
+            },
+        ],
+        values: [
+            {
+                column: 'nimi',
+                value: 'tuote',
+                type: 'TEXT',
+            },
+            {
+                column: 'hinta',
+                value: 10,
+                type: 'INTEGER',
+            },
+        ],
     }
     state.insertIntoTable(insertCommand)
     const rows = state.tables[0].rows
@@ -75,6 +93,6 @@ test('SELECT * FROM returns rows from table', () => {
         name: 'SELECT *',
         tableName: 'Tuotteet',
     }
-    const rows = state.selectAllFromTable(selectCommand)
-    expect(rows.length).toBe(1)
+    const result = state.selectAllFromTable(selectCommand)
+    expect(result.rows.length).toBe(1)
 })

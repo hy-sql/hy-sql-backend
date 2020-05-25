@@ -34,10 +34,7 @@ const executer = (request, response, next) => {
                 ja selectillä palauttaakin jo tulostaulut, jolloin tämä palautus tallennettaisiin resultArrayhin.
                 Olisi informatiivisemmat onnistumisviestit/tulostaulut.
                 */
-                state.updateState(command.value)
-                resultArray.push(
-                    `${command.value.name} -query was executed successfully`
-                )
+                resultArray.push(state.updateState(command.value))
             }
         }
     }
