@@ -5,6 +5,7 @@ const ColumnsSchema = Joi.object({
 
     type: Joi.string()
         .valid('INTEGER', 'TEXT')
+        .pattern(/[;]./, { invert: true })
         .insensitive()
         .required()
         .messages({}),
@@ -15,6 +16,7 @@ const ColumnsSchema = Joi.object({
 const CreateTableSchema = Joi.object({
     name: Joi.string()
         .valid('CREATE TABLE')
+        .pattern(/[;]./, { invert: true })
         .insensitive()
         .required()
         .messages({}),
@@ -27,7 +29,7 @@ const CreateTableSchema = Joi.object({
 
     closingBracket: Joi.boolean().valid(true).required().messages({}),
 
-    finalSemicolon: Joi.string().valid(';').required().messages({}),
+    finalSemicolon: Joi.string().valid(';').optional().messages({}),
 })
 
 module.exports = { CreateTableSchema, ColumnsSchema }

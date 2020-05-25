@@ -18,8 +18,12 @@ const parseCommand = (fullCommandAsStringList) => {
         ),
         closingBracket: fullCommandAsStringList.indexOf(')') > 0,
         finalSemicolon:
-            fullCommandAsStringList[fullCommandAsStringList.length - 1],
+            fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
+                ? ';'
+                : undefined,
     }
+
+    console.log(CreateTableSchema.validate(parsedCommand))
 
     return CreateTableSchema.validate(parsedCommand)
 }
