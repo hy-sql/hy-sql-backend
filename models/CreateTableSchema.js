@@ -8,6 +8,8 @@ const ColumnsSchema = Joi.object({
         .required()
         .messages({
             'string.pattern.invert.base': 'Semicolon not allowed here',
+            'string.pattern.base':
+                'Only letters, numbers and underscore allowed',
         }),
 
     type: Joi.string()
@@ -17,22 +19,20 @@ const ColumnsSchema = Joi.object({
         .required()
         .messages({
             'string.pattern.invert.base': 'Semicolon not allowed here',
+            'string.pattern.base': 'Invalid type',
         }),
 
-    constraints: Joi.array()
-        .items(
-            Joi.string()
-                .pattern(/[;]/, { invert: true })
-                .pattern(/^PRIMARY KEY$/)
-                .insensitive()
-                .optional()
-                .messages({
-                    'string.pattern.invert.base': 'Semicolon not allowed here',
-                })
-        )
-        .messages({
-            'string.pattern.invert.base': 'Semicolon not allowed here',
-        }),
+    constraints: Joi.array().items(
+        Joi.string()
+            .pattern(/[;]/, { invert: true })
+            .pattern(/^PRIMARY KEY$/)
+            .insensitive()
+            .optional()
+            .messages({
+                'string.pattern.invert.base': 'Semicolon not allowed here',
+                'string.pattern.base': 'Invalid constraint or colon missing',
+            })
+    ),
 })
 
 const CreateTableSchema = Joi.object({
