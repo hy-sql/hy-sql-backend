@@ -66,7 +66,7 @@ const CreateTableSchema = Joi.object({
 
     closingBracket: Joi.boolean().valid(true).required().messages({}),
 
-    finalSemicolon: Joi.string().valid(';').optional().messages({}),
+    finalSemicolon: Joi.string().valid(';').required().messages({}),
 })
 
 module.exports = { CreateTableSchema, ColumnsSchema }
