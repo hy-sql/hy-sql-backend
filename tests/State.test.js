@@ -44,6 +44,26 @@ test('CREATE TABLE returns error when table already exists', () => {
     expect(result.error).toBe('Table Tuotteet already exists')
 })
 
+test('CREATE TABLE returns error when trying to create duplicate columns', () => {
+    const initTables = []
+    const state = new State(initTables)
+    const command = {
+        name: 'CREATE TABLE',
+        tableName: 'Tuotteet',
+        openingBracket: '(',
+        columns: [
+            { name: 'id', type: 'INTEGER', primaryKey: true },
+            { name: 'nimi', type: 'TEXT', primaryKey: false },
+            { name: 'nimi', type: 'INTEGER', primaryKey: false },
+        ],
+        closingBracket: ')',
+        finalSemicolon: ';',
+    }
+    const result = state.createTable(command)
+    expect(result.error.length).toBe(1)
+    expect(result.error[0]).toBe('duplicate column nimi: nimi')
+})
+
 test('INSERT INTO returns error if table does not exist', () => {
     const initTables = []
     const state = new State(initTables)

@@ -38,9 +38,14 @@ class State {
         const tableIndex = this.tablelist.findIndex(
             (e) => e.name === command.tableName
         )
-        console.log(`TABLE INDEX ${tableIndex}`)
+
         if (tableIndex !== -1)
             return `Table ${command.tableName} already exists`
+
+        const nameArray = command.columns.map((e) => e.name)
+        const duplicates = findDuplicates(nameArray)
+        if (duplicates.length !== 0)
+            return duplicates.map((e) => `duplicate column ${e}: ${e}`)
     }
 
     insertIntoTable(command) {
@@ -86,5 +91,8 @@ class State {
         }
     }
 }
+
+const findDuplicates = (arr) =>
+    arr.filter((item, index) => arr.indexOf(item) !== index)
 
 module.exports = State

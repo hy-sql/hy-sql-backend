@@ -59,6 +59,18 @@ Content-Type: application/json
   ]
 }
 
+### Invalid CREATE TABLE -query (duplicate columns)
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, nimi INTEGER, id TEXT);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "SELECT * FROM Tuotteet;"
+  ]
+}
+
 ### Invalid SELECT * -query
 
 POST http://localhost:3001/api/query
