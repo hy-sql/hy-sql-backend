@@ -7,23 +7,29 @@ const parseCommand = (fullCommandAsStringList) => {
         .split(' ')
         .indexOf('VALUES')
 
-    if (anchorLocation === -1)
+    if (anchorLocation === -1) {
         return {
-            name: fullCommandAsStringList.slice(0, 2).join(' '),
-            error:
-                'INSERT INTO needs a VALUES keyword before the actual values to be inserted',
+            value: { name: fullCommandAsStringList.slice(0, 2).join(' ') },
+            error: {
+                details: [
+                    {
+                        message:
+                            'INSERT INTO needs a VALUES keyword before the actual values to be inserted',
+                    },
+                ],
+            },
         }
+    }
 
-    const columnList = []
-    cleanStringArray(
+    const columnList = cleanStringArray(
         fullCommandAsStringList.slice(
             fullCommandAsStringList[3] === '(' ? 4 : 3,
             fullCommandAsStringList[anchorLocation - 1] === ')'
                 ? anchorLocation - 1
                 : anchorLocation
         )
-    ).forEach((col) => {
-        columnList.push({ name: col })
+    ).map((col) => {
+        return { name: col }
     })
 
     const parsedCommand = {
@@ -75,19 +81,18 @@ const cleanStringArray = (columnsAsStringList) => {
 }
 
 const addAttributesToValuesArray = (columnList, stringArray) => {
-    const taulukko = []
-    stringArray.forEach((value, index) =>
+    const taulukko = stringArray.map((value, index) =>
         value.match('[0-9]')
-            ? taulukko.push({
+            ? {
                 column: columnList[index] ? columnList[index].name : null,
                 value,
                 type: 'INTEGER',
-            })
-            : taulukko.push({
+            }
+            : {
                 column: columnList[index] ? columnList[index].name : null,
                 value: value.replace(/'/g, ' ').trim(),
                 type: 'TEXT',
-            })
+            }
     )
     return taulukko
 }
