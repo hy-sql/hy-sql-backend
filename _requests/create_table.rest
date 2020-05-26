@@ -13,9 +13,14 @@ POST http://localhost:3001/api/query
 Content-Type: application/json
 
 {
-  "commandArray": ["CREATE TABLE Tuotteet    (id INTEGER PRIMARY KEY,    nimi TEXT,    hinta INTEGER);",
+  "commandArray": [
+  "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
   "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
-  "SELECT * FROM Tuotteet;"
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('porkkana',5);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu',8);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
+  "SELECT * FROM Tuotteet ORDER BY hinta desc;"
   ]
 }
 

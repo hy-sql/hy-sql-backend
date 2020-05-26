@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 class StateService {
     constructor(state) {
         this.state = state
@@ -64,8 +66,15 @@ class StateService {
             (table) => table.name === command.tableName
         )
 
-        const rows = { rows: this.state.tables[tableIndex].rows }
-        console.log(rows)
+        let rows = this.state.tables[tableIndex].rows
+
+        if (command.orderBy) {
+            rows =
+                command.orderBy.order &&
+                command.orderBy.order.toUpperCase() === 'DESC'
+                    ? _.orderBy(rows, ['hinta'], ['desc'])
+                    : _.orderBy(rows, ['hinta'], ['asc'])
+        }
 
         return {
             result: `SELECT * FROM ${command.tableName} -query was executed succesfully`,

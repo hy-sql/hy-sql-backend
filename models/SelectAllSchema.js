@@ -59,14 +59,15 @@ const SelectAllOrderBySchema = SelectAllSchema.keys({
 
         order: Joi.string()
             .pattern(/[;]/, { invert: true })
-            .pattern(/^ASC$|^DESC$/)
+            .pattern(/^ASC$|^DESC$/i)
+            .insensitive()
             .max(64)
-            .required()
+            .optional()
             .messages({
                 'string.pattern.invert.base':
                     'Semicolon should be only found at the end of a query',
                 'string.pattern.base':
-                    'Only letters, numbers and underscore allowed',
+                    'Not a sorting keyword at the end of the query',
             }),
     }),
 })
