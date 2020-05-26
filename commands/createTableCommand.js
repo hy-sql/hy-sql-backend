@@ -19,8 +19,6 @@ const parseCommand = (fullCommandAsStringList) => {
                 : undefined,
     }
 
-    console.log(CreateTableSchema.validate(parsedCommand))
-
     return CreateTableSchema.validate(parsedCommand)
 }
 
@@ -45,8 +43,6 @@ const parseColumns = (columnsAsStringList) => {
 }
 
 const parseColumnConstraints = (constraintsAsStringArray) => {
-    console.log(constraintsAsStringArray)
-
     // const constraints = new RegExp(
     //     [
     //         '(?<=CHECK)|(?=CHECK)',

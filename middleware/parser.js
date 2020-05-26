@@ -18,8 +18,6 @@ const parser = (request, response, next) => {
             .filter(Boolean)
     )
 
-    console.log(splitCommandArray)
-
     const parsedCommands = splitCommandArray.map((c) => commands.isCommand(c))
 
     request.parsedCommands = parsedCommands
