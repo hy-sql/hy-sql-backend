@@ -12,7 +12,7 @@ const parseCommand = (fullCommandAsStringList) => {
                 fullCommandAsStringList.indexOf(')')
             )
         ),
-        closingBracket: fullCommandAsStringList.indexOf(')') > 0,
+        closingBracket: fullCommandAsStringList.join(' ').indexOf(')') > 0,
         finalSemicolon:
             fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
                 ? ';'
