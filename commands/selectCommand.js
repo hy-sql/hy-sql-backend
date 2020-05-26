@@ -12,6 +12,7 @@ const parseCommand = (fullCommandAsStringList) => {
     //const columns = []
 
     // SARAKKEIDEN OSIO - (*AS -- TODO*)
+    let jatkavaLaskuri = 1
     let laskuri = 1
     let avoimetSulut = 0
     loop1: while (laskuri < fullCommandAsStringList.length) {
@@ -22,6 +23,20 @@ const parseCommand = (fullCommandAsStringList) => {
                 avoimetSulut++
                 laskuri++
                 continue loop1
+            case 'JOIN':
+                //katsotaan avoimet sulut, tarvitseeko välittää, SITTEN ihmetellään mikä otus kyseessä
+                if (avoimetSulut === 0) {
+                    //heitetään varmaan joku virhe koska on mahdoton sanoa
+                    //onko edellisessä termissä kyseessä taulu vai sarake, tuo [laskuri -1 ] on se epäselvä
+                    //tarkistus vielä ettei olla komentoa seuraavassa sanassa, pitää keksiä jotain!
+                    break loop1
+                }
+                laskuri++
+                continue loop1
+            //muut katkaisevat sanat
+            case 'GROUP BY':
+            case 'HAVING':
+            case 'WHERE':
             case 'FROM':
                 if (avoimetSulut === 0) break loop1
             /* falls through */
@@ -38,6 +53,9 @@ const parseCommand = (fullCommandAsStringList) => {
         )
         return 'LASKIN MODE - TODO'
     }
+    //eli löytyi tuo, voidaan asettaa jatkavaLaskuri tähän kohtaan
+    jatkavaLaskuri = laskuri
+    console.log(jatkavaLaskuri)
 
     parsedCommand.columns = cleanStringArray(
         fullCommandAsStringList.slice(1, laskuri)
