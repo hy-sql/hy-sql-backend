@@ -13,7 +13,16 @@ const ValuesSchema = Joi.object({
         .required()
         .messages({}),
 
-    value: Joi.string().pattern(/^\w+$/).min(1).max(64).required().messages({}),
+    value: Joi.alternatives().conditional('type', {
+        is: 'INTEGER',
+        then: Joi.number(),
+        otherwise: Joi.string()
+            .pattern(/^\w+$/)
+            .min(1)
+            .max(64)
+            .required()
+            .messages({}),
+    }),
 
     type: Joi.string()
         .valid('INTEGER', 'TEXT')

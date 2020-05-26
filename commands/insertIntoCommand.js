@@ -85,7 +85,7 @@ const addAttributesToValuesArray = (columnList, stringArray) => {
         value.match('[0-9]')
             ? {
                 column: columnList[index] ? columnList[index].name : null,
-                value,
+                value: Number(value),
                 type: 'INTEGER',
             }
             : {
@@ -94,6 +94,7 @@ const addAttributesToValuesArray = (columnList, stringArray) => {
                 type: 'TEXT',
             }
     )
+    console.log('taulukko', taulukko)
     return taulukko
 }
 
