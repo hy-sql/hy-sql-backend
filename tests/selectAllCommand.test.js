@@ -1,21 +1,22 @@
 const selectAllCommand = require('../commands/selectAllCommand')
 const commandService = require('../services/CommandService')
 
-describe.each(['SELEC * FROM Taulu;', 'SELECT a FROM Taulu;'])(
-    'Query not beginning with SELECT *',
-    (wrongCommand) => {
-        describe(wrongCommand, () => {
-            const command = wrongCommand
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+describe.each([
+    'SELEC * FROM Taulu;',
+    'SELECT a FROM Taulu;',
+    'SELECT FROM Taulu',
+])('Query not beginning with SELECT *', (wrongCommand) => {
+    describe(wrongCommand, () => {
+        const command = wrongCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-            test('is not recognised as a command', () => {
-                expect(commandService.parseCommand(command)).toBeFalsy()
-            })
+        test('does not pass validation', () => {
+            expect(selectAllCommand.parseCommand(command).error).toBeDefined()
         })
-    }
-)
+    })
+})
 
 describe.each([
     'SELECT * FROM Taulu76;',
