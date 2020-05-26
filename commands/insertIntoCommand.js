@@ -32,25 +32,6 @@ const parseCommand = (fullCommandAsStringList) => {
         return { name: col }
     })
 
-    /*
-    for (let index = anchorLocation + 1; index < array.length; index++) {
-        const element = array[index];
-
-    }
-        const values = addAttributesToValuesArray(
-            columnList,
-            cleanStringArray(
-                fullCommandAsStringList.slice(
-                    fullCommandAsStringList[anchorLocation + 1] &&
-                        fullCommandAsStringList[anchorLocation + 1] === '('
-                        ? anchorLocation + 2
-                        : anchorLocation + 1,
-                    fullCommandAsStringList.length - 2
-                )
-            )
-        )
-        */
-
     const parsedCommand = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
         tableName: fullCommandAsStringList[2],
@@ -62,94 +43,84 @@ const parseCommand = (fullCommandAsStringList) => {
                 ? ')'
                 : undefined,
         anchorKeyword: fullCommandAsStringList[anchorLocation],
-        valuesOpeningBracket:
-            fullCommandAsStringList[anchorLocation + 1] &&
-            fullCommandAsStringList[anchorLocation + 1] === '('
-                ? '('
-                : undefined,
-        valuesClosingBracket:
-            fullCommandAsStringList[fullCommandAsStringList.length - 2] === ')'
-                ? ')'
-                : undefined,
-        finalSemicolon:
-            fullCommandAsStringList[fullCommandAsStringList.length - 1],
     }
 
     //VALUES kentät
     const parseErrors = []
-    let avoimetSulut = 0
-    const valueTaulukko = []
     let lohko = []
-    // TODO pari rajatapausta, katso kohta
-    for (
-        let index = anchorLocation;
+    loop1: for (
+        let index = anchorLocation + 1;
         index < fullCommandAsStringList.length;
         index++
     ) {
-        const element = fullCommandAsStringList[index]
-        if (element === ';') {
-            if (lohko.length !== 0) {
-                valueTaulukko.push(cleanStringArray(lohko))
-            }
-            break
-        }
-        if (element === '(') {
-            if (avoimetSulut > 0) {
-                parseErrors.push({
-                    message: 'ylimääräinen avaava sulku value lohkossa',
-                })
-                continue
-            } else {
-                avoimetSulut++
-                continue
-            }
-        }
-        if (element === ')' || element === '),') {
-            if (avoimetSulut > 0) {
-                avoimetSulut = 0
-                valueTaulukko.push(
-                    addAttributesToValuesArray(
+        switch (fullCommandAsStringList[index]) {
+            case ';':
+                parsedCommand.finalSemicolon = ';'
+                if (index < fullCommandAsStringList.length - 1)
+                    parseErrors.push({
+                        message: 'There is unparsed text after semicolon',
+                    })
+                break loop1
+            case '(':
+                if (!parsedCommand.valuesOpeningBracket) {
+                    parsedCommand.valuesOpeningBracket = '('
+                    continue loop1
+                } else {
+                    parseErrors.push({
+                        message: 'Too many opening brackets in values',
+                    })
+                    continue loop1
+                }
+            case '))':
+                if (!parsedCommand.valuesClosingBracket) {
+                    parsedCommand.values = addAttributesToValuesArray(
                         parsedCommand.columns,
                         cleanStringArray(lohko)
                     )
-                )
-                console.log(valueTaulukko)
-                lohko = []
-                continue
-            } else {
-                parseErrors.push({
-                    message: 'ylimääräinen sulkeva sulku value lohkossa',
-                })
-                continue
-            }
+                    parseErrors.push({
+                        message: 'Too many closing brackets in values',
+                    })
+                    parsedCommand.valuesClosingBracket = ')'
+                    lohko = []
+                    continue loop1
+                } else {
+                    parseErrors.push({
+                        message: 'Too many closing brackets in values',
+                    })
+                    continue loop1
+                }
+            case ')':
+                if (!parsedCommand.valuesClosingBracket) {
+                    parsedCommand.values = addAttributesToValuesArray(
+                        parsedCommand.columns,
+                        cleanStringArray(lohko)
+                    )
+                    parsedCommand.valuesClosingBracket = ')'
+                    lohko = []
+                    continue loop1
+                } else {
+                    parseErrors.push({
+                        message: 'Too many closing brackets in values',
+                    })
+                    continue loop1
+                }
+            default:
+                lohko.push(fullCommandAsStringList[index])
         }
-        if (element === ')(') {
-            parseErrors.push({
-                message: 'eri arvojoukkojen välissä on oltava pilkku',
-            })
-            valueTaulukko.push(
-                addAttributesToValuesArray(
-                    parsedCommand.columns,
-                    cleanStringArray(lohko)
-                )
-            )
-            lohko = []
-            continue
-        }
-        if (element === ',') {
-            console.log(element)
-            continue
-        }
-        lohko.push(element)
     }
-    if (avoimetSulut > 0) {
-        parseErrors.push({ message: 'values lohkosta puuttuu sulkeva sulku' })
+    if (lohko.length !== 0) {
+        parsedCommand.values = addAttributesToValuesArray(
+            parsedCommand.columns,
+            cleanStringArray(lohko)
+        )
     }
-    parsedCommand.values = valueTaulukko
 
-    if (parsedCommand.error) return parsedCommand.error
-
-    return InsertIntoSchema.validate(parsedCommand)
+    const palautettava = InsertIntoSchema.validate(parsedCommand)
+    if (!palautettava.error && parseErrors.length > 0) {
+        palautettava.error = { details: [] }
+        parseErrors.map((pe) => palautettava.error.details.push(pe))
+    }
+    return palautettava
 }
 
 const cleanStringArray = (columnsAsStringList) => {
