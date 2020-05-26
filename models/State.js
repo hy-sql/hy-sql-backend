@@ -21,26 +21,32 @@ class State {
     }
 
     createTable(command) {
-        let error
+        let error = this.checkCreateTableErrors(command)
+        if (error) return { error: error }
+
         const newTable = {
             name: command.tableName,
             columns: command.columns,
             rows: [],
         }
         this.tablelist.push(newTable)
-        if (!error) {
-            return {
-                result: `Table ${newTable.name} created successfully`,
-            }
-        } else {
-            return {
-                error: error,
-            }
-        }
+
+        return { result: `Table ${newTable.name} created successfully` }
+    }
+
+    checkCreateTableErrors(command) {
+        const tableIndex = this.tablelist.findIndex(
+            (e) => e.name === command.tableName
+        )
+        console.log(`TABLE INDEX ${tableIndex}`)
+        if (tableIndex !== -1)
+            return `Table ${command.tableName} already exists`
     }
 
     insertIntoTable(command) {
-        let error
+        const error = this.checkIfTableExists(command)
+        if (error) return { error: error }
+
         const tableIndex = this.tablelist.findIndex(
             (element) => element.name === command.tableName
         )
@@ -55,16 +61,22 @@ class State {
         }
         newtablelist[tableIndex].rows.push(newRow)
         this.tablelist = newtablelist
-        if (!error) {
-            return {
-                result: `INSERT INTO ${command.tableName} -query was executed succesfully`,
-            }
-        } else {
-            return { error: error }
+        return {
+            result: `INSERT INTO ${command.tableName} -query was executed succesfully`,
         }
     }
 
+    checkIfTableExists(command) {
+        const tableIndex = this.tablelist.findIndex(
+            (e) => e.name === command.tableName
+        )
+        if (tableIndex === -1) return `No such table ${command.tableName}`
+    }
+
     selectAllFromTable(command) {
+        const error = this.checkIfTableExists(command)
+        if (error) return { error: error }
+
         const tableIndex = this.tablelist.findIndex(
             (table) => table.name === command.tableName
         )
