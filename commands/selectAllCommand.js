@@ -5,7 +5,10 @@ const parseCommand = (fullCommandAsStringList) => {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
         from: fullCommandAsStringList[2],
         tableName: fullCommandAsStringList[3],
-        finalSemicolon: fullCommandAsStringList[4],
+        finalSemicolon:
+            fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
+                ? ';'
+                : undefined,
     }
 
     return selectAllSchema.validate(parsedCommand)

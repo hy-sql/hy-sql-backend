@@ -10,7 +10,7 @@ describe.each(['SELEC * FROM Taulu;', 'SELECT a FROM Taulu;'])(
                 .replace(/\s\s+/g, ' ')
                 .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-            test('is not reconised as SELECT * -command', () => {
+            test('is not recognised as a command', () => {
                 expect(commandService.parseCommand(command)).toBeFalsy()
             })
         })
@@ -29,7 +29,7 @@ describe.each([
             .replace(/\s\s+/g, ' ')
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-        test('is recognised as SELECT * -command', () => {
+        test('is recognised as a command', () => {
             expect(commandService.parseCommand(command)).toBeTruthy()
         })
 
@@ -60,7 +60,7 @@ describe.each([
             .replace(/\s\s+/g, ' ')
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-        test('is recognised as SELECT * -command', () => {
+        test('is recognised as a command', () => {
             expect(commandService.parseCommand(command)).toBeTruthy()
         })
 
