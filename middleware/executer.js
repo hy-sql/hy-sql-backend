@@ -28,16 +28,13 @@ const executer = (request, response, next) => {
                 )
                 noErrors = false
             } else {
-                /* state voisi palauttaa udateState metodista esim. create table ja insert intolla
-                'x - query was executed successfully'
-                tai tarkemman onnistumisviestin kuten 'Table x created successfully'
-                ja selectillä palauttaakin jo tulostaulut, jolloin tämä palautus tallennettaisiin resultArrayhin.
-                Olisi informatiivisemmat onnistumisviestit/tulostaulut.
+                /* State palauttaa updateState:sta tuloksen muodossa { result: result }
+                tai vastaavasti virheilmoituksen muodossa { error: error }. Lisäksi SELECT *
+                palauttaa taulun rivit muodossa { result: result, rows: [] }.
+                Jos CREATE TABLE -lauseessa yritetään muodostaa duplikaattisarakkeita palautetaan lista
+                virheviestejä muodossa { error: [] }
                 */
-                state.updateState(command.value)
-                resultArray.push(
-                    `${command.value.name} -query was executed successfully`
-                )
+                resultArray.push(state.updateState(command.value))
             }
         }
     }
