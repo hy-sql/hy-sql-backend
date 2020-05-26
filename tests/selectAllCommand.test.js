@@ -4,7 +4,7 @@ const commandService = require('../services/CommandService')
 describe.each([
     'SELEC * FROM Taulu;',
     'SELECT a FROM Taulu;',
-    'SELECT FROM Taulu',
+    'SELECT FROM Taulu;',
 ])('Query not beginning with SELECT *', (wrongCommand) => {
     describe(wrongCommand, () => {
         const command = wrongCommand
