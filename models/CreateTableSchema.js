@@ -7,7 +7,8 @@ const ColumnsSchema = Joi.object({
         .max(64)
         .required()
         .messages({
-            'string.pattern.invert.base': 'Semicolon not allowed here',
+            'string.pattern.invert.base':
+                'Semicolon should be only found at the end of a query',
             'string.pattern.base':
                 'Only letters, numbers and underscore allowed',
         }),
@@ -18,7 +19,8 @@ const ColumnsSchema = Joi.object({
         .insensitive()
         .required()
         .messages({
-            'string.pattern.invert.base': 'Semicolon not allowed here',
+            'string.pattern.invert.base':
+                'Semicolon should be only found at the end of a query',
             'string.pattern.base': 'Invalid type',
         }),
 
@@ -29,7 +31,8 @@ const ColumnsSchema = Joi.object({
             .insensitive()
             .optional()
             .messages({
-                'string.pattern.invert.base': 'Semicolon not allowed here',
+                'string.pattern.invert.base':
+                    'Semicolon should be only found at the end of a query',
                 'string.pattern.base': 'Invalid constraint or colon missing',
             })
     ),
@@ -42,7 +45,8 @@ const CreateTableSchema = Joi.object({
         .insensitive()
         .required()
         .messages({
-            'string.pattern.invert.base': 'Semicolon not allowed here',
+            'string.pattern.invert.base':
+                'Semicolon should be only found at the end of a query',
         }),
 
     tableName: Joi.string()
@@ -51,7 +55,8 @@ const CreateTableSchema = Joi.object({
         .max(64)
         .required()
         .messages({
-            'string.pattern.invert.base': 'Semicolon not allowed here',
+            'string.pattern.invert.base':
+                'Semicolon should be only found at the end of a query',
         }),
 
     openingBracket: Joi.string()
@@ -59,14 +64,18 @@ const CreateTableSchema = Joi.object({
         .pattern(/^\($/)
         .required()
         .messages({
-            'string.pattern.invert.base': 'Semicolon not allowed here',
+            'string.pattern.invert.base':
+                'Semicolon should be only found at the end of a query',
         }),
 
     columns: Joi.array().items(ColumnsSchema).required(),
 
     closingBracket: Joi.boolean().valid(true).required().messages({}),
 
-    finalSemicolon: Joi.string().valid(';').required().messages({}),
+    finalSemicolon: Joi.string().valid(';').required().messages({
+        'string.any.only': 'Query must end with ;',
+        'any.required': 'Query must end with ;',
+    }),
 })
 
 module.exports = { CreateTableSchema, ColumnsSchema }
