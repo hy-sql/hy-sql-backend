@@ -54,6 +54,7 @@ describe.each([
     'SELECT * FROM Taulu:',
     'SELECT * FROM Taulu',
     'SELECT * FROM',
+    'SELECT * FROM Taulu)a;',
 ])('Invalid SELECT * -query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = invalidCommand
