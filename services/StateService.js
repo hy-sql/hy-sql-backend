@@ -63,9 +63,13 @@ class StateService {
         const tableIndex = this.state.tables.findIndex(
             (table) => table.name === command.tableName
         )
+
+        const rows = { rows: this.state.tables[tableIndex].rows }
+        console.log(rows)
+
         return {
             result: `SELECT * FROM ${command.tableName} -query was executed succesfully`,
-            rows: this.state.tables[tableIndex].rows,
+            rows,
         }
     }
 
