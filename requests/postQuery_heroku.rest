@@ -10,7 +10,7 @@ Content-Type: application/json
   ]
 }
 
-### Valid queries demonstrating keyword case-insensitive
+### Valid queries demonstrating keyword case-insensitivity
 
 POST https://hy-sql.herokuapp.com/api/query
 Content-Type: application/json
