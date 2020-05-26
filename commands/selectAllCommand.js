@@ -25,7 +25,25 @@ const parseSelectAll = (fullCommandAsStringList) => {
                 : undefined,
     }
 
-    return SelectAllSchema.validate(parsedCommand)
+    const validationResult = SelectAllSchema.validate(parsedCommand)
+
+    /* if there is something additional between the table name and ending semicolon
+        an error about the nonbelonging part is created and added to existing
+        validation errors or an error object is added into the validation object */
+    if (fullCommandAsStringList.length > 5) {
+        const additional = fullCommandAsStringList
+            .slice(4, fullCommandAsStringList.length - 1)
+            .join(' ')
+        const errorMessage = `The following part of the query is causing it to fail: '${additional}'`
+
+        validationResult.error
+            ? validationResult.error.details.push({ message: errorMessage })
+            : (validationResult.error = {
+                details: [{ message: errorMessage }],
+            })
+    }
+
+    return validationResult
 }
 
 const parseSelectAllOrderBy = (fullCommandAsStringList) => {
@@ -42,8 +60,6 @@ const parseSelectAllOrderBy = (fullCommandAsStringList) => {
                 : undefined,
     }
 
-    console.log(SelectAllOrderBySchema.validate(parsedCommand))
-
     return SelectAllOrderBySchema.validate(parsedCommand)
 }
 
@@ -54,9 +70,9 @@ const parseOrderBy = (slicedCommandAsStringArray) => {
         ? {
             keyword: slicedCommandAsStringArray.slice(0, 2).join(' '),
             columnName: slicedCommandAsStringArray[2],
-            order: slicedCommandAsStringArray[3],
+            order: slicedCommandAsStringArray.slice(3).join(' '),
         }
-        : console.log('fail')
+        : null
 }
 
 module.exports = { parseCommand }
