@@ -33,9 +33,14 @@ const InsertIntoSchema = Joi.object({
             'any.only': 'Command must be "INSERT INTO"',
         }),
 
-    tableName: Joi.string().alphanum().min(2).max(64).required().messages({
-        'string.base': 'this is not a string',
-    }),
+    tableName: Joi.string()
+        .pattern(/^\w+$/)
+        .min(2)
+        .max(64)
+        .required()
+        .messages({
+            'string.base': 'this is not a string',
+        }),
 
     columnsOpeningBracket: Joi.string().valid('(').required(),
 
