@@ -1,13 +1,22 @@
 const commandService = require('../services/CommandService')
+const CommandArraySchema = require('../models/CommandArraySchema')
 
 const parser = (request, response, next) => {
-    if (!request.body.commandArray) {
+    const commandArray = request.body.commandArray
+
+    if (!commandArray) {
         return response.status(400).json({
             error: 'commandArray missing',
         })
     }
 
-    const { commandArray } = request.body
+    const validatedCommandArray = CommandArraySchema.validate(commandArray)
+
+    if (validatedCommandArray.error) {
+        return response.status(400).json({
+            error: 'invalid format',
+        })
+    }
 
     const splitCommandArray = commandArray.map((input) =>
         input
