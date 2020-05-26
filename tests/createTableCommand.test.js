@@ -1,5 +1,5 @@
 const createTableCommand = require('../commands/createTableCommand')
-const commands = require('../commands')
+const commandService = require('../services/CommandService')
 
 describe.each([
     'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
@@ -15,7 +15,7 @@ describe.each([
         .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
     test('valid command is recognized and true returned', () => {
-        const result = commands.isCommand(fullCommandAsStringList)
+        const result = commandService.parseCommand(fullCommandAsStringList)
 
         expect(result).toBeTruthy()
     })
@@ -70,7 +70,7 @@ describe.each([
         .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
     test('valid command is recognized and true returned', () => {
-        const result = commands.isCommand(fullCommandAsStringList)
+        const result = commandService.parseCommand(fullCommandAsStringList)
 
         expect(result).toBeFalsy()
     })

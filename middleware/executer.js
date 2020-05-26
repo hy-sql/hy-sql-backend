@@ -1,7 +1,9 @@
 const State = require('../models/State')
+const StateService = require('../services/StateService')
 
 const executer = (request, response, next) => {
     const state = new State([])
+    const stateService = new StateService(state)
 
     const parsedCommands = request.parsedCommands
 
@@ -34,7 +36,7 @@ const executer = (request, response, next) => {
                 Jos CREATE TABLE -lauseessa yritetään muodostaa duplikaattisarakkeita palautetaan lista
                 virheviestejä muodossa { error: [] }
                 */
-                resultArray.push(state.updateState(command.value))
+                resultArray.push(stateService.updateState(command.value))
             }
         }
     }

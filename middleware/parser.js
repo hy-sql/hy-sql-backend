@@ -1,4 +1,4 @@
-const commands = require('../commands')
+const commandService = require('../services/CommandService')
 
 const parser = (request, response, next) => {
     if (!request.body.commandArray) {
@@ -18,7 +18,9 @@ const parser = (request, response, next) => {
             .filter(Boolean)
     )
 
-    const parsedCommands = splitCommandArray.map((c) => commands.isCommand(c))
+    const parsedCommands = splitCommandArray.map((c) =>
+        commandService.parseCommand(c)
+    )
 
     request.parsedCommands = parsedCommands
 

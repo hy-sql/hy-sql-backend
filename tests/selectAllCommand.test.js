@@ -1,5 +1,5 @@
 const selectAllCommand = require('../commands/selectAllCommand')
-const commands = require('../commands')
+const commandService = require('../services/CommandService')
 
 describe.each(['SELEC * FROM Taulu;', 'SELECT a FROM Taulu;'])(
     'Query not beginning with SELECT *',
@@ -11,7 +11,7 @@ describe.each(['SELEC * FROM Taulu;', 'SELECT a FROM Taulu;'])(
                 .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
             test('is not recognised as a command', () => {
-                expect(commands.isCommand(command)).toBeFalsy()
+                expect(commandService.parseCommand(command)).toBeFalsy()
             })
         })
     }
@@ -30,7 +30,7 @@ describe.each([
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
         test('is recognised as a command', () => {
-            expect(commands.isCommand(command)).toBeTruthy()
+            expect(commandService.parseCommand(command)).toBeTruthy()
         })
 
         test('is parsed and validated succesfully', () => {
@@ -61,7 +61,7 @@ describe.each([
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
         test('is recognised as a command', () => {
-            expect(commands.isCommand(command)).toBeTruthy()
+            expect(commandService.parseCommand(command)).toBeTruthy()
         })
 
         test('fails validation after parsed to command object', () => {

@@ -1,8 +1,8 @@
-const createTableCommand = require('./createTableCommand')
-const insertIntoCommand = require('./insertIntoCommand')
-const selectAllCommand = require('./selectAllCommand')
+const createTableCommand = require('../commands/createTableCommand')
+const insertIntoCommand = require('../commands/insertIntoCommand')
+const selectAllCommand = require('../commands/selectAllCommand')
 
-const isCommand = (fullCommandAsStringArray) => {
+const parseCommand = (fullCommandAsStringArray) => {
     switch (fullCommandAsStringArray.slice(0, 2).join(' ').toUpperCase()) {
         case 'CREATE TABLE':
             return createTableCommand.parseCommand(fullCommandAsStringArray)
@@ -16,4 +16,4 @@ const isCommand = (fullCommandAsStringArray) => {
     }
 }
 
-module.exports = { isCommand }
+module.exports = { parseCommand }
