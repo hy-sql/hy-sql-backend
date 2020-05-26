@@ -7,12 +7,16 @@ const parseCommand = (fullCommandAsStringList) => {
         tableName: fullCommandAsStringList[2],
         openingBracket: fullCommandAsStringList[3],
         columns: parseColumns(
-            fullCommandAsStringList.slice(4, fullCommandAsStringList.length - 2)
+            fullCommandAsStringList.slice(
+                fullCommandAsStringList.indexOf('(') + 1,
+                fullCommandAsStringList.indexOf(')')
+            )
         ),
-        closingBracket:
-            fullCommandAsStringList[fullCommandAsStringList.length - 2],
+        closingBracket: fullCommandAsStringList.indexOf(')') > 0,
         finalSemicolon:
-            fullCommandAsStringList[fullCommandAsStringList.length - 1],
+            fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
+                ? ';'
+                : undefined,
     }
 
     return CreateTableSchema.validate(parsedCommand)
@@ -31,22 +35,35 @@ const parseColumns = (columnsAsStringList) => {
             return {
                 name: item[0],
                 type: item[1] ? item[1].toUpperCase() : null,
-                primaryKey: parsePrimaryKey(item.slice(2)),
+                constraints: parseColumnConstraints(item.slice(2)),
             }
         })
 
     return columns
 }
 
-const parsePrimaryKey = (stringArray) => {
-    if (!Array.isArray(stringArray) || !stringArray.length) return false
-    const value = stringArray.join(' ').trim().toUpperCase()
+const parseColumnConstraints = (constraintsAsStringArray) => {
+    // const constraints = new RegExp(
+    //     [
+    //         '(?<=CHECK)|(?=CHECK)',
+    //         '(?<=NOT NULL)|(?=NOT NULL)|',
+    //         '(?<=UNIQUE)|(?=UNIQUE)',
+    //         '(?<=PRIMARY KEY)|(?=PRIMARY KEY)|',
+    //         '(?<=FOREIGN KEY)|(?=FOREIGN KEY)|',
+    //         '(?<=INDEX)|(?=INDEX)',
+    //     ].join('')
+    // )
 
-    if (value === 'PRIMARY KEY') {
-        return true
-    } else {
-        return null
-    }
+    const primaryKey = new RegExp(['(?<=PRIMARY KEY)|(?=PRIMARY KEY)'].join(''))
+
+    const separatedConstraintsAsStringList = constraintsAsStringArray
+        .join(' ')
+        .toUpperCase()
+        .split(primaryKey)
+        .map((c) => c.trim())
+        .filter(Boolean)
+
+    return separatedConstraintsAsStringList
 }
 
 module.exports = { parseCommand }
