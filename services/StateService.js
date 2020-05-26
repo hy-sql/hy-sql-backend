@@ -49,6 +49,8 @@ class StateService {
             newRow[column] = value
         }
 
+        this.state.insertIntoTable(tableIndex, newRow)
+
         return {
             result: `INSERT INTO ${command.tableName} -query was executed succesfully`,
         }
