@@ -154,9 +154,7 @@ test('INSERT INTO creates row and updates id', () => {
         ],
     }
     stateService.insertIntoTable(insertCommand)
-    console.log(state.tables[0])
     const rows = state.tables[0].rows
-    console.log(rows)
     expect(rows[0].id).toBe(1)
     expect(rows[0].nimi).toBe('tuote')
     expect(rows[0].hinta).toBe(10)
