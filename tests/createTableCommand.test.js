@@ -1,5 +1,5 @@
 const createTableCommand = require('../commands/createTableCommand')
-const commandService = require('../services/CommandService')
+const commandService = require('../services/commandService')
 
 describe.each([
     'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',

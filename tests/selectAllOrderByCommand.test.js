@@ -3,27 +3,33 @@ const commandService = require('../services/commandService')
 
 describe.each([
     'SELEC * FROM Taulu;',
-    'SELECT a FROM Taulu;',
-    'SELECT FROM Taulu;',
-])('Query not beginning with SELECT *', (wrongCommand) => {
+    'SELECT a FROM Taulu BY;',
+    'SELECT FROM Taulu ORDER;',
+    'SELECT FROM Taulu BY ORDER;',
+])('SELECT * query not containing ORDER BY', (wrongCommand) => {
     describe(wrongCommand, () => {
         const command = wrongCommand
             .trim()
             .replace(/\s\s+/g, ' ')
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-        test('does not pass validation', () => {
-            expect(selectAllCommand.parseCommand(command).error).toBeDefined()
+        test('does not contain orderBy field', () => {
+            expect(selectAllCommand.parseCommand(command).value).toBeDefined()
+            expect(
+                selectAllCommand.parseCommand(command).value.orderBy
+            ).not.toBeDefined()
         })
     })
 })
 
 describe.each([
-    'SELECT * FROM Taulu76;',
-    'SELECT    * FROM        Taulu;',
-    'seLEcT * FrOm Taulu;',
-    'SELECT * FROM Taulun_nimi;',
-])('Valid SELECT * -query', (validCommand) => {
+    'SELECT * FROM Taulu76 order by column ;',
+    'SELECT    * FROM        Taulu ORDER BY columnS;',
+    'seLEcT * FrOm Taulu   order BY column asc;',
+    'SELECT * FROM Taulun_nimi ORder BY column Asc;',
+    'SELECT * FROM Tuotteet ORDER BY hinta desc;',
+    'SELECT * FROM Tuotteet ORDER BY hinta   dESc  ;',
+])('Valid SELECT * ORDER BY -query', (validCommand) => {
     describe(validCommand, () => {
         const command = validCommand
             .trim()
@@ -37,11 +43,14 @@ describe.each([
         test('is parsed and validated succesfully', () => {
             const parsedCommand = selectAllCommand.parseCommand(command)
 
+            console.log(parsedCommand)
+
             expect(parsedCommand.value).toBeDefined()
             expect(parsedCommand.value).toHaveProperty('name')
             expect(parsedCommand.value).toHaveProperty('from')
             expect(parsedCommand.value).toHaveProperty('tableName')
             expect(parsedCommand.value).toHaveProperty('finalSemicolon')
+            expect(parsedCommand.value).toHaveProperty('orderBy')
 
             expect(selectAllCommand.parseCommand(command).error).toBeUndefined()
         })
@@ -49,12 +58,12 @@ describe.each([
 })
 
 describe.each([
-    'SELECT * FRM Taulu;',
-    'SELECT * FROM Tau&lu;',
-    'SELECT * FROM Taulu:',
-    'SELECT * FROM Taulu',
-    'SELECT * FROM',
-    'SELECT * FROM Taulu)a;',
+    'SELECT * FROM Taulu order by where where;',
+    'SELECT * FROM Taulu order by asc hi;',
+    'SELECT * FROM Taulu order by asc hi:',
+    'SELECT * FROM Taulu order asc by;',
+    'SELECT * FROM Taulu by order',
+    'SELECT * FROM Taulu order by)a;',
 ])('Invalid SELECT * -query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = invalidCommand
