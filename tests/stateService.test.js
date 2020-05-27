@@ -228,11 +228,11 @@ test('SELECT * FROM ORDER BY returns rows from table in ascending order', () => 
 
     const commands = [
         'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
-        'INSERT INTO Tuotteet (nimi, hinta) VALUES (\'retiisi\', 7);',
-        'INSERT INTO Tuotteet (nimi,hinta) VALUES (\'porkkana\',5);',
-        'INSERT INTO Tuotteet (nimi,hinta) VALUES (\'nauris\',4);',
-        'INSERT INTO Tuotteet (nimi,hinta) VALUES (\'lanttu\',8);',
-        'INSERT INTO Tuotteet (nimi,hinta) VALUES (\'selleri\',4);',
+        "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+        "INSERT INTO Tuotteet (nimi,hinta) VALUES ('porkkana',5);",
+        "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4);",
+        "INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu',8);",
+        "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
     ]
 
     const splitCommandArray = commands.map((input) =>
