@@ -13,6 +13,8 @@ class StateService {
                 return this.insertIntoTable(parsedCommand)
             case 'SELECT *':
                 return this.selectAllFromTable(parsedCommand)
+            case 'SELECT':
+                return this.selectFromTable(parsedCommand)
             default:
                 break
         }
@@ -34,7 +36,7 @@ class StateService {
     }
 
     insertIntoTable(command) {
-        const error = this.checkIfTableExists(command)
+        const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
 
         const tableIndex = this.state.tables.findIndex(
@@ -59,7 +61,7 @@ class StateService {
     }
 
     selectAllFromTable(command) {
-        const error = this.checkIfTableExists(command)
+        const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
 
         const tableIndex = this.state.tables.findIndex(
@@ -82,6 +84,13 @@ class StateService {
         }
     }
 
+    selectFromTable(command) {
+        const error = this.checkIfTableExists(command.tableName)
+        if (error) return { error: error }
+
+        return `${command.name} FROM ${command.tableName} -query was executed successfully`
+    }
+
     checkCreateTableErrors(command) {
         const tableIndex = this.state.tables.findIndex(
             (e) => e.name === command.tableName
@@ -98,11 +107,11 @@ class StateService {
             return duplicates.map((e) => `duplicate column ${e}: ${e}`)
     }
 
-    checkIfTableExists(command) {
+    checkIfTableExists(tableName) {
         const tableIndex = this.state.tables.findIndex(
-            (e) => e.name === command.tableName
+            (e) => e.name === tableName
         )
-        if (tableIndex === -1) return `No such table ${command.tableName}`
+        if (tableIndex === -1) return `No such table ${tableName}`
     }
 
     findDuplicates(arr) {
