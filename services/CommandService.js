@@ -6,9 +6,9 @@ const parseCommand = (fullCommandAsStringArray) => {
     switch (fullCommandAsStringArray.slice(0, 2).join(' ').toUpperCase()) {
         case 'CREATE TABLE':
             return createTableCommand.parseCommand(fullCommandAsStringArray)
-        case 'INSERT':
+        case 'INSERT INTO':
             return insertIntoCommand.parseCommand(fullCommandAsStringArray)
-        case 'SELECT':
+        case 'SELECT *':
             return selectAllCommand.parseCommand(fullCommandAsStringArray)
         default:
             console.log('sth went wrong')
