@@ -3,9 +3,6 @@ const { parseColumnNames } = require('./parserTools/parseColumnNames')
 const selectSchema = require('../models/SelectSchema')
 
 const parseCommand = (fullCommandAsStringList) => {
-    // ensin simppeli ilman alikyselyitä
-    console.log(fullCommandAsStringList)
-
     //KOMENTO
     const parsedCommand = {
         name: fullCommandAsStringList[0],
@@ -13,12 +10,14 @@ const parseCommand = (fullCommandAsStringList) => {
     let parserCounter = 1
 
     // SARAKKEIDEN OSIO - (*AS -- TODO*)
+    //copy pastesta eroon
     let palautusolio = parseColumnNames(parserCounter, fullCommandAsStringList)
-    parserCounter = palautusolio.parserCounter //jatketaan tästä seuraavassa
-    palautusolio.columnsOpenBrackets > 0 //tarkoituksena että heittää errorin validoinnissa
+    parserCounter = palautusolio.parserCounter
+    palautusolio.columnsOpenBrackets > 0
         ? parsedCommand.columnsOpenBrackets
         : null
     parsedCommand.columns = palautusolio.columns
+    //copy paste loppuu, seuraava tauluissa
 
     //FROM
     if (fullCommandAsStringList[parserCounter].toUpperCase() === 'FROM') {
@@ -28,7 +27,8 @@ const parseCommand = (fullCommandAsStringList) => {
 
     //TAULUJEN OSIO
     palautusolio = parseTableNames(parserCounter, fullCommandAsStringList)
-
+    parserCounter = palautusolio.parserCounter
+    if (palautusolio.tableName) parsedCommand.tableName = palautusolio.tableName
     // WHERE OSIO - specifies which rows to retrieve.
 
     // GROUP BY - groups rows sharing a property so that an aggregate function can be applied to each group.
@@ -38,14 +38,22 @@ const parseCommand = (fullCommandAsStringList) => {
     // ORDER BY -- tehdään controllerissa -- specifies an order in which to return the rows.
 
     // finalSemicolon
+    if (fullCommandAsStringList[parserCounter] === ';')
+        parsedCommand.semicolon = ';'
 
-    console.log(parsedCommand)
     return selectSchema.validate(parsedCommand)
 }
 
 const parseTableNames = (parserCounter, stringArray) => {
     //toistaiseksi lyhyt kun hyväksytään vain yksi taulu! =D
-    if (stringArray[parserCounter]) console.log(stringArray)
+    let palautettava = {
+        parserCounter,
+    }
+    if (stringArray[parserCounter].toUpperCase() !== 'WHERE|JOIN|(|)') {
+        palautettava.parserCounter++
+        palautettava.tableName = stringArray[parserCounter]
+    }
+    return palautettava
 }
 
 module.exports = { parseCommand }
