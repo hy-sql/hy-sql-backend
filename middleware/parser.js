@@ -1,4 +1,4 @@
-const commandService = require('../services/CommandService')
+const commandService = require('../services/commandService')
 const CommandArraySchema = require('../models/CommandArraySchema')
 
 const parser = (request, response, next) => {

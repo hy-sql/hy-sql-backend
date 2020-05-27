@@ -94,7 +94,6 @@ const addAttributesToValuesArray = (columnList, stringArray) => {
                 type: 'TEXT',
             }
     )
-    console.log('taulukko', taulukko)
     return taulukko
 }
 

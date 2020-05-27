@@ -1,5 +1,5 @@
 const selectAllCommand = require('../commands/selectAllCommand')
-const commandService = require('../services/CommandService')
+const commandService = require('../services/commandService')
 
 describe.each([
     'SELEC * FROM Taulu;',
