@@ -1,3 +1,15 @@
+### Valid select query
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": [
+    "SELECT nimi,hinta FROM Tuotteet;"
+  ]
+}
+
+
 ### Valid queries
 
 POST http://localhost:3001/api/query

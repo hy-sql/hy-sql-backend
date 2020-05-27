@@ -1,15 +1,15 @@
 const createTableCommand = require('../commands/createTableCommand')
 const insertIntoCommand = require('../commands/insertIntoCommand')
-const selectAllCommand = require('../commands/selectAllCommand')
+const selectCommand = require('../commands/selectCommand')
 
 const parseCommand = (fullCommandAsStringArray) => {
-    switch (fullCommandAsStringArray.slice(0, 2).join(' ').toUpperCase()) {
-        case 'CREATE TABLE':
+    switch (fullCommandAsStringArray[0].toUpperCase()) {
+        case 'CREATE':
             return createTableCommand.parseCommand(fullCommandAsStringArray)
-        case 'INSERT INTO':
+        case 'INSERT':
             return insertIntoCommand.parseCommand(fullCommandAsStringArray)
-        case 'SELECT *':
-            return selectAllCommand.parseCommand(fullCommandAsStringArray)
+        case 'SELECT':
+            return selectCommand.parseCommand(fullCommandAsStringArray)
         default:
             console.log('sth went wrong')
             return null
