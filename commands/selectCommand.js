@@ -1,39 +1,33 @@
 const { parseColumnNames } = require('./parserTools')
 
-//const selectSchema = require('../models/SelectSchema')
+const selectSchema = require('../models/SelectSchema')
 
 const parseCommand = (fullCommandAsStringList) => {
     // ensin simppeli ilman alikyselyitä
     console.log(fullCommandAsStringList)
 
+    //KOMENTO
     const parsedCommand = {
         name: fullCommandAsStringList[0],
     }
     let parserCounter = 1
-    //const columns = []
 
     // SARAKKEIDEN OSIO - (*AS -- TODO*)
-    //eli löytyi tuo, voidaan asettaa jatkavaLaskuri tähän kohtaan
-    //    let index = 1
     let palautusolio = parseColumnNames(parserCounter, fullCommandAsStringList)
-    console.log('palautusolio:', palautusolio)
-    parserCounter = palautusolio.parserCounter
-    palautusolio.columnsOpenBrackets > 0
+    parserCounter = palautusolio.parserCounter //jatketaan tästä seuraavassa
+    palautusolio.columnsOpenBrackets > 0 //tarkoituksena että heittää errorin validoinnissa
         ? parsedCommand.columnsOpenBrackets
         : null
     parsedCommand.columns = palautusolio.columns
 
-    /*
-
-        parsedCommand.columns = cleanStringArray(
-            fullCommandAsStringList.slice(1, laskuri)
-        ).map((c) => {
-            return { name: c }
-        })
-        parsedCommand.fromKeyword = fullCommandAsStringList[laskuri]*/
+    //FROM
+    if (fullCommandAsStringList[parserCounter].toUpperCase() === 'FROM') {
+        parsedCommand.fromKeyword = fullCommandAsStringList[parserCounter]
+        parserCounter++
+    }
 
     //TAULUJEN OSIO
-    //tableName: sana
+    palautusolio = parseTableNames(parserCounter, fullCommandAsStringList)
 
     // WHERE OSIO - specifies which rows to retrieve.
 
@@ -46,8 +40,11 @@ const parseCommand = (fullCommandAsStringList) => {
     // finalSemicolon
 
     console.log(parsedCommand)
-    //return selectSchema.validate(parsedCommand)
-    return parsedCommand
+    return selectSchema.validate(parsedCommand)
+}
+
+const parseTableNames = (parserCounter, stringArray) => {
+    console.log(stringArray)
 }
 
 module.exports = { parseCommand }
