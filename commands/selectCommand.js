@@ -21,7 +21,7 @@ const parseCommand = (fullCommandAsStringList) => {
 
     //FROM
     if (fullCommandAsStringList[parserCounter].toUpperCase() === 'FROM') {
-        parsedCommand.fromKeyword = fullCommandAsStringList[parserCounter]
+        parsedCommand.from = fullCommandAsStringList[parserCounter]
         parserCounter++
     }
 
@@ -39,8 +39,9 @@ const parseCommand = (fullCommandAsStringList) => {
 
     // finalSemicolon
     if (fullCommandAsStringList[parserCounter] === ';')
-        parsedCommand.semicolon = ';'
+        parsedCommand.finalSemicolon = ';'
 
+    console.log(selectSchema.validate(parsedCommand))
     return selectSchema.validate(parsedCommand)
 }
 
