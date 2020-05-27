@@ -1,4 +1,4 @@
-const { parseColumnNames } = require('./parserTools')
+const { parseColumnNames } = require('./parserTools/parseColumnNames')
 
 const selectSchema = require('../models/SelectSchema')
 
@@ -44,7 +44,8 @@ const parseCommand = (fullCommandAsStringList) => {
 }
 
 const parseTableNames = (parserCounter, stringArray) => {
-    console.log(stringArray)
+    //toistaiseksi lyhyt kun hyväksytään vain yksi taulu! =D
+    if (stringArray[parserCounter]) console.log(stringArray)
 }
 
 module.exports = { parseCommand }

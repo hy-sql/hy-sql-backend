@@ -1,17 +1,4 @@
-const cleanStringArray = (stringArray) => {
-    return stringArray
-        .join(' ')
-        .split(', ')
-        .map((col) => col.trim())
-}
-
-const namify = (stringList) => {
-    return stringList.map((str) => {
-        return {
-            name: str,
-        }
-    })
-}
+const { namify, cleanStringArray } = require('./smallTools')
 
 const parseColumnNames = (parserCounter, fullCommandAsStringList) => {
     let laskuri = parserCounter
@@ -26,7 +13,6 @@ const parseColumnNames = (parserCounter, fullCommandAsStringList) => {
             case ',':
                 continue loop1
             // katkaisevat sanat, lisää näitä
-            //lista? katsotaan löytyykö sana listasta? en tiedä vielä miten sen tekis casen kanssa
             case ';':
             case 'SELECT':
             case 'CREATE':
@@ -54,29 +40,7 @@ const parseColumnNames = (parserCounter, fullCommandAsStringList) => {
         returnable.parserCounter = laskuri
         returnable.columns = namify(cleanStringArray(columns))
     }
-    console.log(returnable)
     return returnable
 }
 
-const addAttributesToValuesArray = (columns, stringArray) => {
-    const taulukko = stringArray.map((value, index) =>
-        value.match('[0-9]')
-            ? {
-                  column: columns[index] ? columns[index].name : null,
-                  value,
-                  type: 'INTEGER',
-              }
-            : {
-                  column: columns[index] ? columns[index].name : null,
-                  value: value.replace(/'/g, ' ').trim(),
-                  type: 'TEXT',
-              }
-    )
-    return taulukko
-}
-
-module.exports = {
-    cleanStringArray,
-    addAttributesToValuesArray,
-    parseColumnNames,
-}
+module.exports = { parseColumnNames }

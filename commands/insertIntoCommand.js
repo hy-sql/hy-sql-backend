@@ -1,4 +1,5 @@
 const { InsertIntoSchema } = require('../models/InsertIntoSchema')
+const { parseColumnNames } = require('./parserTools/parseColumnNames')
 
 const parseCommand = (fullCommandAsStringList) => {
     let anchorLocation = fullCommandAsStringList
@@ -21,28 +22,28 @@ const parseCommand = (fullCommandAsStringList) => {
         }
     }
 
-    const columnList = cleanStringArray(
-        fullCommandAsStringList.slice(
-            fullCommandAsStringList[3] === '(' ? 4 : 3,
-            fullCommandAsStringList[anchorLocation - 1] === ')'
-                ? anchorLocation - 1
-                : anchorLocation
-        )
-    ).map((col) => {
-        return { name: col }
-    })
-
     const parsedCommand = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
         tableName: fullCommandAsStringList[2],
-        columnsOpeningBracket:
-            fullCommandAsStringList[3] === '(' ? '(' : undefined,
-        columns: columnList,
-        columnsClosingBracket:
-            fullCommandAsStringList[anchorLocation - 1] === ')'
-                ? ')'
-                : undefined,
         anchorKeyword: fullCommandAsStringList[anchorLocation],
+    }
+    let parserCounter = 3
+    if (fullCommandAsStringList[parserCounter] === '(') {
+        parsedCommand.columnsOpeningBracket = '('
+        parserCounter++
+    }
+
+    //tämä copy paste pitää saada vielä pois
+    let palautusolio = parseColumnNames(parserCounter, fullCommandAsStringList)
+    parserCounter = palautusolio.parserCounter
+    palautusolio.columnsOpenBrackets > 0 //tarkoituksena että heittää errorin validoinnissa
+        ? parsedCommand.columnsOpenBrackets
+        : null
+    parsedCommand.columns = palautusolio.columns
+    //copy paste loppuu
+
+    if (fullCommandAsStringList[parserCounter] === ')') {
+        parsedCommand.columnsClosingBracket = ')'
     }
 
     //VALUES kentät
@@ -134,15 +135,15 @@ const addAttributesToValuesArray = (columnList, stringArray) => {
     const taulukko = stringArray.map((value, index) =>
         value.match('[0-9]')
             ? {
-                column: columnList[index] ? columnList[index].name : null,
-                value,
-                type: 'INTEGER',
-            }
+                  column: columnList[index] ? columnList[index].name : null,
+                  value,
+                  type: 'INTEGER',
+              }
             : {
-                column: columnList[index] ? columnList[index].name : null,
-                value: value.replace(/'/g, ' ').trim(),
-                type: 'TEXT',
-            }
+                  column: columnList[index] ? columnList[index].name : null,
+                  value: value.replace(/'/g, ' ').trim(),
+                  type: 'TEXT',
+              }
     )
     return taulukko
 }
