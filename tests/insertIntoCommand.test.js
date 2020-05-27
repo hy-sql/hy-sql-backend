@@ -1,6 +1,6 @@
 const insertIntoCommand = require('../commands/insertIntoCommand')
 const { InsertIntoSchema } = require('../models/InsertIntoSchema')
-const commandService = require('../services/CommandService')
+const commandService = require('../services/commandService')
 
 describe.each([
     'INSERT INTO Tuotteet (id, nimi, hinta) VALUES (1, \'nauris\', 3);',

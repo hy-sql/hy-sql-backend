@@ -33,7 +33,7 @@ const ColumnsSchema = Joi.object({
             .messages({
                 'string.pattern.invert.base':
                     'Semicolon should be only found at the end of a query',
-                'string.pattern.base': 'Invalid constraint or colon missing',
+                'string.pattern.base': 'Invalid constraint or comma missing',
             })
     ),
 })
@@ -50,7 +50,7 @@ const CreateTableSchema = Joi.object({
         }),
 
     tableName: Joi.string()
-        .pattern(/[;]./, { invert: true })
+        .pattern(/;/, { invert: true })
         .pattern(/^\w+$/)
         .max(64)
         .required()

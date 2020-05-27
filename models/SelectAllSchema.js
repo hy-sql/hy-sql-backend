@@ -1,4 +1,5 @@
 const Joi = require('@hapi/joi')
+const OrderBySchema = require('./OrderBySchema')
 
 const SelectAllSchema = Joi.object({
     name: Joi.string().required().valid('SELECT *').insensitive().messages({
@@ -36,4 +37,8 @@ const SelectAllSchema = Joi.object({
     }),
 })
 
-module.exports = SelectAllSchema
+const SelectAllOrderBySchema = SelectAllSchema.keys({
+    orderBy: OrderBySchema,
+})
+
+module.exports = { SelectAllSchema, SelectAllOrderBySchema }

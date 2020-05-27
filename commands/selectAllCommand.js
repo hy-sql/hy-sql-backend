@@ -1,6 +1,29 @@
-const selectAllSchema = require('../models/SelectAllSchema')
+const {
+    SelectAllSchema,
+    SelectAllOrderBySchema,
+} = require('../models/SelectAllSchema')
 
 const parseCommand = (fullCommandAsStringList) => {
+    if (hasOrderByKeywords(fullCommandAsStringList)) {
+        return parseSelectAllOrderBy(fullCommandAsStringList)
+    }
+
+    return parseSelectAll(fullCommandAsStringList)
+}
+
+const hasOrderByKeywords = (fullCommandAsStringList) => {
+    const hasOrder = fullCommandAsStringList.findIndex(
+        (s) => s.toUpperCase() === 'ORDER'
+    )
+
+    const hasBy = fullCommandAsStringList.findIndex(
+        (s) => s.toUpperCase() === 'BY'
+    )
+
+    return hasOrder > 0 && hasBy > 0 ? hasOrder < hasBy : false
+}
+
+const parseSelectAll = (fullCommandAsStringList) => {
     const parsedCommand = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
         from: fullCommandAsStringList[2],
@@ -11,7 +34,7 @@ const parseCommand = (fullCommandAsStringList) => {
                 : undefined,
     }
 
-    const validationResult = selectAllSchema.validate(parsedCommand)
+    const validationResult = SelectAllSchema.validate(parsedCommand)
 
     /* if there is something additional between the table name and ending semicolon
         an error about the nonbelonging part is created and added to existing
@@ -30,6 +53,40 @@ const parseCommand = (fullCommandAsStringList) => {
     }
 
     return validationResult
+}
+
+const parseSelectAllOrderBy = (fullCommandAsStringList) => {
+    const parsedCommand = {
+        name: fullCommandAsStringList.slice(0, 2).join(' '),
+        from: fullCommandAsStringList[2],
+        tableName: fullCommandAsStringList[3],
+        orderBy: parseOrderBy(
+            fullCommandAsStringList.slice(4, fullCommandAsStringList.length - 1)
+        ),
+        finalSemicolon:
+            fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
+                ? ';'
+                : undefined,
+    }
+
+    return SelectAllOrderBySchema.validate(parsedCommand)
+}
+
+const parseOrderBy = (slicedCommandAsStringArray) => {
+    return slicedCommandAsStringArray.slice(0, 2).join(' ').toUpperCase() ===
+        'ORDER BY'
+        ? {
+            keyword: slicedCommandAsStringArray
+                .slice(0, 2)
+                .join(' ')
+                .toUpperCase(),
+            columnName: slicedCommandAsStringArray[2],
+            order: slicedCommandAsStringArray
+                .slice(3)
+                .join(' ')
+                .toUpperCase(),
+        }
+        : null
 }
 
 module.exports = { parseCommand }
