@@ -2,7 +2,10 @@ const Joi = require('@hapi/joi')
 
 const ColumnsSchema = Joi.object({
     //name: Joi.string().pattern(/^\w+$/).max(64).invalid(null).required().messages({}),
-    name: Joi.string().pattern(/^\w+$/).max(64).required().messages({}),
+    name: Joi.string().pattern(/^\w+$/).max(64).required().messages({
+        'string.pattern.base':
+            'One of the column names is invalid. Only a-z,A-Z,0-9 and _ allowed.',
+    }),
 })
 
 const ValuesSchema = Joi.object({
@@ -33,9 +36,14 @@ const InsertIntoSchema = Joi.object({
             'any.only': 'Command must be "INSERT INTO"',
         }),
 
-    tableName: Joi.string().alphanum().min(2).max(64).required().messages({
-        'string.base': 'this is not a string',
-    }),
+    tableName: Joi.string()
+        .pattern(/^\w+$/)
+        .min(2)
+        .max(64)
+        .required()
+        .messages({
+            'string.base': 'this is not a string',
+        }),
 
     columnsOpeningBracket: Joi.string().valid('(').required(),
 

@@ -1,21 +1,22 @@
 const selectAllCommand = require('../commands/selectAllCommand')
-const commands = require('../commands')
+const commandService = require('../services/CommandService')
 
-describe.each(['SELEC * FROM Taulu;', 'SELECT a FROM Taulu;'])(
-    'Query not beginning with SELECT *',
-    (wrongCommand) => {
-        describe(wrongCommand, () => {
-            const command = wrongCommand
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+describe.each([
+    'SELEC * FROM Taulu;',
+    'SELECT a FROM Taulu;',
+    'SELECT FROM Taulu;',
+])('Query not beginning with SELECT *', (wrongCommand) => {
+    describe(wrongCommand, () => {
+        const command = wrongCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-            test('is not reconised as SELECT * -command', () => {
-                expect(commands.isCommand(command)).toBeFalsy()
-            })
+        test('does not pass validation', () => {
+            expect(selectAllCommand.parseCommand(command).error).toBeDefined()
         })
-    }
-)
+    })
+})
 
 describe.each([
     'SELECT * FROM Taulu76;',
@@ -29,8 +30,8 @@ describe.each([
             .replace(/\s\s+/g, ' ')
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-        test('is recognised as SELECT * -command', () => {
-            expect(commands.isCommand(command)).toBeTruthy()
+        test('is recognised as a command', () => {
+            expect(commandService.parseCommand(command)).toBeTruthy()
         })
 
         test('is parsed and validated succesfully', () => {
@@ -53,6 +54,7 @@ describe.each([
     'SELECT * FROM Taulu:',
     'SELECT * FROM Taulu',
     'SELECT * FROM',
+    'SELECT * FROM Taulu)a;',
 ])('Invalid SELECT * -query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = invalidCommand
@@ -60,8 +62,8 @@ describe.each([
             .replace(/\s\s+/g, ' ')
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-        test('is recognised as SELECT * -command', () => {
-            expect(commands.isCommand(command)).toBeTruthy()
+        test('is recognised as a command', () => {
+            expect(commandService.parseCommand(command)).toBeTruthy()
         })
 
         test('fails validation after parsed to command object', () => {
