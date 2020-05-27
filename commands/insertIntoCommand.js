@@ -43,34 +43,84 @@ const parseCommand = (fullCommandAsStringList) => {
                 ? ')'
                 : undefined,
         anchorKeyword: fullCommandAsStringList[anchorLocation],
-        valuesOpeningBracket:
-            fullCommandAsStringList[anchorLocation + 1] &&
-            fullCommandAsStringList[anchorLocation + 1] === '('
-                ? '('
-                : undefined,
-        values: addAttributesToValuesArray(
-            columnList,
-            cleanStringArray(
-                fullCommandAsStringList.slice(
-                    fullCommandAsStringList[anchorLocation + 1] &&
-                        fullCommandAsStringList[anchorLocation + 1] === '('
-                        ? anchorLocation + 2
-                        : anchorLocation + 1,
-                    fullCommandAsStringList.length - 2
-                )
-            )
-        ),
-        valuesClosingBracket:
-            fullCommandAsStringList[fullCommandAsStringList.length - 2] === ')'
-                ? ')'
-                : undefined,
-        finalSemicolon:
-            fullCommandAsStringList[fullCommandAsStringList.length - 1],
     }
 
-    if (parsedCommand.error) return parsedCommand.error
+    //VALUES kentät
+    const parseErrors = []
+    let lohko = []
+    loop1: for (
+        let index = anchorLocation + 1;
+        index < fullCommandAsStringList.length;
+        index++
+    ) {
+        switch (fullCommandAsStringList[index]) {
+            case ';':
+                parsedCommand.finalSemicolon = ';'
+                if (index < fullCommandAsStringList.length - 1)
+                    parseErrors.push({
+                        message: 'There is unparsed text after semicolon',
+                    })
+                break loop1
+            case '(':
+                if (!parsedCommand.valuesOpeningBracket) {
+                    parsedCommand.valuesOpeningBracket = '('
+                    continue loop1
+                } else {
+                    parseErrors.push({
+                        message: 'Too many opening brackets in values',
+                    })
+                    continue loop1
+                }
+            case '))':
+                if (!parsedCommand.valuesClosingBracket) {
+                    parsedCommand.values = addAttributesToValuesArray(
+                        parsedCommand.columns,
+                        cleanStringArray(lohko)
+                    )
+                    parseErrors.push({
+                        message: 'Too many closing brackets in values',
+                    })
+                    parsedCommand.valuesClosingBracket = ')'
+                    lohko = []
+                    continue loop1
+                } else {
+                    parseErrors.push({
+                        message: 'Too many closing brackets in values',
+                    })
+                    continue loop1
+                }
+            case ')':
+                if (!parsedCommand.valuesClosingBracket) {
+                    parsedCommand.values = addAttributesToValuesArray(
+                        parsedCommand.columns,
+                        cleanStringArray(lohko)
+                    )
+                    parsedCommand.valuesClosingBracket = ')'
+                    lohko = []
+                    continue loop1
+                } else {
+                    parseErrors.push({
+                        message: 'Too many closing brackets in values',
+                    })
+                    continue loop1
+                }
+            default:
+                lohko.push(fullCommandAsStringList[index])
+        }
+    }
+    if (lohko.length !== 0) {
+        parsedCommand.values = addAttributesToValuesArray(
+            parsedCommand.columns,
+            cleanStringArray(lohko)
+        )
+    }
 
-    return InsertIntoSchema.validate(parsedCommand)
+    const palautettava = InsertIntoSchema.validate(parsedCommand)
+    if (!palautettava.error && parseErrors.length > 0) {
+        palautettava.error = { details: [] }
+        parseErrors.map((pe) => palautettava.error.details.push(pe))
+    }
+    return palautettava
 }
 
 const cleanStringArray = (columnsAsStringList) => {
@@ -84,15 +134,15 @@ const addAttributesToValuesArray = (columnList, stringArray) => {
     const taulukko = stringArray.map((value, index) =>
         value.match('[0-9]')
             ? {
-                column: columnList[index] ? columnList[index].name : null,
-                value,
-                type: 'INTEGER',
-            }
+                  column: columnList[index] ? columnList[index].name : null,
+                  value,
+                  type: 'INTEGER',
+              }
             : {
-                column: columnList[index] ? columnList[index].name : null,
-                value: value.replace(/'/g, ' ').trim(),
-                type: 'TEXT',
-            }
+                  column: columnList[index] ? columnList[index].name : null,
+                  value: value.replace(/'/g, ' ').trim(),
+                  type: 'TEXT',
+              }
     )
     return taulukko
 }
