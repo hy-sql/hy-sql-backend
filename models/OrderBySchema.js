@@ -23,6 +23,7 @@ const OrderBySchema = Joi.object({
     order: Joi.string()
         .pattern(/[;]/, { invert: true })
         .pattern(/^ASC$|^DESC$/i)
+        .allow('')
         .insensitive()
         .max(64)
         .optional()

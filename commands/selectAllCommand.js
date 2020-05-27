@@ -4,14 +4,23 @@ const {
 } = require('../models/SelectAllSchema')
 
 const parseCommand = (fullCommandAsStringList) => {
-    if (
-        fullCommandAsStringList.includes('ORDER') &&
-        fullCommandAsStringList.includes('BY')
-    ) {
+    if (hasOrderByKeywords(fullCommandAsStringList)) {
         return parseSelectAllOrderBy(fullCommandAsStringList)
     }
 
     return parseSelectAll(fullCommandAsStringList)
+}
+
+const hasOrderByKeywords = (fullCommandAsStringList) => {
+    const hasOrder = fullCommandAsStringList.findIndex(
+        (s) => s.toUpperCase() === 'ORDER'
+    )
+
+    const hasBy = fullCommandAsStringList.findIndex(
+        (s) => s.toUpperCase() === 'BY'
+    )
+
+    return hasOrder > 0 && hasBy > 0 ? hasOrder < hasBy : false
 }
 
 const parseSelectAll = (fullCommandAsStringList) => {
@@ -64,13 +73,18 @@ const parseSelectAllOrderBy = (fullCommandAsStringList) => {
 }
 
 const parseOrderBy = (slicedCommandAsStringArray) => {
-    console.log(slicedCommandAsStringArray)
-
-    return slicedCommandAsStringArray.slice(0, 2).join(' ') === 'ORDER BY'
+    return slicedCommandAsStringArray.slice(0, 2).join(' ').toUpperCase() ===
+        'ORDER BY'
         ? {
-            keyword: slicedCommandAsStringArray.slice(0, 2).join(' '),
+            keyword: slicedCommandAsStringArray
+                .slice(0, 2)
+                .join(' ')
+                .toUpperCase(),
             columnName: slicedCommandAsStringArray[2],
-            order: slicedCommandAsStringArray.slice(3).join(' '),
+            order: slicedCommandAsStringArray
+                .slice(3)
+                .join(' ')
+                .toUpperCase(),
         }
         : null
 }

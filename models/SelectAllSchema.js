@@ -38,7 +38,7 @@ const SelectAllSchema = Joi.object({
 })
 
 const SelectAllOrderBySchema = SelectAllSchema.keys({
-    orderBy: Joi.object().schema(OrderBySchema),
+    orderBy: OrderBySchema,
 })
 
 module.exports = { SelectAllSchema, SelectAllOrderBySchema }
