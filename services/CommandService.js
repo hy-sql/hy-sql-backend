@@ -15,7 +15,8 @@ const parseCommand = (fullCommandAsStringArray) => {
                 return insertIntoCommand.parseCommand(fullCommandAsStringArray)
             return null
         case 'SELECT':
-            if (fullCommandAsStringArray[1] === '*') return selectAllCommand
+            if (fullCommandAsStringArray[1] === '*')
+                return selectAllCommand.parseCommand(fullCommandAsStringArray)
             return selectCommand.parseCommand(fullCommandAsStringArray)
         default:
             console.log('sth went wrong')
