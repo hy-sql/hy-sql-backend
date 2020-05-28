@@ -1,11 +1,18 @@
 const {
     SelectAllSchema,
     SelectAllOrderBySchema,
+    SelectAllWhereSchema,
 } = require('../models/SelectAllSchema')
+const {
+    queryContainsWhereKeyword,
+    parseWhereToCommandObject,
+} = require('./whereCommand')
 
 const parseCommand = (fullCommandAsStringList) => {
     if (hasOrderByKeywords(fullCommandAsStringList)) {
         return parseSelectAllOrderBy(fullCommandAsStringList)
+    } else if (queryContainsWhereKeyword(fullCommandAsStringList)) {
+        return parseSelectAllWhere(fullCommandAsStringList)
     }
 
     return parseSelectAll(fullCommandAsStringList)
@@ -23,8 +30,8 @@ const hasOrderByKeywords = (fullCommandAsStringList) => {
     return hasOrder > 0 && hasBy > 0 ? hasOrder < hasBy : false
 }
 
-const parseSelectAll = (fullCommandAsStringList) => {
-    const parsedCommand = {
+const parseBaseCommand = (fullCommandAsStringList) => {
+    return {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
         from: fullCommandAsStringList[2],
         tableName: fullCommandAsStringList[3],
@@ -33,7 +40,10 @@ const parseSelectAll = (fullCommandAsStringList) => {
                 ? ';'
                 : undefined,
     }
+}
 
+const parseSelectAll = (fullCommandAsStringList) => {
+    const parsedCommand = parseBaseCommand(fullCommandAsStringList)
     const validationResult = SelectAllSchema.validate(parsedCommand)
 
     /* if there is something additional between the table name and ending semicolon
@@ -43,7 +53,7 @@ const parseSelectAll = (fullCommandAsStringList) => {
         const additional = fullCommandAsStringList
             .slice(4, fullCommandAsStringList.length - 1)
             .join(' ')
-        const errorMessage = `The following part of the query is causing it to fail: '${additional}'`
+        const errorMessage = `The following part of the query is probably incorrect and causing it to fail: '${additional}'`
 
         validationResult.error
             ? validationResult.error.details.push({ message: errorMessage })
@@ -56,20 +66,21 @@ const parseSelectAll = (fullCommandAsStringList) => {
 }
 
 const parseSelectAllOrderBy = (fullCommandAsStringList) => {
-    const parsedCommand = {
-        name: fullCommandAsStringList.slice(0, 2).join(' '),
-        from: fullCommandAsStringList[2],
-        tableName: fullCommandAsStringList[3],
-        orderBy: parseOrderBy(
-            fullCommandAsStringList.slice(4, fullCommandAsStringList.length - 1)
-        ),
-        finalSemicolon:
-            fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
-                ? ';'
-                : undefined,
-    }
+    const parsedCommand = parseBaseCommand(fullCommandAsStringList)
+    parsedCommand.orderBy = parseOrderBy(
+        fullCommandAsStringList.slice(4, fullCommandAsStringList.length - 1)
+    )
 
     return SelectAllOrderBySchema.validate(parsedCommand)
+}
+
+const parseSelectAllWhere = (fullCommandAsStringList) => {
+    const parsedCommand = parseBaseCommand(fullCommandAsStringList)
+    parsedCommand.where = parseWhereToCommandObject(
+        fullCommandAsStringList.slice(4)
+    )
+
+    return SelectAllWhereSchema.validate(parsedCommand)
 }
 
 const parseOrderBy = (slicedCommandAsStringArray) => {

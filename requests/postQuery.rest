@@ -94,3 +94,16 @@ Content-Type: application/json
     "SELECT * FROM Tuotteet;"
   ]
 }
+
+### For testing SELECT * ... WHERE ..
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+  "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "SELECT * FROM Tuotteet WHERE hinta=7;",
+    "SELECT * FROM Tuotteet a WHERE nimi='retiisi';"
+  ]
+}
+
