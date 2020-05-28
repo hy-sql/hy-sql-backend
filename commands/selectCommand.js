@@ -4,9 +4,9 @@ const selectSchema = require('../models/SelectSchema')
 
 const parseCommand = (fullCommandAsStringList) => {
     //KOMENTO
-    const parsedCommand = {
+    let parsedCommand = {
         name: fullCommandAsStringList[0],
-        parserCounter: 1
+        parserCounter: 1,
     }
 
     // SARAKKEIDEN OSIO - (*AS -- TODO*)
@@ -15,14 +15,17 @@ const parseCommand = (fullCommandAsStringList) => {
     //FROM
     //tämä olisi helppo muuttaa käymään koko rimpsua läpi, palauttamaan avainsanan, ja heittämään virheen jos avainsana on väärässä paikassa
     //vs nykyinen, missä katsotaan vain onko se FROM siinä oikeassa paikassa
-    if (fullCommandAsStringList[parsedCommand.parserCounter].toUpperCase() === 'FROM') {
-        parsedCommand.from = fullCommandAsStringList[parsedCommand.parserCounter]
+    if (
+        fullCommandAsStringList[parsedCommand.parserCounter].toUpperCase() ===
+        'FROM'
+    ) {
+        parsedCommand.from =
+            fullCommandAsStringList[parsedCommand.parserCounter]
         parsedCommand.parserCounter++
     }
 
     //TAULUJEN OSIO
     parsedCommand = parseTableNames(fullCommandAsStringList, parsedCommand)
-
 
     // WHERE OSIO - specifies which rows to retrieve.
 
@@ -36,22 +39,39 @@ const parseCommand = (fullCommandAsStringList) => {
     if (fullCommandAsStringList[parsedCommand.parserCounter] === ';') {
         parsedCommand.finalSemicolon = ';'
         parsedCommand.parserCounter++
-
-    } else if (fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';') {
+    } else if (
+        fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
+    ) {
         parsedCommand.finalSemicolon = ';'
-        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList.slice(parsedCommand.parserCounter, fullCommandAsStringList.length - 2).join(' ')
+        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList
+            .slice(
+                parsedCommand.parserCounter,
+                fullCommandAsStringList.length - 2
+            )
+            .join(' ')
     } else {
-        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList.slice(parsedCommand.parserCounter, fullCommandAsStringList.length - 1).join(' ')
+        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList
+            .slice(
+                parsedCommand.parserCounter,
+                fullCommandAsStringList.length - 1
+            )
+            .join(' ')
     }
     return selectSchema.validate(parsedCommand)
 }
 
-const parseTableNames = (parserCounter, stringArray, parsedCommand) => {
-
+const parseTableNames = (stringArray, parsedCommand) => {
+    console.log('stringArray', stringArray)
+    console.log('-----------------------')
+    console.log('parsedCommand', parsedCommand)
     //näitä lisää, mieluiten johonkin ReservedWords-listaan joka importataan, *TODO: RESERVED WORDS LIST*
-    if (!['WHERE', 'JOIN', '(', ')', ';', 'VALUES'].includes(stringArray[parserCounter].toUpperCase())) {
+    if (
+        !['WHERE', 'JOIN', '(', ')', ';', 'VALUES'].includes(
+            stringArray[parsedCommand.parserCounter].toUpperCase()
+        )
+    ) {
         parsedCommand.parserCounter++
-        parsedCommand.tableName = stringArray[parserCounter]
+        parsedCommand.tableName = stringArray[parsedCommand.parserCounter]
     }
     return parsedCommand
 }
