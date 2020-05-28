@@ -10,6 +10,19 @@ Content-Type: application/json
   ]
 }
 
+### Valid query for inserting several rows
+
+POST https://hy-sql.herokuapp.com/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 5);",
+    "SELECT * FROM Tuotteet;"
+  ]
+}
+
 ### Valid queries demonstrating keyword case-insensitivity
 
 POST https://hy-sql.herokuapp.com/api/query
@@ -42,6 +55,30 @@ Content-Type: application/json
 {
   "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TX, hinta INTEGER);",
     "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "SELECT * FROM Tuotteet;"
+  ]
+}
+
+### Invalid CREATE TABLE -query (duplicate columns)
+
+POST https://hy-sql.herokuapp.com/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, nimi INTEGER, id TEXT);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "SELECT * FROM Tuotteet;"
+  ]
+}
+
+### Invalid CREATE TABLE -query (wrong data type for column)
+
+POST https://hy-sql.herokuapp.com/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES (123, 'string');",
     "SELECT * FROM Tuotteet;"
   ]
 }
