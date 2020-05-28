@@ -12,9 +12,7 @@ const parseCommand = (fullCommandAsStringList) => {
     // SARAKKEIDEN OSIO - (*AS -- TODO*)
     parsedCommand = parseColumnNames(fullCommandAsStringList, parsedCommand)
 
-    //FROM
-    //tämä olisi helppo muuttaa käymään koko rimpsua läpi, palauttamaan avainsanan, ja heittämään virheen jos avainsana on väärässä paikassa
-    //vs nykyinen, missä katsotaan vain onko se FROM siinä oikeassa paikassa
+    //FROM  (* etsiminen muualtakin -- TODO*)
     if (
         fullCommandAsStringList[parsedCommand.parserCounter].toUpperCase() ===
         'FROM'
@@ -46,18 +44,14 @@ const parseCommand = (fullCommandAsStringList) => {
         parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList
             .slice(
                 parsedCommand.parserCounter,
-                fullCommandAsStringList.length - 2
+                fullCommandAsStringList.length - 1
             )
             .join(' ')
     } else {
         parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList
-            .slice(
-                parsedCommand.parserCounter,
-                fullCommandAsStringList.length - 1
-            )
+            .slice(parsedCommand.parserCounter, fullCommandAsStringList.length)
             .join(' ')
     }
-    console.log('ennen validointia', parsedCommand)
     return SelectSchema.validate(parsedCommand)
 }
 

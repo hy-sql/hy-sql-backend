@@ -5,6 +5,8 @@ Content-Type: application/json
 
 {
   "commandArray": [
+    "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
     "SELECT nimi,hinta FROM Tuotteet;"
   ]
 }
@@ -28,7 +30,7 @@ Content-Type: application/json
 
 {
   "commandArray": [
-    "SELECT nimi,hinta FROM Tuotteet; jotain"
+    "SELECT nimi,hinta FROM Tuotteet; jotain ylimääräistä tässä"
   ]
 }
 
