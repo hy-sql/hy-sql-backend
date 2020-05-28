@@ -22,12 +22,10 @@ const executer = (request, response, next) => {
             )
             noErrors = false
         } else {
-            // Optimaalisesti olisi siirtää validaatiovirheet omaan virhekäsittelijään
             if (command.error) {
-                // koko error olion sijaan vain sen sisältämä viesti
-                resultArray.push(
-                    `${command.value.name} -query execution failed: ${command.error.details[0].message}`
-                )
+                resultArray.push({
+                    error: `${command.value.name} -query execution failed: ${command.error.details[0].message}`,
+                })
                 noErrors = false
             } else {
                 /* State palauttaa updateState:sta tuloksen muodossa { result: result }
