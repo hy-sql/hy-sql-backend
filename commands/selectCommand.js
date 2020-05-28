@@ -4,29 +4,30 @@ const selectSchema = require('../models/SelectSchema')
 
 const parseCommand = (fullCommandAsStringList) => {
     //KOMENTO
-    const parsedCommand = {
+    let parsedCommand = {
         name: fullCommandAsStringList[0],
+        size: fullCommandAsStringList.length,
+        parserCounter: 1,
     }
-    let parserCounter = 1
 
     // SARAKKEIDEN OSIO - (*AS -- TODO*)
-    let palautusolio = parseColumnNames(parserCounter, fullCommandAsStringList)
-    parserCounter = palautusolio.parserCounter
-    palautusolio.columnsOpenBrackets > 0
-        ? parsedCommand.columnsOpenBrackets
-        : null
-    parsedCommand.columns = palautusolio.columns
+    parsedCommand = parseColumnNames(fullCommandAsStringList, parsedCommand)
 
     //FROM
-    if (fullCommandAsStringList[parserCounter].toUpperCase() === 'FROM') {
-        parsedCommand.from = fullCommandAsStringList[parserCounter]
-        parserCounter++
+    //tämä olisi helppo muuttaa käymään koko rimpsua läpi, palauttamaan avainsanan, ja heittämään virheen jos avainsana on väärässä paikassa
+    //vs nykyinen, missä katsotaan vain onko se FROM siinä oikeassa paikassa
+    if (
+        fullCommandAsStringList[parsedCommand.parserCounter].toUpperCase() ===
+        'FROM'
+    ) {
+        parsedCommand.from =
+            fullCommandAsStringList[parsedCommand.parserCounter]
+        parsedCommand.parserCounter++
     }
 
     //TAULUJEN OSIO
-    palautusolio = parseTableNames(parserCounter, fullCommandAsStringList)
-    parserCounter = palautusolio.parserCounter
-    if (palautusolio.tableName) parsedCommand.tableName = palautusolio.tableName
+    parsedCommand = parseTableNames(fullCommandAsStringList, parsedCommand)
+
     // WHERE OSIO - specifies which rows to retrieve.
 
     // GROUP BY - groups rows sharing a property so that an aggregate function can be applied to each group.
@@ -35,22 +36,43 @@ const parseCommand = (fullCommandAsStringList) => {
 
     // ORDER BY -- tehdään controllerissa -- specifies an order in which to return the rows.
 
-    // finalSemicolon
-    if (fullCommandAsStringList[parserCounter] === ';')
+    // finalSemicolon ---- NÄMÄ PITÄÄ SIISTIÄ, HOLY SPAGHETTI BATMAN
+    if (fullCommandAsStringList[parsedCommand.parserCounter] === ';') {
         parsedCommand.finalSemicolon = ';'
-
+        parsedCommand.parserCounter++
+    } else if (
+        fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
+    ) {
+        parsedCommand.finalSemicolon = ';'
+        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList
+            .slice(
+                parsedCommand.parserCounter,
+                fullCommandAsStringList.length - 2
+            )
+            .join(' ')
+    } else {
+        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList
+            .slice(
+                parsedCommand.parserCounter,
+                fullCommandAsStringList.length - 1
+            )
+            .join(' ')
+    }
+    console.log('ennen validointia', parsedCommand)
     return selectSchema.validate(parsedCommand)
 }
 
-const parseTableNames = (parserCounter, stringArray) => {
-    let palautettava = {
-        parserCounter,
+const parseTableNames = (stringArray, parsedCommand) => {
+    //näitä lisää, mieluiten johonkin ReservedWords-listaan joka importataan, *TODO: RESERVED WORDS LIST*
+    if (
+        !['WHERE', 'JOIN', '(', ')', ';', 'VALUES'].includes(
+            stringArray[parsedCommand.parserCounter].toUpperCase()
+        )
+    ) {
+        parsedCommand.tableName = stringArray[parsedCommand.parserCounter]
+        parsedCommand.parserCounter++
     }
-    if (stringArray[parserCounter].toUpperCase() !== 'WHERE|JOIN|(|)') {
-        palautettava.parserCounter++
-        palautettava.tableName = stringArray[parserCounter]
-    }
-    return palautettava
+    return parsedCommand
 }
 
 module.exports = { parseCommand }

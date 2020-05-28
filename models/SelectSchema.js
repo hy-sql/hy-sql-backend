@@ -13,6 +13,10 @@ const SelectAllSchema = Joi.object({
         'any.required': 'Query must begin with SELECT',
     }),
 
+    size: Joi.number().positive().required().messages({}),
+
+    parserCounter: Joi.number().required().min(Joi.ref('size')).messages({}),
+
     columns: Joi.array().min(1).items(ColumnsSchema).required().messages({
         'array.base': 'this is not an array',
         'array.min': 'there should be at least one column',

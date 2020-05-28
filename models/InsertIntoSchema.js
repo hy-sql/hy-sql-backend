@@ -53,6 +53,13 @@ const InsertIntoSchema = Joi.object({
             'string.base': 'this is not a string',
         }),
 
+    size: Joi.number().positive().required().messages({}),
+
+    parserCounter: Joi.number()
+        .required()
+        //.min(Joi.ref('size'))
+        .messages({}),
+
     columnsOpeningBracket: Joi.string().valid('(').required(),
 
     columns: Joi.array().min(1).items(ColumnsSchema).required().messages({
