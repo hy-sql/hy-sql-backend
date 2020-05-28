@@ -331,4 +331,46 @@ describe('selectFromTable()', () => {
         const result = stateService.selectFromTable(command)
         expect(result.error).toBe('No such table products')
     })
+
+    test('returns column nimi for SELECT nimi FROM Tuotteet;', () => {
+        const initArray = []
+        const state = new State(initArray)
+        const stateService = new StateService(state)
+
+        const commands = [
+            'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
+            'INSERT INTO Tuotteet (nimi, hinta) VALUES (tuote, 10);',
+        ]
+
+        const splitCommandArray = commands.map((input) =>
+            input
+                .trim()
+                .replace(/\s\s+/g, ' ')
+                .replace(/\s+,/g, ',')
+                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+                .filter(Boolean)
+        )
+
+        const parsedCommands = splitCommandArray.map((c) =>
+            commandService.parseCommand(c)
+        )
+
+        parsedCommands.forEach((c) => stateService.updateState(c.value))
+
+        const selectCommand = 'SELECT nimi from Tuotteet;'
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.selectFromTable(parsedCommand.value)
+        expect(result.result).toBe(
+            'SELECT nimi FROM Tuotteet -query was executed successfully'
+        )
+        expect(result.rows.length).toBe(1)
+        expect(result.rows[0]['nimi']).toBe('tuote')
+    })
 })

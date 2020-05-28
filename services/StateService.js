@@ -39,24 +39,21 @@ class StateService {
         const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
 
-        const tableIndex = this.state.tables.findIndex(
-            (element) => element.name === command.tableName
-        )
+        const table = this.findTable(command.tableName)
+        const tableIndex = this.findTableIndex(command.tableName)
 
         const newRow = {
-            id: this.state.tables[tableIndex].rows.length + 1,
+            id: table.rows.length + 1,
         }
 
         for (let i = 0; i < command.columns.length; i++) {
             const columnName = command.columns[i].name
             const value = command.values[i]
 
-            const columnIndex = this.state.tables[tableIndex].columns.findIndex(
+            const columnIndex = table.columns.findIndex(
                 (e) => e.name === columnName
             )
-            const columnType = this.state.tables[tableIndex].columns[
-                columnIndex
-            ].type
+            const columnType = table.columns[columnIndex].type
 
             if (columnType !== value.type)
                 return {
@@ -147,6 +144,12 @@ class StateService {
             (table) => table.name === tableName
         )
         return this.state.tables[tableIndex]
+    }
+
+    findTableIndex(tableName) {
+        return this.state.tables.findIndex(
+            (element) => element.name === tableName
+        )
     }
 
     pickColumnsFromRow(columns, row) {
