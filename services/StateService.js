@@ -13,6 +13,8 @@ class StateService {
                 return this.insertIntoTable(parsedCommand)
             case 'SELECT *':
                 return this.selectAllFromTable(parsedCommand)
+            case 'SELECT':
+                return this.selectFromTable(parsedCommand)
             default:
                 break
         }
@@ -34,21 +36,31 @@ class StateService {
     }
 
     insertIntoTable(command) {
-        const error = this.checkIfTableExists(command)
+        const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
 
-        const tableIndex = this.state.tables.findIndex(
-            (element) => element.name === command.tableName
-        )
+        const table = this.findTable(command.tableName)
+        const tableIndex = this.findTableIndex(command.tableName)
 
         const newRow = {
-            id: this.state.tables[tableIndex].rows.length + 1,
+            id: table.rows.length + 1,
         }
 
         for (let i = 0; i < command.columns.length; i++) {
-            const column = command.columns[i].name
-            const value = command.values[i].value
-            newRow[column] = value
+            const columnName = command.columns[i].name
+            const value = command.values[i]
+
+            const columnIndex = table.columns.findIndex(
+                (e) => e.name === columnName
+            )
+            const columnType = table.columns[columnIndex].type
+
+            if (columnType !== value.type)
+                return {
+                    error: `Wrong datatype: expected ${columnType} but was ${value.type}`,
+                }
+
+            newRow[columnName] = value.value
         }
 
         this.state.insertIntoTable(tableIndex, newRow)
@@ -59,7 +71,7 @@ class StateService {
     }
 
     selectAllFromTable(command) {
-        const error = this.checkIfTableExists(command)
+        const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
 
         const tableIndex = this.state.tables.findIndex(
@@ -82,6 +94,24 @@ class StateService {
         }
     }
 
+    selectFromTable(command) {
+        //This is for SELECT column_1, column_2 FROM -queries
+        const error = this.checkIfTableExists(command.tableName)
+        if (error) return { error: error }
+
+        const table = this.findTable(command.tableName)
+        let rows = []
+        table.rows.forEach((row) => {
+            rows.push(this.pickColumnsFromRow(command.columns, row))
+        })
+
+        const columnsStr = command.columns.map((e) => e.name).join(', ')
+        return {
+            result: `${command.name} ${columnsStr} FROM ${command.tableName} -query was executed successfully`,
+            rows,
+        }
+    }
+
     checkCreateTableErrors(command) {
         const tableIndex = this.state.tables.findIndex(
             (e) => e.name === command.tableName
@@ -98,15 +128,36 @@ class StateService {
             return duplicates.map((e) => `duplicate column ${e}: ${e}`)
     }
 
-    checkIfTableExists(command) {
+    checkIfTableExists(tableName) {
         const tableIndex = this.state.tables.findIndex(
-            (e) => e.name === command.tableName
+            (e) => e.name === tableName
         )
-        if (tableIndex === -1) return `No such table ${command.tableName}`
+        if (tableIndex === -1) return `No such table ${tableName}`
     }
 
     findDuplicates(arr) {
         return arr.filter((item, index) => arr.indexOf(item) !== index)
+    }
+
+    findTable(tableName) {
+        const tableIndex = this.state.tables.findIndex(
+            (table) => table.name === tableName
+        )
+        return this.state.tables[tableIndex]
+    }
+
+    findTableIndex(tableName) {
+        return this.state.tables.findIndex(
+            (element) => element.name === tableName
+        )
+    }
+
+    pickColumnsFromRow(columns, row) {
+        let filteredRow = {}
+        columns.forEach((column) => {
+            filteredRow[column.name] = row[column.name]
+        })
+        return filteredRow
     }
 }
 

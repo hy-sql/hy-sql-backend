@@ -34,6 +34,19 @@ Content-Type: application/json
   ]
 }
 
+### Valid query for inserting several rows and select spesified columns
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 5);",
+    "SELECT nimi FROM Tuotteet;"
+  ]
+}
+
 ### Valid queries demonstrating keyword case-insensitive
 
 POST http://localhost:3001/api/query
