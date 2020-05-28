@@ -48,9 +48,22 @@ class StateService {
         }
 
         for (let i = 0; i < command.columns.length; i++) {
-            const column = command.columns[i].name
-            const value = command.values[i].value
-            newRow[column] = value
+            const columnName = command.columns[i].name
+            const value = command.values[i]
+
+            const columnIndex = this.state.tables[tableIndex].columns.findIndex(
+                (e) => e.name === columnName
+            )
+            const columnType = this.state.tables[tableIndex].columns[
+                columnIndex
+            ].type
+
+            if (columnType !== value.type)
+                return {
+                    error: `Wrong datatype: expected ${columnType} but was ${value.type}`,
+                }
+
+            newRow[columnName] = value.value
         }
 
         this.state.insertIntoTable(tableIndex, newRow)

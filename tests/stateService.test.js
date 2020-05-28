@@ -151,6 +151,40 @@ describe('insertIntoTable()', () => {
         expect(rows[0].nimi).toBe('tuote')
         expect(rows[0].hinta).toBe(10)
     })
+
+    test('returns error when trying to insert wrong datatype to column', () => {
+        const initArray = []
+        const state = new State(initArray)
+        const stateService = new StateService(state)
+        const createCommand = {
+            name: 'CREATE TABLE',
+            tableName: 'Tuotteet',
+            openingBracket: '(',
+            columns: [
+                { name: 'id', type: 'INTEGER', primaryKey: true },
+                { name: 'nimi', type: 'TEXT', primaryKey: false },
+                { name: 'hinta', type: 'INTEGER', primaryKey: false },
+            ],
+            closingBracket: ')',
+            finalSemicolon: ';',
+        }
+        stateService.createTable(createCommand)
+
+        const insertCommand =
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES (10, 'tuote' );"
+        const splitCommand = insertCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(splitCommand)
+
+        const result = stateService.insertIntoTable(parsedCommand.value)
+        expect(result.error).toBe(
+            'Wrong datatype: expected TEXT but was INTEGER'
+        )
+    })
 })
 
 describe('selectAllFromTable()', () => {
@@ -183,13 +217,18 @@ describe('selectAllFromTable()', () => {
             finalSemicolon: ';',
         }
         stateService.createTable(createCommand)
-        const insertCommand = {
-            name: 'INSERT INTO',
-            tableName: 'Tuotteet',
-            columns: ['nimi', 'hinta'],
-            values: ['tuote', 10],
-        }
-        stateService.insertIntoTable(insertCommand)
+
+        const insertCommand =
+            'INSERT INTO Tuotteet (nimi, hinta) VALUES (tuote, 10);'
+        const splitCommand = insertCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(splitCommand)
+
+        stateService.insertIntoTable(parsedCommand.value)
         const selectCommand = {
             name: 'SELECT *',
             tableName: 'Tuotteet',
