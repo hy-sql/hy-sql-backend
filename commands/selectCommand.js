@@ -1,6 +1,5 @@
 const { parseColumnNames } = require('./parserTools/parseColumnNames')
-
-const selectSchema = require('../models/SelectSchema')
+const { SelectSchema } = require('../models/SelectSchema')
 
 const parseCommand = (fullCommandAsStringList) => {
     //KOMENTO
@@ -59,7 +58,7 @@ const parseCommand = (fullCommandAsStringList) => {
             .join(' ')
     }
     console.log('ennen validointia', parsedCommand)
-    return selectSchema.validate(parsedCommand)
+    return SelectSchema.validate(parsedCommand)
 }
 
 const parseTableNames = (stringArray, parsedCommand) => {

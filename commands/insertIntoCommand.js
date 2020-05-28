@@ -130,15 +130,15 @@ const addAttributesToValuesArray = (columnList, stringArray) => {
     const taulukko = stringArray.map((value, index) =>
         value.match('[0-9]')
             ? {
-                  column: columnList[index] ? columnList[index].name : null,
-                  value: Number(value),
-                  type: 'INTEGER',
-              }
+                column: columnList[index] ? columnList[index].name : null,
+                value: Number(value),
+                type: 'INTEGER',
+            }
             : {
-                  column: columnList[index] ? columnList[index].name : null,
-                  value: value.replace(/'/g, ' ').trim(),
-                  type: 'TEXT',
-              }
+                column: columnList[index] ? columnList[index].name : null,
+                value: value.replace(/'/g, ' ').trim(),
+                type: 'TEXT',
+            }
     )
     return taulukko
 }
