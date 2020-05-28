@@ -11,7 +11,7 @@ const SelectAllSchema = Joi.object({
     from: Joi.string()
         .required()
         .pattern(/;/, { invert: true })
-        .pattern(/^[F,f][R,r][O,o][M,m]$/)
+        .pattern(/^[Ff][Rr][Oo][Mm]$/)
         .messages({
             'string.pattern.invert.base':
                 'Semicolon should only be found at the end of a query',

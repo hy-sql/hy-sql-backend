@@ -26,7 +26,7 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
     let valueOption = slicedCommandAsStringList[index]
         ? slicedCommandAsStringList[index]
         : ''
-    slicedCommandAsStringList[index + 1] === "'" ? index++ : ''
+    index++
 
     let columnName = undefined
     let sign = findSign(columnSignValue)
@@ -48,7 +48,8 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
     } else {
         columnName = columnSignValue.split(sign)[0]
         value =
-            columnSignValue.endsWith(sign) || columnSignValue.endsWith("'")
+            columnSignValue.endsWith(sign) ||
+            columnSignValue.endsWith(`${sign}'`)
                 ? signValueOption
                 : columnSignValue.split(sign)[1]
         signSet = true
@@ -60,9 +61,14 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
         value = signValueOption.endsWith(sign)
             ? valueOption
             : signValueOption.split(sign)[1]
+
+        if (signValueOption.endsWith(sign) && valueOption === "'") {
+            value = slicedCommandAsStringList[index]
+            index++
+        }
     }
 
-    if (value === ';') {
+    if (value === ';' && index >= slicedCommandAsStringList.length) {
         index--
         value = undefined
     }
@@ -77,6 +83,8 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
 
     columnName === '' ? (columnName = undefined) : ''
     value === '' ? (value = undefined) : ''
+
+    slicedCommandAsStringList[index + 1] === "'" ? index++ : ''
 
     return {
         keyword,

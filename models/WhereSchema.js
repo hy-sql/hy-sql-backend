@@ -12,7 +12,7 @@ const WhereSchema = Joi.object({
     keyword: Joi.string()
         .required()
         .pattern(/;/, { invert: true })
-        .pattern(/^[W,w][H,h][E,e][R,r][E,e]$/)
+        .pattern(/^([Ww][Hh][Ee][Rr][Ee])$/)
         .messages({
             'any.required':
                 'This query is expected to have the following keyword: WHERE',
