@@ -98,10 +98,13 @@ class StateService {
     }
 
     selectFromTable(command) {
+        //This is for SELECT column_1, column_2 FROM -queries
         const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
-
-        return `${command.name} FROM ${command.tableName} -query was executed successfully`
+        //TODO RETURN ROWS ALSO
+        return {
+            result: `${command.name} FROM ${command.tableName} -query was executed successfully`,
+        }
     }
 
     checkCreateTableErrors(command) {
