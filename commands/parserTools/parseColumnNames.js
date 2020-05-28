@@ -1,18 +1,18 @@
 const { namify, cleanStringArray } = require('./smallTools')
 
-const parseColumnNames = (parserCounter, fullCommandAsStringList) => {
-    let laskuri = parserCounter
-    const returnable = { parserCounter, columnsOpenBrackets: 0 }
+const parseColumnNames = (stringArray, parsedCommand) => {
+    let laskuri = parsedCommand.parserCounter
+    parsedCommand.columnsOpenBrackets = 0
     const columns = []
-    loop1: for (; laskuri < fullCommandAsStringList.length; laskuri++) {
-        const element = fullCommandAsStringList[laskuri]
+    loop1: for (; laskuri < stringArray.length; laskuri++) {
+        const element = stringArray[laskuri]
         switch (element.toUpperCase()) {
             case '(':
-                returnable.columnsOpenBrackets++
+                parsedCommand.columnsOpenBrackets++
                 continue loop1
             case ',':
                 continue loop1
-            // katkaisevat sanat, lisää näitä
+            // katkaisevat sanat, lisää näitä, *TODO: RESERVED WORDS LISTA*
             case ';':
             case 'SELECT':
             case 'CREATE':
@@ -23,24 +23,26 @@ const parseColumnNames = (parserCounter, fullCommandAsStringList) => {
             case 'HAVING':
             case 'WHERE':
             case 'FROM':
-                if (returnable.columnsOpenBrackets === 0) break loop1
+                if (parsedCommand.columnsOpenBrackets === 0) break loop1
                 continue loop1
             case ')':
-                if (returnable.columnsOpenBrackets > 0) {
-                    returnable.columnsOpenBrackets--
+                if (parsedCommand.columnsOpenBrackets > 0) {
+                    parsedCommand.columnsOpenBrackets--
                     continue loop1
                 }
                 break loop1
             default:
-                if (returnable.columnsOpenBrackets > 0) continue loop1
+                if (parsedCommand.columnsOpenBrackets > 0) continue loop1
                 columns.push(element)
         }
     }
-    if (laskuri !== fullCommandAsStringList.length) {
-        returnable.parserCounter = laskuri
-        returnable.columns = namify(cleanStringArray(columns))
+    if (laskuri !== stringArray.length) {
+        parsedCommand.parserCounter = laskuri
+        parsedCommand.columns = namify(cleanStringArray(columns))
     }
-    return returnable
+    if (parsedCommand.columnsOpenBrackets === 0)
+        delete parsedCommand.columnsOpenBrackets
+    return parsedCommand
 }
 
 module.exports = { parseColumnNames }
