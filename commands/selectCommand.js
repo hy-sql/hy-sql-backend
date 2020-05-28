@@ -10,7 +10,7 @@ const parseCommand = (fullCommandAsStringList) => {
     }
 
     // SARAKKEIDEN OSIO - (*AS -- TODO*)
-    parsedCommand = parseColumnNames(parsedCommand, fullCommandAsStringList)
+    parsedCommand = parseColumnNames(fullCommandAsStringList, parsedCommand)
 
     //FROM
     //tämä olisi helppo muuttaa käymään koko rimpsua läpi, palauttamaan avainsanan, ja heittämään virheen jos avainsana on väärässä paikassa
@@ -35,7 +35,7 @@ const parseCommand = (fullCommandAsStringList) => {
 
     // ORDER BY -- tehdään controllerissa -- specifies an order in which to return the rows.
 
-    // finalSemicolon
+    // finalSemicolon ---- NÄMÄ PITÄÄ SIISTIÄ, HOLY SPAGHETTI BATMAN
     if (fullCommandAsStringList[parsedCommand.parserCounter] === ';') {
         parsedCommand.finalSemicolon = ';'
         parsedCommand.parserCounter++
@@ -57,21 +57,19 @@ const parseCommand = (fullCommandAsStringList) => {
             )
             .join(' ')
     }
+    console.log('ennen validointia', parsedCommand)
     return selectSchema.validate(parsedCommand)
 }
 
 const parseTableNames = (stringArray, parsedCommand) => {
-    console.log('stringArray', stringArray)
-    console.log('-----------------------')
-    console.log('parsedCommand', parsedCommand)
     //näitä lisää, mieluiten johonkin ReservedWords-listaan joka importataan, *TODO: RESERVED WORDS LIST*
     if (
         !['WHERE', 'JOIN', '(', ')', ';', 'VALUES'].includes(
             stringArray[parsedCommand.parserCounter].toUpperCase()
         )
     ) {
-        parsedCommand.parserCounter++
         parsedCommand.tableName = stringArray[parsedCommand.parserCounter]
+        parsedCommand.parserCounter++
     }
     return parsedCommand
 }

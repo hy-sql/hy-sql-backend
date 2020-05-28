@@ -1,11 +1,11 @@
 const { namify, cleanStringArray } = require('./smallTools')
 
-const parseColumnNames = (parsedCommand, fullCommandAsStringList) => {
+const parseColumnNames = (stringArray, parsedCommand) => {
     let laskuri = parsedCommand.parserCounter
-    let columnsOpenBrackets = 0
+    parsedCommand.columnsOpenBrackets = 0
     const columns = []
-    loop1: for (; laskuri < fullCommandAsStringList.length; laskuri++) {
-        const element = fullCommandAsStringList[laskuri]
+    loop1: for (; laskuri < stringArray.length; laskuri++) {
+        const element = stringArray[laskuri]
         switch (element.toUpperCase()) {
             case '(':
                 parsedCommand.columnsOpenBrackets++
@@ -36,16 +36,10 @@ const parseColumnNames = (parsedCommand, fullCommandAsStringList) => {
                 columns.push(element)
         }
     }
-    if (laskuri !== fullCommandAsStringList.length) {
+    if (laskuri !== stringArray.length) {
         parsedCommand.parserCounter = laskuri
         parsedCommand.columns = namify(cleanStringArray(columns))
     }
-
-
-    console.log(parsedCommand)
-
-
-
     return parsedCommand
 }
 
