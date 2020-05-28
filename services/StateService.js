@@ -74,11 +74,9 @@ class StateService {
         const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
 
-        const tableIndex = this.state.tables.findIndex(
-            (table) => table.name === command.tableName
-        )
+        const table = this.findTable(command.tableName)
 
-        let rows = this.state.tables[tableIndex].rows
+        let rows = table.rows
 
         if (command.orderBy) {
             rows =
