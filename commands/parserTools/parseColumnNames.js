@@ -40,6 +40,8 @@ const parseColumnNames = (stringArray, parsedCommand) => {
         parsedCommand.parserCounter = laskuri
         parsedCommand.columns = namify(cleanStringArray(columns))
     }
+    if (parsedCommand.columnsOpenBrackets === 0)
+        delete parsedCommand.columnsOpenBrackets
     return parsedCommand
 }
 
