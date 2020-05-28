@@ -1,5 +1,6 @@
 const Joi = require('@hapi/joi')
 const OrderBySchema = require('./OrderBySchema')
+const WhereSchema = require('./WhereSchema')
 
 const SelectAllSchema = Joi.object({
     name: Joi.string().required().valid('SELECT *').insensitive().messages({
@@ -29,6 +30,7 @@ const SelectAllSchema = Joi.object({
             'any.required': 'Query must contain a table name',
             'string.pattern.base':
                 'Table name should only contain one or more alphanumeric characters and underscores',
+            'string.max': 'Table name is too long',
         }),
 
     finalSemicolon: Joi.string().required().valid(';').messages({
@@ -41,4 +43,12 @@ const SelectAllOrderBySchema = SelectAllSchema.keys({
     orderBy: OrderBySchema,
 })
 
-module.exports = { SelectAllSchema, SelectAllOrderBySchema }
+const SelectAllWhereSchema = SelectAllSchema.keys({
+    where: WhereSchema,
+})
+
+module.exports = {
+    SelectAllSchema,
+    SelectAllOrderBySchema,
+    SelectAllWhereSchema,
+}
