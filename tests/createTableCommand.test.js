@@ -69,7 +69,7 @@ describe.each([
         .replace(/\s\s+/g, ' ')
         .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-    test('valid command is recognized and true returned', () => {
+    test('invalid command is not recognized and false returned', () => {
         const result = commandService.parseCommand(fullCommandAsStringList)
 
         expect(result).toBeFalsy()
