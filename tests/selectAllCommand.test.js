@@ -87,6 +87,7 @@ describe.each([
     "SELECT * FROM Tuotteet WHERE name = ' test ';",
     "SELECT * FROM Tuotteet WHERE name=' test';",
     "SELECT * FROM Tuotteet WHERE name='test ';",
+    "SELECT * FROM Tuotteet WHERE name='test';",
 ])('Valid SELECT * FROM ... WHERE ...-query', (validCommand) => {
     describe(validCommand, () => {
         const command = validCommand

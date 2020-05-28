@@ -48,7 +48,8 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
     } else {
         columnName = columnSignValue.split(sign)[0]
         value =
-            columnSignValue.endsWith(sign) || columnSignValue.endsWith("'")
+            columnSignValue.endsWith(sign) ||
+            columnSignValue.endsWith(`${sign}'`)
                 ? signValueOption
                 : columnSignValue.split(sign)[1]
         signSet = true
