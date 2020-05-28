@@ -101,9 +101,17 @@ class StateService {
         //This is for SELECT column_1, column_2 FROM -queries
         const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
-        //TODO RETURN ROWS ALSO
+
+        const table = this.findTable(command.tableName)
+        let rows = []
+        table.rows.forEach((row) => {
+            rows.push(this.pickColumnsFromRow(command.columns, row))
+        })
+
+        const columnsStr = command.columns.map((e) => e.name).join(', ')
         return {
-            result: `${command.name} FROM ${command.tableName} -query was executed successfully`,
+            result: `${command.name} ${columnsStr} FROM ${command.tableName} -query was executed successfully`,
+            rows,
         }
     }
 
@@ -132,6 +140,21 @@ class StateService {
 
     findDuplicates(arr) {
         return arr.filter((item, index) => arr.indexOf(item) !== index)
+    }
+
+    findTable(tableName) {
+        const tableIndex = this.state.tables.findIndex(
+            (table) => table.name === tableName
+        )
+        return this.state.tables[tableIndex]
+    }
+
+    pickColumnsFromRow(columns, row) {
+        let filteredRow = {}
+        columns.forEach((column) => {
+            filteredRow[column.name] = row[column.name]
+        })
+        return filteredRow
     }
 }
 
