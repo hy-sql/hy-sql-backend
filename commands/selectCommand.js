@@ -1,6 +1,5 @@
 const { parseColumnNames } = require('./parserTools/parseColumnNames')
-
-const selectSchema = require('../models/SelectSchema')
+const { SelectSchema } = require('../models/SelectSchema')
 
 const parseCommand = (fullCommandAsStringList) => {
     //KOMENTO
@@ -39,7 +38,7 @@ const parseCommand = (fullCommandAsStringList) => {
     if (fullCommandAsStringList[parserCounter] === ';')
         parsedCommand.finalSemicolon = ';'
 
-    return selectSchema.validate(parsedCommand)
+    return SelectSchema.validate(parsedCommand)
 }
 
 const parseTableNames = (parserCounter, stringArray) => {

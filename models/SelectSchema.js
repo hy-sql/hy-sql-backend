@@ -7,7 +7,7 @@ const ColumnsSchema = Joi.object({
     }),
 })
 
-const SelectAllSchema = Joi.object({
+const SelectSchema = Joi.object({
     name: Joi.string().required().valid('SELECT').insensitive().messages({
         'any.only': 'Query must begin with SELECT',
         'any.required': 'Query must begin with SELECT',
@@ -35,4 +35,4 @@ const SelectAllSchema = Joi.object({
     }),
 })
 
-module.exports = SelectAllSchema
+module.exports = { SelectSchema }
