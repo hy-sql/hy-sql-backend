@@ -95,6 +95,7 @@ const parseSelectAllWhere = (fullCommandAsStringList) => {
 }
 
 const parseOrderBy = (slicedCommandAsStringArray) => {
+    console.log(slicedCommandAsStringArray)
     return slicedCommandAsStringArray.slice(0, 2).join(' ').toUpperCase() ===
         'ORDER BY'
         ? {
@@ -111,4 +112,4 @@ const parseOrderBy = (slicedCommandAsStringArray) => {
         : null
 }
 
-module.exports = { parseCommand }
+module.exports = { parseCommand, parseOrderBy }
