@@ -1,0 +1,107 @@
+### Valid select query
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": [
+    "SELECT nimi,hinta FROM Tuotteet;"
+  ]
+}
+
+
+### puuttuu taulun nimi
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": [
+    "SELECT nimi,hinta FROM WHERE id=1;"
+  ]
+}
+
+### Valid query for inserting several rows
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 5);",
+    "SELECT * FROM Tuotteet;"
+  ]
+}
+
+### Valid queries demonstrating keyword case-insensitive
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CReAtE TAbLE Tuotteet (id INTEgER PRImARY KeY, nimi TExT, hinta INTeGER);",
+    "INSeRT InTO Tuotteet (nimi, hinta) VALuES ('retiisi', 7);",
+    "SELeCT * FrOm Tuotteet;"
+  ]
+}
+
+### Unrecognisable first query
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "SELECT * FROM Tuotteet;"
+  ]
+}
+
+### Invalid CREATE TABLE -query
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TX, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "SELECT * FROM Tuotteet;"
+  ]
+}
+
+### Invalid CREATE TABLE -query (duplicate columns)
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, nimi INTEGER, id TEXT);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "SELECT * FROM Tuotteet;"
+  ]
+}
+
+### Invalid SELECT * -query
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "SELECT * FROM Tuotteet"
+  ]
+}
+
+### Invalid INSERT INTO -query
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet nimi, hinta) VALUES ('retiisi', 7);",
+    "SELECT * FROM Tuotteet;"
+  ]
+}
