@@ -63,7 +63,7 @@ const WhereSchema = Joi.object({
                     'Semicolon should only be found at the end of a query',
                 'string.pattern.base':
                     'String values in query should be in quotes and contain only alphanumeric characters and underscores',
-                'string.max': 'Table name is too long',
+                'string.max': 'A string value is too long',
             }),
     }),
 })

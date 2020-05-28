@@ -30,8 +30,8 @@ const hasOrderByKeywords = (fullCommandAsStringList) => {
     return hasOrder > 0 && hasBy > 0 ? hasOrder < hasBy : false
 }
 
-const parseSelectAll = (fullCommandAsStringList) => {
-    const parsedCommand = {
+const parseBaseCommand = (fullCommandAsStringList) => {
+    return {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
         from: fullCommandAsStringList[2],
         tableName: fullCommandAsStringList[3],
@@ -40,7 +40,10 @@ const parseSelectAll = (fullCommandAsStringList) => {
                 ? ';'
                 : undefined,
     }
+}
 
+const parseSelectAll = (fullCommandAsStringList) => {
+    const parsedCommand = parseBaseCommand(fullCommandAsStringList)
     const validationResult = SelectAllSchema.validate(parsedCommand)
 
     /* if there is something additional between the table name and ending semicolon
@@ -63,33 +66,19 @@ const parseSelectAll = (fullCommandAsStringList) => {
 }
 
 const parseSelectAllOrderBy = (fullCommandAsStringList) => {
-    const parsedCommand = {
-        name: fullCommandAsStringList.slice(0, 2).join(' '),
-        from: fullCommandAsStringList[2],
-        tableName: fullCommandAsStringList[3],
-        orderBy: parseOrderBy(
-            fullCommandAsStringList.slice(4, fullCommandAsStringList.length - 1)
-        ),
-        finalSemicolon:
-            fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
-                ? ';'
-                : undefined,
-    }
+    const parsedCommand = parseBaseCommand(fullCommandAsStringList)
+    parsedCommand.orderBy = parseOrderBy(
+        fullCommandAsStringList.slice(4, fullCommandAsStringList.length - 1)
+    )
 
     return SelectAllOrderBySchema.validate(parsedCommand)
 }
 
 const parseSelectAllWhere = (fullCommandAsStringList) => {
-    const parsedCommand = {
-        name: fullCommandAsStringList.slice(0, 2).join(' '),
-        from: fullCommandAsStringList[2],
-        tableName: fullCommandAsStringList[3],
-        where: parseWhereToCommandObject(fullCommandAsStringList.slice(4)),
-        finalSemicolon:
-            fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
-                ? ';'
-                : undefined,
-    }
+    const parsedCommand = parseBaseCommand(fullCommandAsStringList)
+    parsedCommand.where = parseWhereToCommandObject(
+        fullCommandAsStringList.slice(4)
+    )
 
     return SelectAllWhereSchema.validate(parsedCommand)
 }
