@@ -21,14 +21,14 @@ Content-Type: application/json
   ]
 }
 
-### Valid query for inserting several rows
+### puolipisteen jälkeen tavaraa
 
 POST http://localhost:3001/api/query
 Content-Type: application/json
 
 {
   "commandArray": [
-    "SELECT nimi,hinta FROM Tuotteet;"
+    "SELECT nimi,hinta FROM Tuotteet; jotain"
   ]
 }
 

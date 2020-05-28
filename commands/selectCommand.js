@@ -6,12 +6,15 @@ const parseCommand = (fullCommandAsStringList) => {
     //KOMENTO
     let parsedCommand = {
         name: fullCommandAsStringList[0],
+        size: fullCommandAsStringList.length,
         parserCounter: 1,
     }
 
     // SARAKKEIDEN OSIO - (*AS -- TODO*)
     parsedCommand = parseColumnNames(fullCommandAsStringList, parsedCommand)
 
+    if (parsedCommand.columnsOpenBrackets === 0)
+        delete parsedCommand.columnsOpenBrackets
     //FROM
     //tämä olisi helppo muuttaa käymään koko rimpsua läpi, palauttamaan avainsanan, ja heittämään virheen jos avainsana on väärässä paikassa
     //vs nykyinen, missä katsotaan vain onko se FROM siinä oikeassa paikassa
