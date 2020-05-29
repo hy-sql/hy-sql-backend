@@ -111,34 +111,27 @@ class StateService {
         const column = whereObject.columnName
         const value = whereObject.value
         const sign = whereObject.sign
-        let filter
 
         switch (sign) {
             case '>':
-                filter = (item) => {
+                return (item) => {
                     return item[column] > value
                 }
-                break
             case '<':
-                filter = (item) => {
+                return (item) => {
                     return item[column] < value
                 }
-                break
             case '>=':
-                filter = (item) => {
+                return (item) => {
                     return item[column] >= value
                 }
-                break
             case '<=':
-                filter = (item) => {
+                return (item) => {
                     return item[column] <= value
                 }
-                break
             default:
-                filter = { [column]: value }
-                break
+                return { [column]: value }
         }
-        return filter
     }
 
     selectColumnsFromTable(command) {
