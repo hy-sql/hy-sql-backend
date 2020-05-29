@@ -14,7 +14,7 @@ class StateService {
             case 'SELECT *':
                 return this.selectAllFromTable(parsedCommand)
             case 'SELECT':
-                return this.selectFromTable(parsedCommand)
+                return this.selectColumnsFromTable(parsedCommand)
             default:
                 break
         }
@@ -135,14 +135,17 @@ class StateService {
     }
 
     selectColumnsFromTable(command) {
-        const error = this.checkIfTableExists(command)
+        //This is for SELECT column_1, column_2 FROM -queries
+        const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
 
-        const tableIndex = this.state.tables.findIndex(
-            (table) => table.name === command.tableName
-        )
+        const table = this.findTable(command.tableName)
+        let rows = []
+        table.rows.forEach((row) => {
+            rows.push(this.pickColumnsFromRow(command.columns, row))
+        })
 
-        let rows = this.state.tables[tableIndex].rows
+        console.log(command.orderBy)
 
         if (command.where && command.orderBy) {
             const column = command.where.columnName
@@ -158,33 +161,20 @@ class StateService {
                 rows =
                     command.orderBy.order &&
                     command.orderBy.order.toUpperCase() === 'DESC'
-                        ? _.orderBy(rows, ['hinta'], ['desc'])
-                        : _.orderBy(rows, ['hinta'], ['asc'])
+                        ? _.orderBy(
+                            rows,
+                            [command.orderBy.columnName],
+                            ['desc']
+                        )
+                        : _.orderBy(rows, [command.orderBy.columnName], ['asc'])
             }
         } else if (command.orderBy) {
             rows =
                 command.orderBy.order &&
                 command.orderBy.order.toUpperCase() === 'DESC'
-                    ? _.orderBy(rows, ['hinta'], ['desc'])
-                    : _.orderBy(rows, ['hinta'], ['asc'])
+                    ? _.orderBy(rows, [command.orderBy.columnName], ['desc'])
+                    : _.orderBy(rows, [command.orderBy.columnName], ['asc'])
         }
-
-        return {
-            result: `SELECT * FROM ${command.tableName} -query was executed succesfully`,
-            rows,
-        }
-    }
-
-    selectFromTable(command) {
-        //This is for SELECT column_1, column_2 FROM -queries
-        const error = this.checkIfTableExists(command.tableName)
-        if (error) return { error: error }
-
-        const table = this.findTable(command.tableName)
-        let rows = []
-        table.rows.forEach((row) => {
-            rows.push(this.pickColumnsFromRow(command.columns, row))
-        })
 
         const columnsStr = command.columns.map((e) => e.name).join(', ')
         return {

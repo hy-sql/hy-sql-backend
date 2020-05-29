@@ -1,4 +1,6 @@
 const Joi = require('@hapi/joi')
+const WhereSchema = require('./WhereSchema')
+const OrderBySchema = require('./OrderBySchema')
 
 const ColumnsSchema = Joi.object({
     name: Joi.string().pattern(/^\w+$/).max(64).required().messages({
@@ -15,7 +17,11 @@ const SelectSchema = Joi.object({
 
     size: Joi.number().positive().required().messages({}),
 
-    parserCounter: Joi.number().required().min(Joi.ref('size')).messages({}),
+    parserCounter: Joi.number()
+        .required()
+        .min(Joi.ref('size'))
+        .messages({})
+        .optional(),
 
     columns: Joi.array().min(1).items(ColumnsSchema).required().messages({
         'array.base': 'this is not an array',
@@ -39,4 +45,22 @@ const SelectSchema = Joi.object({
     }),
 })
 
-module.exports = { SelectSchema }
+const SelectColumnsOrderBySchema = SelectSchema.keys({
+    orderBy: OrderBySchema,
+})
+
+const SelectColumnsWhereSchema = SelectSchema.keys({
+    where: WhereSchema,
+})
+
+const SelectColumnsWhereOrderBySchema = SelectSchema.keys({
+    where: WhereSchema,
+    orderBy: OrderBySchema,
+})
+
+module.exports = {
+    SelectSchema,
+    SelectColumnsOrderBySchema,
+    SelectColumnsWhereSchema,
+    SelectColumnsWhereOrderBySchema,
+}

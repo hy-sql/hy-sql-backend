@@ -22,6 +22,7 @@ const OrderBySchema = Joi.object({
 
     order: Joi.string()
         .pattern(/[;]/, { invert: true })
+        .pattern(/^ASC.+$|^DESC.+$/i, { name: 'extra', invert: true })
         .pattern(/^ASC$|^DESC$/i)
         .allow('')
         .insensitive()
@@ -32,6 +33,8 @@ const OrderBySchema = Joi.object({
                 'Semicolon should be only found at the end of a query',
             'string.pattern.base':
                 'Not a sorting keyword at the end of the query',
+            'string.pattern.invert.name':
+                'Extra characters at the end of the line are causing command to fail',
         }),
 })
 
