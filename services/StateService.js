@@ -78,14 +78,8 @@ class StateService {
 
         let rows = table.rows
 
-        if (command.where && command.orderBy) {
-            const column = command.where.columnName
-            const value = command.where.value
-
-            const filter = {
-                [column]: value,
-            }
-
+        if (command.where /*&& command.orderBy*/) {
+            const filter = this.createFilter(command.where)
             rows = _.filter(rows, filter)
 
             if (command.orderBy) {
@@ -107,6 +101,40 @@ class StateService {
             result: `SELECT * FROM ${command.tableName} -query was executed succesfully`,
             rows,
         }
+    }
+
+    createFilter(whereObject) {
+        const column = whereObject.columnName
+        const value = whereObject.value
+        const sign = whereObject.sign
+        let filter
+
+        switch (sign) {
+            case '>':
+                filter = (item) => {
+                    return item[column] > value
+                }
+                break
+            case '<':
+                filter = (item) => {
+                    return item[column] < value
+                }
+                break
+            case '>=':
+                filter = (item) => {
+                    return item[column] >= value
+                }
+                break
+            case '<=':
+                filter = (item) => {
+                    return item[column] <= value
+                }
+                break
+            default:
+                filter = { [column]: value }
+                break
+        }
+        return filter
     }
 
     selectColumnsFromTable(command) {
