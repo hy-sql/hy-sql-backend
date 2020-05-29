@@ -1,7 +1,26 @@
 const { parseColumnNames } = require('./parserTools/parseColumnNames')
+const {
+    parseWhereToCommandObject,
+    queryContainsWhereKeyword,
+} = require('./whereCommand')
+const { parseOrderBy, hasOrderByKeywords } = require('./orderByCommand')
 const { SelectSchema } = require('../models/SelectSchema')
+const {
+    SelectColumnsWhereSchema,
+    SelectColumnsOrderBySchema,
+} = require('../models/SelectSchema')
 
-const parseCommand = (fullCommandAsStringList) => {
+const parseCommand = (fullCommandAsStringArray) => {
+    if (hasOrderByKeywords(fullCommandAsStringArray)) {
+        return parseSelectColumnsOrderBy(fullCommandAsStringArray)
+    } else if (queryContainsWhereKeyword(fullCommandAsStringArray)) {
+        return parseSelectColumnsWhere(fullCommandAsStringArray)
+    }
+
+    return parseSelectColumns(fullCommandAsStringArray)
+}
+
+const parseSelectColumns = (fullCommandAsStringList) => {
     //KOMENTO
     let parsedCommand = {
         name: fullCommandAsStringList[0],
@@ -41,18 +60,20 @@ const parseCommand = (fullCommandAsStringList) => {
         fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
     ) {
         parsedCommand.finalSemicolon = ';'
-        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList
-            .slice(
-                parsedCommand.parserCounter,
-                fullCommandAsStringList.length - 1
-            )
-            .join(' ')
+        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList.slice(
+            parsedCommand.parserCounter,
+            fullCommandAsStringList.length - 1
+        )
     } else {
-        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList
-            .slice(parsedCommand.parserCounter, fullCommandAsStringList.length)
-            .join(' ')
+        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList.slice(
+            parsedCommand.parserCounter,
+            fullCommandAsStringList.length
+        )
     }
-    return SelectSchema.validate(parsedCommand)
+
+    const validationResult = SelectSchema.validate(parsedCommand)
+
+    return validationResult
 }
 
 const parseTableNames = (stringArray, parsedCommand) => {
@@ -66,6 +87,49 @@ const parseTableNames = (stringArray, parsedCommand) => {
         parsedCommand.parserCounter++
     }
     return parsedCommand
+}
+
+const parseSelectColumnsWhere = (fullCommandAsStringArray) => {
+    const parsedBaseCommand = parseSelectColumns(fullCommandAsStringArray)
+
+    parsedBaseCommand.value.where = parseWhereToCommandObject(
+        parsedBaseCommand.value.unparsedBeforeFinalSemicolon
+    )
+
+    parsedBaseCommand.value.parserCounter =
+        parsedBaseCommand.value.parserCounter +
+        parsedBaseCommand.value.where.indexCounter
+
+    delete parsedBaseCommand.value.unparsedBeforeFinalSemicolon
+
+    const validationResult = SelectColumnsWhereSchema.validate(
+        parsedBaseCommand.value
+    )
+
+    console.log(validationResult)
+
+    return validationResult
+}
+
+const parseSelectColumnsOrderBy = (fullCommandAsStringArray) => {
+    const parsedBaseCommand = parseSelectColumns(fullCommandAsStringArray)
+
+    console.log(parsedBaseCommand.value.unparsedBeforeFinalSemicolon)
+
+    parsedBaseCommand.value.orderBy = parseOrderBy(
+        parsedBaseCommand.value.unparsedBeforeFinalSemicolon
+    )
+
+    delete parsedBaseCommand.value.unparsedBeforeFinalSemicolon
+    delete parsedBaseCommand.value.parserCounter
+
+    const validationResult = SelectColumnsOrderBySchema.validate(
+        parsedBaseCommand.value
+    )
+
+    console.log(validationResult)
+
+    return validationResult
 }
 
 module.exports = { parseCommand }

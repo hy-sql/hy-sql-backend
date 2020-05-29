@@ -50,6 +50,11 @@ describe.each([
             expect(parsedCommand.value).toHaveProperty('finalSemicolon')
             expect(parsedCommand.value).toHaveProperty('orderBy')
 
+            if (selectAllCommand.parseCommand(command).error) {
+                console.log('ERRORR HERE')
+                console.log(parsedCommand.value.orderBy.order)
+            }
+
             expect(selectAllCommand.parseCommand(command).error).toBeUndefined()
         })
     })
