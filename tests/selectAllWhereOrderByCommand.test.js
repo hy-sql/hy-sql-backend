@@ -69,12 +69,12 @@ describe.each([
 })
 
 describe.each([
-    'SELECT * FROM Taulu76 where name="test" order by column;',
+    "SELECT * FROM Taulu76 where name='test' order by column;",
     'SELECT    * FROM        Taulu  WheRe hinta<4 ORDER BY hinta;',
     'seLEcT * FrOm Taulu  whERE hinta>6 order BY hinta asc;',
     'SELECT * FROM Taulun_nimi where taulu=9 ORder BY column Asc;',
     'seLEcT * FrOm Taulu  whERE hinta>6 order BY hinta desc;',
-    'SELECT * FROM Tuotteet where column="table" ORDER BY table   dESc  ;',
+    "SELECT * FROM Tuotteet where column='table' ORDER BY table   dESc  ;",
 ])('Valid SELECT * ORDER BY -query', (validCommand) => {
     describe(validCommand, () => {
         const command = validCommand
