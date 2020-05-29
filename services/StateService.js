@@ -78,7 +78,7 @@ class StateService {
 
         let rows = table.rows
 
-        if (command.where /*&& command.orderBy*/) {
+        if (command.where) {
             const filter = this.createFilter(command.where)
             rows = _.filter(rows, filter)
 
@@ -97,8 +97,12 @@ class StateService {
                     : _.orderBy(rows, ['hinta'], ['asc'])
         }
 
+        const result = command.where
+            ? `SELECT * FROM ${command.tableName} WHERE ${command.where.columnName}${command.where.sign}${command.where.value} -query executed succesfully`
+            : `SELECT * FROM ${command.tableName} -query was executed succesfully`
+
         return {
-            result: `SELECT * FROM ${command.tableName} -query was executed succesfully`,
+            result,
             rows,
         }
     }
