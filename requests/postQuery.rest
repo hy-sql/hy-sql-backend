@@ -120,3 +120,21 @@ Content-Type: application/json
   ]
 }
 
+### SELECT column_1, column_2 FROM ... WHERE ... ORDER BY
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": [
+  "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+  "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('porkkana',5);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu',4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',1);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',6);",
+  "SELECT nimi FROM Tuotteet WHERE hinta=4 ORDER BY nimi DESC;"
+  ]
+}
