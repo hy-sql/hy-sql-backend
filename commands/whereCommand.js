@@ -2,7 +2,7 @@ const queryContainsWhereKeyword = (fullCommandAsStringList) => {
     const where = fullCommandAsStringList.findIndex(
         (string) => string.toUpperCase() === 'WHERE'
     )
-    return where > 0
+    return where !== -1
 }
 
 /* expects as input a sliced version of the array containing the full command.
