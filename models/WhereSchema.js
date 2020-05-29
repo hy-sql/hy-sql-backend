@@ -12,7 +12,7 @@ const WhereSchema = Joi.object({
     keyword: Joi.string()
         .required()
         .pattern(/;/, { invert: true })
-        .pattern(/^[W,w][H,h][E,e][R,r][E,e]$/)
+        .pattern(/^([Ww][Hh][Ee][Rr][Ee])$/)
         .messages({
             'any.required':
                 'This query is expected to have the following keyword: WHERE',
@@ -54,7 +54,7 @@ const WhereSchema = Joi.object({
         otherwise: Joi.string()
             .required()
             .pattern(/;/, { invert: true })
-            .pattern(/^(')(\w+)(')$|^(")(\w+)(")$/)
+            .pattern(/^\w+$/)
             .max(64)
             .messages({
                 'any.required':
@@ -62,10 +62,12 @@ const WhereSchema = Joi.object({
                 'string.pattern.invert.base':
                     'Semicolon should only be found at the end of a query',
                 'string.pattern.base':
-                    'String values in query should be in quotes and contain only alphanumeric characters and underscores',
+                    'Number and string values in the query should only contain alphanumeric characters and underscores',
                 'string.max': 'A string value is too long',
             }),
     }),
+
+    indexCounter: Joi.number(),
 })
 
 module.exports = WhereSchema

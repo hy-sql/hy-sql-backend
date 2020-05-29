@@ -22,27 +22,22 @@ const parseCommand = (fullCommandAsStringList) => {
         }
     }
 
-    const parsedCommand = {
+    let parsedCommand = {
         name: fullCommandAsStringList.slice(0, 2).join(' '),
+        size: fullCommandAsStringList.length,
+        parserCounter: 3,
         tableName: fullCommandAsStringList[2],
         anchorKeyword: fullCommandAsStringList[anchorLocation],
     }
-    let parserCounter = 3
-    if (fullCommandAsStringList[parserCounter] === '(') {
+
+    if (fullCommandAsStringList[parsedCommand.parserCounter] === '(') {
         parsedCommand.columnsOpeningBracket = '('
-        parserCounter++
+        parsedCommand.parserCounter++
     }
 
-    //tämä copy paste pitää saada vielä pois
-    let palautusolio = parseColumnNames(parserCounter, fullCommandAsStringList)
-    parserCounter = palautusolio.parserCounter
-    palautusolio.columnsOpenBrackets > 0 //tarkoituksena että heittää errorin validoinnissa
-        ? parsedCommand.columnsOpenBrackets
-        : null
-    parsedCommand.columns = palautusolio.columns
-    //copy paste loppuu
+    parsedCommand = parseColumnNames(fullCommandAsStringList, parsedCommand)
 
-    if (fullCommandAsStringList[parserCounter] === ')') {
+    if (fullCommandAsStringList[parsedCommand.parserCounter] === ')') {
         parsedCommand.columnsClosingBracket = ')'
     }
 
@@ -135,15 +130,15 @@ const addAttributesToValuesArray = (columnList, stringArray) => {
     const taulukko = stringArray.map((value, index) =>
         value.match('[0-9]')
             ? {
-                  column: columnList[index] ? columnList[index].name : null,
-                  value: Number(value),
-                  type: 'INTEGER',
-              }
+                column: columnList[index] ? columnList[index].name : null,
+                value: Number(value),
+                type: 'INTEGER',
+            }
             : {
-                  column: columnList[index] ? columnList[index].name : null,
-                  value: value.replace(/'/g, ' ').trim(),
-                  type: 'TEXT',
-              }
+                column: columnList[index] ? columnList[index].name : null,
+                value: value.replace(/'/g, ' ').trim(),
+                type: 'TEXT',
+            }
     )
     return taulukko
 }

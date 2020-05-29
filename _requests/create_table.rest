@@ -29,7 +29,9 @@ Content-Type: application/json
   "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4);",
   "INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu',8);",
   "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
-  "SELECT * FROM Tuotteet ORDER BY hinta;"
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',1);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',6);",
+  "SELECT * FROM Tuotteet WHERE hinta=4 ORDER BY hinta;"
   ]
 }
 
