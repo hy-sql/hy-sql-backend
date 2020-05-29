@@ -89,8 +89,6 @@ const parseSelectAllOrderBy = (fullCommandAsStringArray) => {
 
     const validationResult = SelectAllOrderBySchema.validate(parsedCommand)
 
-    console.log(validationResult)
-
     return validationResult
 }
 

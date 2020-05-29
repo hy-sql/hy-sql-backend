@@ -1,5 +1,4 @@
 const parseOrderBy = (slicedCommandAsStringArray) => {
-    console.log('hello', slicedCommandAsStringArray)
     return slicedCommandAsStringArray.slice(0, 2).join(' ').toUpperCase() ===
         'ORDER BY'
         ? {

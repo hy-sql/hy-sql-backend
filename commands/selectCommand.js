@@ -106,15 +106,11 @@ const parseSelectColumnsWhere = (fullCommandAsStringArray) => {
         parsedBaseCommand.value
     )
 
-    console.log(validationResult)
-
     return validationResult
 }
 
 const parseSelectColumnsOrderBy = (fullCommandAsStringArray) => {
     const parsedBaseCommand = parseSelectColumns(fullCommandAsStringArray)
-
-    console.log(parsedBaseCommand.value.unparsedBeforeFinalSemicolon)
 
     parsedBaseCommand.value.orderBy = parseOrderBy(
         parsedBaseCommand.value.unparsedBeforeFinalSemicolon
@@ -126,8 +122,6 @@ const parseSelectColumnsOrderBy = (fullCommandAsStringArray) => {
     const validationResult = SelectColumnsOrderBySchema.validate(
         parsedBaseCommand.value
     )
-
-    console.log(validationResult)
 
     return validationResult
 }
