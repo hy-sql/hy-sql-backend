@@ -328,7 +328,7 @@ describe('selectFromTable()', () => {
             tableName: 'products',
         }
 
-        const result = stateService.selectFromTable(command)
+        const result = stateService.selectColumnsFromTable(command)
         expect(result.error).toBe('No such table products')
     })
 
@@ -366,7 +366,7 @@ describe('selectFromTable()', () => {
             .filter(Boolean)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectFromTable(parsedCommand.value)
+        const result = stateService.selectColumnsFromTable(parsedCommand.value)
         expect(result.result).toBe(
             'SELECT nimi FROM Tuotteet -query was executed successfully'
         )
