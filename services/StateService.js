@@ -74,20 +74,12 @@ class StateService {
         const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
 
-        const tableIndex = this.state.tables.findIndex(
-            (table) => table.name === command.tableName
-        )
+        const table = this.findTable(command.tableName)
 
-        let rows = this.state.tables[tableIndex].rows
+        let rows = table.rows
 
-        if (command.where && command.orderBy) {
-            const column = command.where.columnName
-            const value = command.where.value
-
-            const filter = {
-                [column]: value,
-            }
-
+        if (command.where) {
+            const filter = this.createFilter(command.where)
             rows = _.filter(rows, filter)
 
             if (command.orderBy) {
@@ -105,9 +97,40 @@ class StateService {
                     : _.orderBy(rows, ['hinta'], ['asc'])
         }
 
+        const result = command.where
+            ? `SELECT * FROM ${command.tableName} WHERE ${command.where.columnName}${command.where.sign}${command.where.value} -query executed succesfully`
+            : `SELECT * FROM ${command.tableName} -query was executed succesfully`
+
         return {
-            result: `SELECT * FROM ${command.tableName} -query was executed succesfully`,
+            result,
             rows,
+        }
+    }
+
+    createFilter(whereObject) {
+        const column = whereObject.columnName
+        const value = whereObject.value
+        const sign = whereObject.sign
+
+        switch (sign) {
+            case '>':
+                return (item) => {
+                    return item[column] > value
+                }
+            case '<':
+                return (item) => {
+                    return item[column] < value
+                }
+            case '>=':
+                return (item) => {
+                    return item[column] >= value
+                }
+            case '<=':
+                return (item) => {
+                    return item[column] <= value
+                }
+            default:
+                return { [column]: value }
         }
     }
 

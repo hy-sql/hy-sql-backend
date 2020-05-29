@@ -114,8 +114,9 @@ Content-Type: application/json
 {
   "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
   "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
-    "SELECT * FROM Tuotteet WHERE hinta=7;",
-    "SELECT * FROM Tuotteet WHERE nimi='retiisi';"
+  "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 5);",
+    "SELECT * FROM Tuotteet WHERE hinta>5;",
+    "SELECT * FROM Tuotteet WHERE nimi='omena';"
   ]
 }
 
