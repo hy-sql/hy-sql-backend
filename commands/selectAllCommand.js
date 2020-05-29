@@ -8,6 +8,11 @@ const {
     queryContainsWhereKeyword,
     parseWhereToCommandObject,
 } = require('./whereCommand')
+const {
+    parseOrderBy,
+    hasOrderByKeywords,
+    hasWhereOrderByKeywords,
+} = require('./orderByCommand')
 
 const parseCommand = (fullCommandAsStringArray) => {
     if (hasWhereOrderByKeywords(fullCommandAsStringArray)) {
@@ -19,34 +24,6 @@ const parseCommand = (fullCommandAsStringArray) => {
     }
 
     return parseSelectAll(fullCommandAsStringArray)
-}
-
-const hasOrderByKeywords = (fullCommandAsStringArray) => {
-    const hasOrder = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'ORDER'
-    )
-
-    const hasBy = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'BY'
-    )
-
-    return hasOrder > 0 && hasBy > 0 ? hasOrder < hasBy : false
-}
-
-const hasWhereOrderByKeywords = (fullCommandAsStringArray) => {
-    const hasWhere = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'WHERE'
-    )
-    const hasOrder = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'ORDER'
-    )
-    const hasBy = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'BY'
-    )
-
-    return hasWhere > 0 && hasOrder > 0 && hasBy > 0
-        ? hasWhere < hasOrder && hasOrder < hasBy
-        : false
 }
 
 const parseBaseCommand = (fullCommandAsStringArray) => {
@@ -78,8 +55,8 @@ const parseSelectAll = (fullCommandAsStringArray) => {
         validationResult.error
             ? validationResult.error.details.push({ message: errorMessage })
             : (validationResult.error = {
-                  details: [{ message: errorMessage }],
-              })
+                details: [{ message: errorMessage }],
+            })
     }
 
     return validationResult
@@ -110,7 +87,9 @@ const parseSelectAllOrderBy = (fullCommandAsStringArray) => {
         fullCommandAsStringArray.slice(4, fullCommandAsStringArray.length - 1)
     )
 
-    return SelectAllOrderBySchema.validate(parsedCommand)
+    const validationResult = SelectAllOrderBySchema.validate(parsedCommand)
+
+    return validationResult
 }
 
 const parseSelectAllWhere = (fullCommandAsStringArray) => {
@@ -122,21 +101,4 @@ const parseSelectAllWhere = (fullCommandAsStringArray) => {
     return SelectAllWhereSchema.validate(parsedCommand)
 }
 
-const parseOrderBy = (slicedCommandAsStringArray) => {
-    return slicedCommandAsStringArray.slice(0, 2).join(' ').toUpperCase() ===
-        'ORDER BY'
-        ? {
-              keyword: slicedCommandAsStringArray
-                  .slice(0, 2)
-                  .join(' ')
-                  .toUpperCase(),
-              columnName: slicedCommandAsStringArray[2],
-              order: slicedCommandAsStringArray
-                  .slice(3)
-                  .join(' ')
-                  .toUpperCase(),
-          }
-        : null
-}
-
-module.exports = { parseCommand, parseOrderBy }
+module.exports = { parseCommand }
