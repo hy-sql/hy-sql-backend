@@ -2,7 +2,6 @@ const queryContainsWhereKeyword = (fullCommandAsStringList) => {
     const where = fullCommandAsStringList.findIndex(
         (string) => string.toUpperCase() === 'WHERE'
     )
-    console.log('has where: ', where > 0)
     return where > 0
 }
 
@@ -12,15 +11,21 @@ const queryContainsWhereKeyword = (fullCommandAsStringList) => {
   as a part of the whole query.*/
 const parseWhereToCommandObject = (slicedCommandAsStringList) => {
     const keyword = slicedCommandAsStringList[0]
-    const columnSignValue = slicedCommandAsStringList[1]
-        ? slicedCommandAsStringList[1]
+
+    let index = 1
+    slicedCommandAsStringList[index] === "'" ? index++ : ''
+    let columnSignValue = slicedCommandAsStringList[index]
+        ? slicedCommandAsStringList[index]
         : ''
-    const signValueOption = slicedCommandAsStringList[2]
-        ? slicedCommandAsStringList[2]
+    index++
+    let signValueOption = slicedCommandAsStringList[index]
+        ? slicedCommandAsStringList[index]
         : ''
-    const valueOption = slicedCommandAsStringList[3]
-        ? slicedCommandAsStringList[3]
+    index++
+    let valueOption = slicedCommandAsStringList[index]
+        ? slicedCommandAsStringList[index]
         : ''
+    index++
 
     let columnName = undefined
     let sign = findSign(columnSignValue)
@@ -41,9 +46,11 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
         }
     } else {
         columnName = columnSignValue.split(sign)[0]
-        value = columnSignValue.endsWith(sign)
-            ? signValueOption
-            : columnSignValue.split(sign)[1]
+        value =
+            columnSignValue.endsWith(sign) ||
+            columnSignValue.endsWith(`${sign}'`)
+                ? signValueOption
+                : columnSignValue.split(sign)[1]
         signSet = true
     }
 
@@ -53,13 +60,30 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
         value = signValueOption.endsWith(sign)
             ? valueOption
             : signValueOption.split(sign)[1]
+
+        if (signValueOption.endsWith(sign) && valueOption === "'") {
+            value = slicedCommandAsStringList[index]
+            index++
+        }
+    }
+
+    if (value === ';' && index >= slicedCommandAsStringList.length) {
+        index--
+        value = undefined
     }
 
     if (value) {
         RegExp('^[0-9]+$').test(value)
             ? (value = Number(value))
             : (valueType = 'TEXT')
+
+        valueType === 'TEXT' ? (value = value.replace(/'/g, '')) : ''
     }
+
+    columnName === '' ? (columnName = undefined) : ''
+    value === '' ? (value = undefined) : ''
+
+    slicedCommandAsStringList[index + 1] === "'" ? index++ : ''
 
     return {
         keyword,
@@ -67,6 +91,7 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
         sign,
         valueType,
         value,
+        indexCounter: index,
     }
 }
 

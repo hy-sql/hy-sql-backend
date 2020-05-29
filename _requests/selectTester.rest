@@ -5,6 +5,8 @@ Content-Type: application/json
 
 {
   "commandArray": [
+    "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
     "SELECT nimi,hinta FROM Tuotteet;"
   ]
 }
@@ -21,7 +23,18 @@ Content-Type: application/json
   ]
 }
 
-### Valid query for inserting several rows
+### puolipisteen jälkeen tavaraa
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": [
+    "SELECT nimi,hinta FROM Tuotteet; jotain ylimääräistä tässä"
+  ]
+}
+
+### Valid query for inserting several rows and select spesified columns
 
 POST http://localhost:3001/api/query
 Content-Type: application/json
@@ -30,7 +43,7 @@ Content-Type: application/json
   "commandArray": ["CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
     "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
     "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 5);",
-    "SELECT * FROM Tuotteet;"
+    "SELECT nimi FROM Tuotteet;"
   ]
 }
 
