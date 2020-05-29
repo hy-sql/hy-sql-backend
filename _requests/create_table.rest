@@ -31,7 +31,7 @@ Content-Type: application/json
   "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
   "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',1);",
   "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',6);",
-  "SELECT nimi, hinta FROM Tuotteet ORDER BY nimi DESC;"
+  "SELECT nimi, hinta FROM Tuotteet ORDER BY nimi ASC;"
   ]
 }
 
