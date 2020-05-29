@@ -495,3 +495,129 @@ describe('selectAllFromTable() with command.where', () => {
         expect(result.rows[0].nimi).toBe('tuote')
     })
 })
+
+describe('selectColumnsFromTable() with command.where', () => {
+    let stateService
+
+    beforeEach(() => {
+        const initArray = []
+        const state = new State(initArray)
+        stateService = new StateService(state)
+
+        const commands = [
+            'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
+            'INSERT INTO Tuotteet (nimi, hinta) VALUES (tuote, 10);',
+            'INSERT INTO Tuotteet (nimi, hinta) VALUES (testituote, 20);',
+        ]
+
+        const splitCommandArray = commands.map((input) =>
+            input
+                .trim()
+                .replace(/\s\s+/g, ' ')
+                .replace(/\s+,/g, ',')
+                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+                .filter(Boolean)
+        )
+
+        const parsedCommands = splitCommandArray.map((c) =>
+            commandService.parseCommand(c)
+        )
+
+        parsedCommands.forEach((c) => stateService.updateState(c.value))
+    })
+
+    test('returns filtered rows when where is defined', () => {
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta=10;'
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.selectColumnsFromTable(parsedCommand.value)
+        expect(result.result).toBe(
+            'SELECT nimi FROM Tuotteet WHERE hinta=10 -query executed succesfully'
+        )
+        expect(result.rows.length).toBe(1)
+        expect(result.rows[0].nimi).toBe('tuote')
+        expect(result.rows[0].hinta).toBe(undefined)
+    })
+
+    test('returns filtered rows when command.where contains >', () => {
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta>5;'
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.selectColumnsFromTable(parsedCommand.value)
+        expect(result.result).toBe(
+            'SELECT nimi FROM Tuotteet WHERE hinta>5 -query executed succesfully'
+        )
+        expect(result.rows.length).toBe(2)
+        expect(result.rows[0].nimi).toBe('tuote')
+        expect(result.rows[0].hinta).toBe(undefined)
+    })
+
+    test('returns filtered rows when where-command contains >=', () => {
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta>=20;'
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.selectColumnsFromTable(parsedCommand.value)
+        expect(result.result).toBe(
+            'SELECT nimi FROM Tuotteet WHERE hinta>=20 -query executed succesfully'
+        )
+        expect(result.rows.length).toBe(1)
+        expect(result.rows[0].nimi).toBe('testituote')
+        expect(result.rows[0].hinta).toBe(undefined)
+    })
+
+    test('returns filtered rows when where-command contains <', () => {
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta<20;'
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.selectColumnsFromTable(parsedCommand.value)
+        expect(result.result).toBe(
+            'SELECT nimi FROM Tuotteet WHERE hinta<20 -query executed succesfully'
+        )
+        expect(result.rows.length).toBe(1)
+        expect(result.rows[0].nimi).toBe('tuote')
+        expect(result.rows[0].hinta).toBe(undefined)
+    })
+
+    test('returns filtered rows when where-command contains <=', () => {
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta<=10;'
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.selectColumnsFromTable(parsedCommand.value)
+        expect(result.result).toBe(
+            'SELECT nimi FROM Tuotteet WHERE hinta<=10 -query executed succesfully'
+        )
+        expect(result.rows.length).toBe(1)
+        expect(result.rows[0].nimi).toBe('tuote')
+        expect(result.rows[0].hinta).toBe(undefined)
+    })
+})
