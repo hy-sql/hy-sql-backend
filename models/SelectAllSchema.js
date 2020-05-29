@@ -47,8 +47,14 @@ const SelectAllWhereSchema = SelectAllSchema.keys({
     where: WhereSchema,
 })
 
+const SelectAllWhereOrderBySchema = SelectAllSchema.keys({
+    where: WhereSchema,
+    orderBy: OrderBySchema,
+})
+
 module.exports = {
     SelectAllSchema,
     SelectAllOrderBySchema,
     SelectAllWhereSchema,
+    SelectAllWhereOrderBySchema,
 }

@@ -43,8 +43,6 @@ describe.each([
         test('is parsed and validated succesfully', () => {
             const parsedCommand = selectAllCommand.parseCommand(command)
 
-            console.log(parsedCommand)
-
             expect(parsedCommand.value).toBeDefined()
             expect(parsedCommand.value).toHaveProperty('name')
             expect(parsedCommand.value).toHaveProperty('from')
