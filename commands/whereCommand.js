@@ -2,7 +2,6 @@ const queryContainsWhereKeyword = (fullCommandAsStringList) => {
     const where = fullCommandAsStringList.findIndex(
         (string) => string.toUpperCase() === 'WHERE'
     )
-    console.log('has where: ', where > 0)
     return where > 0
 }
 

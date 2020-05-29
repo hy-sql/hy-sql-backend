@@ -263,8 +263,6 @@ test('SELECT * FROM ORDER BY returns rows from table in ascending order', () => 
         splitSelectAllOrderByCommand
     )
 
-    console.log(parsedSelectAllOrderByCommand)
-
     const result = stateService.selectAllFromTable(
         parsedSelectAllOrderByCommand.value
     )

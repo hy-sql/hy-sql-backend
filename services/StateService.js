@@ -68,7 +68,65 @@ class StateService {
 
         let rows = this.state.tables[tableIndex].rows
 
-        if (command.orderBy) {
+        if (command.where && command.orderBy) {
+            const column = command.where.columnName
+            const value = command.where.value
+
+            const filter = {
+                [column]: value,
+            }
+
+            rows = _.filter(rows, filter)
+
+            if (command.orderBy) {
+                rows =
+                    command.orderBy.order &&
+                    command.orderBy.order.toUpperCase() === 'DESC'
+                        ? _.orderBy(rows, ['hinta'], ['desc'])
+                        : _.orderBy(rows, ['hinta'], ['asc'])
+            }
+        } else if (command.orderBy) {
+            rows =
+                command.orderBy.order &&
+                command.orderBy.order.toUpperCase() === 'DESC'
+                    ? _.orderBy(rows, ['hinta'], ['desc'])
+                    : _.orderBy(rows, ['hinta'], ['asc'])
+        }
+
+        return {
+            result: `SELECT * FROM ${command.tableName} -query was executed succesfully`,
+            rows,
+        }
+    }
+
+    selectColumnsFromTable(command) {
+        const error = this.checkIfTableExists(command)
+        if (error) return { error: error }
+
+        const tableIndex = this.state.tables.findIndex(
+            (table) => table.name === command.tableName
+        )
+
+        let rows = this.state.tables[tableIndex].rows
+
+        if (command.where && command.orderBy) {
+            const column = command.where.columnName
+            const value = command.where.value
+
+            const filter = {
+                [column]: value,
+            }
+
+            rows = _.filter(rows, filter)
+
+            if (command.orderBy) {
+                rows =
+                    command.orderBy.order &&
+                    command.orderBy.order.toUpperCase() === 'DESC'
+                        ? _.orderBy(rows, ['hinta'], ['desc'])
+                        : _.orderBy(rows, ['hinta'], ['asc'])
+            }
+        } else if (command.orderBy) {
             rows =
                 command.orderBy.order &&
                 command.orderBy.order.toUpperCase() === 'DESC'

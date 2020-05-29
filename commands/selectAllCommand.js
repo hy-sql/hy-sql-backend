@@ -2,102 +2,140 @@ const {
     SelectAllSchema,
     SelectAllOrderBySchema,
     SelectAllWhereSchema,
+    SelectAllWhereOrderBySchema,
 } = require('../models/SelectAllSchema')
 const {
     queryContainsWhereKeyword,
     parseWhereToCommandObject,
 } = require('./whereCommand')
 
-const parseCommand = (fullCommandAsStringList) => {
-    if (hasOrderByKeywords(fullCommandAsStringList)) {
-        return parseSelectAllOrderBy(fullCommandAsStringList)
-    } else if (queryContainsWhereKeyword(fullCommandAsStringList)) {
-        return parseSelectAllWhere(fullCommandAsStringList)
+const parseCommand = (fullCommandAsStringArray) => {
+    if (hasWhereOrderByKeywords(fullCommandAsStringArray)) {
+        return parseSelectWhereOrderBy(fullCommandAsStringArray)
+    } else if (hasOrderByKeywords(fullCommandAsStringArray)) {
+        return parseSelectAllOrderBy(fullCommandAsStringArray)
+    } else if (queryContainsWhereKeyword(fullCommandAsStringArray)) {
+        return parseSelectAllWhere(fullCommandAsStringArray)
     }
 
-    return parseSelectAll(fullCommandAsStringList)
+    return parseSelectAll(fullCommandAsStringArray)
 }
 
-const hasOrderByKeywords = (fullCommandAsStringList) => {
-    const hasOrder = fullCommandAsStringList.findIndex(
+const hasOrderByKeywords = (fullCommandAsStringArray) => {
+    const hasOrder = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'ORDER'
     )
 
-    const hasBy = fullCommandAsStringList.findIndex(
+    const hasBy = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'BY'
     )
 
     return hasOrder > 0 && hasBy > 0 ? hasOrder < hasBy : false
 }
 
-const parseBaseCommand = (fullCommandAsStringList) => {
+const hasWhereOrderByKeywords = (fullCommandAsStringArray) => {
+    const hasWhere = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'WHERE'
+    )
+    const hasOrder = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'ORDER'
+    )
+    const hasBy = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'BY'
+    )
+
+    return hasWhere > 0 && hasOrder > 0 && hasBy > 0
+        ? hasWhere < hasOrder && hasOrder < hasBy
+        : false
+}
+
+const parseBaseCommand = (fullCommandAsStringArray) => {
     return {
-        name: fullCommandAsStringList.slice(0, 2).join(' '),
-        from: fullCommandAsStringList[2],
-        tableName: fullCommandAsStringList[3],
+        name: fullCommandAsStringArray.slice(0, 2).join(' '),
+        from: fullCommandAsStringArray[2],
+        tableName: fullCommandAsStringArray[3],
         finalSemicolon:
-            fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
+            fullCommandAsStringArray[fullCommandAsStringArray.length - 1] ===
+            ';'
                 ? ';'
                 : undefined,
     }
 }
 
-const parseSelectAll = (fullCommandAsStringList) => {
-    const parsedCommand = parseBaseCommand(fullCommandAsStringList)
+const parseSelectAll = (fullCommandAsStringArray) => {
+    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
     const validationResult = SelectAllSchema.validate(parsedCommand)
 
     /* if there is something additional between the table name and ending semicolon
         an error about the nonbelonging part is created and added to existing
         validation errors or an error object is added into the validation object */
-    if (fullCommandAsStringList.length > 5) {
-        const additional = fullCommandAsStringList
-            .slice(4, fullCommandAsStringList.length - 1)
+    if (fullCommandAsStringArray.length > 5) {
+        const additional = fullCommandAsStringArray
+            .slice(4, fullCommandAsStringArray.length - 1)
             .join(' ')
         const errorMessage = `The following part of the query is probably incorrect and causing it to fail: '${additional}'`
 
         validationResult.error
             ? validationResult.error.details.push({ message: errorMessage })
             : (validationResult.error = {
-                details: [{ message: errorMessage }],
-            })
+                  details: [{ message: errorMessage }],
+              })
     }
 
     return validationResult
 }
 
-const parseSelectAllOrderBy = (fullCommandAsStringList) => {
-    const parsedCommand = parseBaseCommand(fullCommandAsStringList)
+const parseSelectWhereOrderBy = (fullCommandAsStringArray) => {
+    const indexOfOrder = fullCommandAsStringArray.findIndex(
+        (c) => c.toUpperCase() === 'ORDER'
+    )
+
+    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
+    parsedCommand.where = parseWhereToCommandObject(
+        fullCommandAsStringArray.slice(4, indexOfOrder)
+    )
     parsedCommand.orderBy = parseOrderBy(
-        fullCommandAsStringList.slice(4, fullCommandAsStringList.length - 1)
+        fullCommandAsStringArray.slice(
+            indexOfOrder,
+            fullCommandAsStringArray.length - 1
+        )
+    )
+
+    return SelectAllWhereOrderBySchema.validate(parsedCommand)
+}
+
+const parseSelectAllOrderBy = (fullCommandAsStringArray) => {
+    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
+    parsedCommand.orderBy = parseOrderBy(
+        fullCommandAsStringArray.slice(4, fullCommandAsStringArray.length - 1)
     )
 
     return SelectAllOrderBySchema.validate(parsedCommand)
 }
 
-const parseSelectAllWhere = (fullCommandAsStringList) => {
-    const parsedCommand = parseBaseCommand(fullCommandAsStringList)
+const parseSelectAllWhere = (fullCommandAsStringArray) => {
+    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
     parsedCommand.where = parseWhereToCommandObject(
-        fullCommandAsStringList.slice(4)
+        fullCommandAsStringArray.slice(4)
     )
 
     return SelectAllWhereSchema.validate(parsedCommand)
 }
 
 const parseOrderBy = (slicedCommandAsStringArray) => {
-    console.log(slicedCommandAsStringArray)
     return slicedCommandAsStringArray.slice(0, 2).join(' ').toUpperCase() ===
         'ORDER BY'
         ? {
-            keyword: slicedCommandAsStringArray
-                .slice(0, 2)
-                .join(' ')
-                .toUpperCase(),
-            columnName: slicedCommandAsStringArray[2],
-            order: slicedCommandAsStringArray
-                .slice(3)
-                .join(' ')
-                .toUpperCase(),
-        }
+              keyword: slicedCommandAsStringArray
+                  .slice(0, 2)
+                  .join(' ')
+                  .toUpperCase(),
+              columnName: slicedCommandAsStringArray[2],
+              order: slicedCommandAsStringArray
+                  .slice(3)
+                  .join(' ')
+                  .toUpperCase(),
+          }
         : null
 }
 
