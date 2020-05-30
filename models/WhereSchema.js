@@ -19,7 +19,7 @@ const WhereSchema = Joi.object({
             'string.pattern.invert.base':
                 'Semicolon should only be found at the end of a query',
             'string.pattern.base':
-                'WHERE is either misspelled or in the wrong position',
+                'WHERE is either misspelled, missing or in the wrong position',
         }),
 
     columnName: Joi.string()

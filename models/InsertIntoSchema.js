@@ -96,7 +96,7 @@ const InsertIntoSchema = Joi.object({
         .required()
         .messages({
             'any.only':
-                'This query is expected to contain the following keyword: VALUES',
+                'The keyword VALUES is either misspelled, missing or in the wrong position',
             'any.required':
                 'This query is expected to contain the following keyword: VALUES',
         }),
