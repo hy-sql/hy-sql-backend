@@ -6,7 +6,14 @@ const OrderBySchema = Joi.object({
         .pattern(/^ORDER BY$/)
         .insensitive()
         .optional()
-        .messages({}),
+        .messages({
+            'any.required':
+                'This query is expected to contain the following keyword: ORDER BY',
+            'string.pattern.invert.base':
+                'Semicolon should only be found at the end of a query',
+            'string.pattern.base':
+                'ORDER BY is either misspelled, missing or in the wrong position',
+        }),
 
     columnName: Joi.string()
         .pattern(/[;]/, { invert: true })
@@ -17,7 +24,9 @@ const OrderBySchema = Joi.object({
             'string.pattern.invert.base':
                 'Semicolon should be only found at the end of a query',
             'string.pattern.base':
-                'Only letters, numbers and underscore allowed',
+                'Only letters, numbers and underscore allowed in a column name',
+            'string.max': 'A column name is too long',
+            'any.required': 'A column name is missing',
         }),
 
     order: Joi.string()

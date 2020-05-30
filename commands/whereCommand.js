@@ -73,6 +73,7 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
         value = undefined
     }
 
+    const unmodifiedValue = value
     if (value) {
         RegExp('^[0-9]+$').test(value)
             ? (value = Number(value))
@@ -84,7 +85,11 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
     columnName === '' ? (columnName = undefined) : ''
     value === '' ? (value = undefined) : ''
 
-    slicedCommandAsStringList[index] === "'" ? index++ : ''
+    valueType === 'TEXT' &&
+    slicedCommandAsStringList[index] === "'" &&
+    !unmodifiedValue.endsWith("'")
+        ? index++
+        : ''
 
     return {
         keyword,
