@@ -121,6 +121,7 @@ describe.each([
     "SELECT * FROM Tuotteet WHERE name='';",
     "SELECT * FROM Tuotteet WHERE name name='test';",
     "SELECT * FROM Tuotteet WHERE name='test' additional;",
+    "SELECT * FROM Tuotteet WHERE name='test' ';",
 ])('Invalid SELECT * FROM ... WHERE ...-query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = invalidCommand
