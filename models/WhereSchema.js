@@ -15,11 +15,11 @@ const WhereSchema = Joi.object({
         .pattern(/^([Ww][Hh][Ee][Rr][Ee])$/)
         .messages({
             'any.required':
-                'This query is expected to have the following keyword: WHERE',
+                'This query is expected to contain the following keyword: WHERE',
             'string.pattern.invert.base':
                 'Semicolon should only be found at the end of a query',
             'string.pattern.base':
-                'WHERE is either misspelled or in the wrong position',
+                'WHERE is either misspelled, missing or in the wrong position',
         }),
 
     columnName: Joi.string()
