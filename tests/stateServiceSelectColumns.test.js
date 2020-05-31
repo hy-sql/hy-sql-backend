@@ -1,0 +1,533 @@
+const State = require('../models/State')
+const StateService = require('../services/StateService')
+const commandService = require('../services/commandService')
+
+describe('selectFromTable()', () => {
+    test('returns error when table does not exist', () => {
+        const initArray = []
+        const state = new State(initArray)
+        const stateService = new StateService(state)
+
+        const command = {
+            name: 'SELECT',
+            tableName: 'products',
+        }
+
+        const result = stateService.selectColumnsFromTable(command)
+        expect(result.error).toBe('No such table products')
+    })
+
+    test('returns column nimi for SELECT nimi FROM Tuotteet;', () => {
+        const initArray = []
+        const state = new State(initArray)
+        const stateService = new StateService(state)
+
+        const commands = [
+            'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
+            'INSERT INTO Tuotteet (nimi, hinta) VALUES (tuote, 10);',
+        ]
+
+        const splitCommandArray = commands.map((input) =>
+            input
+                .trim()
+                .replace(/\s\s+/g, ' ')
+                .replace(/\s+,/g, ',')
+                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+                .filter(Boolean)
+        )
+
+        const parsedCommands = splitCommandArray.map((c) =>
+            commandService.parseCommand(c)
+        )
+
+        parsedCommands.forEach((c) => stateService.updateState(c.value))
+
+        const selectCommand = 'SELECT nimi from Tuotteet;'
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.selectColumnsFromTable(parsedCommand.value)
+        expect(result.result).toBe(
+            'SELECT nimi FROM Tuotteet -query was executed successfully'
+        )
+        expect(result.rows.length).toBe(1)
+        expect(result.rows[0]['nimi']).toBe('tuote')
+    })
+})
+
+describe('selectColumnsFromTable() with command.where', () => {
+    let stateService
+
+    beforeEach(() => {
+        const initArray = []
+        const state = new State(initArray)
+        stateService = new StateService(state)
+
+        const commands = [
+            'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
+            'INSERT INTO Tuotteet (nimi, hinta) VALUES (tuote, 10);',
+            'INSERT INTO Tuotteet (nimi, hinta) VALUES (testituote, 20);',
+        ]
+
+        const splitCommandArray = commands.map((input) =>
+            input
+                .trim()
+                .replace(/\s\s+/g, ' ')
+                .replace(/\s+,/g, ',')
+                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+                .filter(Boolean)
+        )
+
+        const parsedCommands = splitCommandArray.map((c) =>
+            commandService.parseCommand(c)
+        )
+
+        parsedCommands.forEach((c) => stateService.updateState(c.value))
+    })
+
+    test('returns filtered rows when where is defined', () => {
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta=10;'
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.selectColumnsFromTable(parsedCommand.value)
+        expect(result.result).toBe(
+            'SELECT nimi FROM Tuotteet WHERE hinta=10 -query executed succesfully'
+        )
+        expect(result.rows.length).toBe(1)
+        expect(result.rows[0].nimi).toBe('tuote')
+        expect(result.rows[0].hinta).toBe(undefined)
+    })
+
+    test('returns filtered rows when command.where contains >', () => {
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta>5;'
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.selectColumnsFromTable(parsedCommand.value)
+        expect(result.result).toBe(
+            'SELECT nimi FROM Tuotteet WHERE hinta>5 -query executed succesfully'
+        )
+        expect(result.rows.length).toBe(2)
+        expect(result.rows[0].nimi).toBe('tuote')
+        expect(result.rows[0].hinta).toBe(undefined)
+    })
+
+    test('returns filtered rows when where-command contains >=', () => {
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta>=20;'
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.selectColumnsFromTable(parsedCommand.value)
+        expect(result.result).toBe(
+            'SELECT nimi FROM Tuotteet WHERE hinta>=20 -query executed succesfully'
+        )
+        expect(result.rows.length).toBe(1)
+        expect(result.rows[0].nimi).toBe('testituote')
+        expect(result.rows[0].hinta).toBe(undefined)
+    })
+
+    test('returns filtered rows when where-command contains <', () => {
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta<20;'
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.selectColumnsFromTable(parsedCommand.value)
+        expect(result.result).toBe(
+            'SELECT nimi FROM Tuotteet WHERE hinta<20 -query executed succesfully'
+        )
+        expect(result.rows.length).toBe(1)
+        expect(result.rows[0].nimi).toBe('tuote')
+        expect(result.rows[0].hinta).toBe(undefined)
+    })
+
+    test('returns filtered rows when where-command contains <=', () => {
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta<=10;'
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.selectColumnsFromTable(parsedCommand.value)
+        expect(result.result).toBe(
+            'SELECT nimi FROM Tuotteet WHERE hinta<=10 -query executed succesfully'
+        )
+        expect(result.rows.length).toBe(1)
+        expect(result.rows[0].nimi).toBe('tuote')
+        expect(result.rows[0].hinta).toBe(undefined)
+    })
+})
+
+describe('selectColumnsFromTable() with ORDER BY -command', () => {
+    test('returns rows from table in ascending order', () => {
+        const initArray = []
+        const state = new State(initArray)
+        const stateService = new StateService(state)
+
+        const expectedRows = [
+            {
+                nimi: 'selleri',
+                hinta: 1,
+            },
+            {
+                nimi: 'nauris',
+                hinta: 4,
+            },
+            {
+                nimi: 'selleri',
+                hinta: 4,
+            },
+            {
+                nimi: 'porkkana',
+                hinta: 5,
+            },
+            {
+                nimi: 'selleri',
+                hinta: 6,
+            },
+            {
+                nimi: 'retiisi',
+                hinta: 7,
+            },
+            {
+                nimi: 'lanttu',
+                hinta: 8,
+            },
+        ]
+
+        const commands = [
+            'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('porkkana',5);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu',8);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',1);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',6);",
+        ]
+
+        const splitCommandArray = commands.map((input) =>
+            input
+                .trim()
+                .replace(/\s\s+/g, ' ')
+                .replace(/\s+,/g, ',')
+                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+                .filter(Boolean)
+        )
+
+        const parsedCommands = splitCommandArray.map((c) =>
+            commandService.parseCommand(c)
+        )
+
+        parsedCommands.forEach((c) => stateService.updateState(c.value))
+
+        const selectAllOrderByCommand =
+            'SELECT nimi, hinta FROM Tuotteet ORDER BY hinta;'
+
+        const splitSelectAllOrderByCommand = selectAllOrderByCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+
+        const parsedSelectAllOrderByCommand = commandService.parseCommand(
+            splitSelectAllOrderByCommand
+        )
+
+        const result = stateService.updateState(
+            parsedSelectAllOrderByCommand.value
+        )
+
+        console.log(result)
+
+        expect(result.rows).toEqual(expectedRows)
+    })
+})
+
+describe('selectColumnsFromTable() with ORDER BY DESC -command (numbers)', () => {
+    test('returns rows from table in ascending order', () => {
+        const initArray = []
+        const state = new State(initArray)
+        const stateService = new StateService(state)
+
+        const expectedRows = [
+            {
+                nimi: 'lanttu',
+                hinta: 8,
+            },
+            {
+                nimi: 'retiisi',
+                hinta: 7,
+            },
+            {
+                nimi: 'selleri',
+                hinta: 6,
+            },
+            {
+                nimi: 'porkkana',
+                hinta: 5,
+            },
+            {
+                nimi: 'nauris',
+                hinta: 4,
+            },
+            {
+                nimi: 'selleri',
+                hinta: 4,
+            },
+            {
+                nimi: 'selleri',
+                hinta: 1,
+            },
+        ]
+
+        const commands = [
+            'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('porkkana',5);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu',8);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',1);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',6);",
+        ]
+
+        const splitCommandArray = commands.map((input) =>
+            input
+                .trim()
+                .replace(/\s\s+/g, ' ')
+                .replace(/\s+,/g, ',')
+                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+                .filter(Boolean)
+        )
+
+        const parsedCommands = splitCommandArray.map((c) =>
+            commandService.parseCommand(c)
+        )
+
+        parsedCommands.forEach((c) => stateService.updateState(c.value))
+
+        const selectAllOrderByCommand =
+            'SELECT nimi, hinta FROM Tuotteet ORDER BY hinta DESC;'
+
+        const splitSelectAllOrderByCommand = selectAllOrderByCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+
+        const parsedSelectAllOrderByCommand = commandService.parseCommand(
+            splitSelectAllOrderByCommand
+        )
+
+        const result = stateService.updateState(
+            parsedSelectAllOrderByCommand.value
+        )
+
+        console.log(result)
+
+        expect(result.rows).toEqual(expectedRows)
+    })
+})
+
+describe('selectColumnsFromTable() with ORDER BY ASC -command', () => {
+    test('returns rows from table in ascending order', () => {
+        const initArray = []
+        const state = new State(initArray)
+        const stateService = new StateService(state)
+
+        const expectedRows = [
+            {
+                nimi: 'lanttu',
+                hinta: 8,
+            },
+            {
+                nimi: 'nauris',
+                hinta: 4,
+            },
+            {
+                nimi: 'porkkana',
+                hinta: 5,
+            },
+            {
+                nimi: 'retiisi',
+                hinta: 7,
+            },
+            {
+                nimi: 'selleri',
+                hinta: 4,
+            },
+            {
+                nimi: 'selleri',
+                hinta: 1,
+            },
+            {
+                nimi: 'selleri',
+                hinta: 6,
+            },
+        ]
+
+        const commands = [
+            'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('porkkana',5);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu',8);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',1);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',6);",
+        ]
+
+        const splitCommandArray = commands.map((input) =>
+            input
+                .trim()
+                .replace(/\s\s+/g, ' ')
+                .replace(/\s+,/g, ',')
+                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+                .filter(Boolean)
+        )
+
+        const parsedCommands = splitCommandArray.map((c) =>
+            commandService.parseCommand(c)
+        )
+
+        parsedCommands.forEach((c) => stateService.updateState(c.value))
+
+        const selectAllOrderByCommand =
+            'SELECT nimi, hinta FROM Tuotteet ORDER BY nimi ASC;'
+
+        const splitSelectAllOrderByCommand = selectAllOrderByCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+
+        const parsedSelectAllOrderByCommand = commandService.parseCommand(
+            splitSelectAllOrderByCommand
+        )
+
+        const result = stateService.updateState(
+            parsedSelectAllOrderByCommand.value
+        )
+
+        console.log(result)
+
+        expect(result.rows).toEqual(expectedRows)
+    })
+})
+
+describe('selectColumnsFromTable() with ORDER BY DESC -command (text)', () => {
+    test('returns rows from table in ascending order', () => {
+        const initArray = []
+        const state = new State(initArray)
+        const stateService = new StateService(state)
+
+        const expectedRows = [
+            {
+                nimi: 'selleri',
+                hinta: 4,
+            },
+            {
+                nimi: 'selleri',
+                hinta: 1,
+            },
+            {
+                nimi: 'selleri',
+                hinta: 6,
+            },
+            {
+                nimi: 'retiisi',
+                hinta: 7,
+            },
+            {
+                nimi: 'porkkana',
+                hinta: 5,
+            },
+            {
+                nimi: 'nauris',
+                hinta: 4,
+            },
+            {
+                nimi: 'lanttu',
+                hinta: 8,
+            },
+        ]
+
+        const commands = [
+            'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('porkkana',5);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu',8);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',1);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',6);",
+        ]
+
+        const splitCommandArray = commands.map((input) =>
+            input
+                .trim()
+                .replace(/\s\s+/g, ' ')
+                .replace(/\s+,/g, ',')
+                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+                .filter(Boolean)
+        )
+
+        const parsedCommands = splitCommandArray.map((c) =>
+            commandService.parseCommand(c)
+        )
+
+        parsedCommands.forEach((c) => stateService.updateState(c.value))
+
+        const selectAllOrderByCommand =
+            'SELECT nimi, hinta FROM Tuotteet ORDER BY nimi DESC;'
+
+        const splitSelectAllOrderByCommand = selectAllOrderByCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+
+        const parsedSelectAllOrderByCommand = commandService.parseCommand(
+            splitSelectAllOrderByCommand
+        )
+
+        const result = stateService.updateState(
+            parsedSelectAllOrderByCommand.value
+        )
+
+        expect(result.rows).toEqual(expectedRows)
+    })
+})

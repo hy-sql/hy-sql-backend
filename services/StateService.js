@@ -134,27 +134,18 @@ class StateService {
         }
     }
 
+    /*This is for SELECT column_1, column_2 FROM -queries*/
     selectColumnsFromTable(command) {
-        //This is for SELECT column_1, column_2 FROM -queries
         const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
 
         const table = this.findTable(command.tableName)
-        let rows = []
-        table.rows.forEach((row) => {
-            rows.push(this.pickColumnsFromRow(command.columns, row))
-        })
+        let rows = table.rows
 
         console.log(command.orderBy)
 
-        if (command.where && command.orderBy) {
-            const column = command.where.columnName
-            const value = command.where.value
-
-            const filter = {
-                [column]: value,
-            }
-
+        if (command.where) {
+            const filter = this.createFilter(command.where)
             rows = _.filter(rows, filter)
 
             if (command.orderBy) {
@@ -162,10 +153,10 @@ class StateService {
                     command.orderBy.order &&
                     command.orderBy.order.toUpperCase() === 'DESC'
                         ? _.orderBy(
-                            rows,
-                            [command.orderBy.columnName],
-                            ['desc']
-                        )
+                              rows,
+                              [command.orderBy.columnName],
+                              ['desc']
+                          )
                         : _.orderBy(rows, [command.orderBy.columnName], ['asc'])
             }
         } else if (command.orderBy) {
@@ -176,10 +167,18 @@ class StateService {
                     : _.orderBy(rows, [command.orderBy.columnName], ['asc'])
         }
 
+        let rowsToReturn = []
+        rows.forEach((row) => {
+            rowsToReturn.push(this.pickColumnsFromRow(command.columns, row))
+        })
+
         const columnsStr = command.columns.map((e) => e.name).join(', ')
+        const result = command.where
+            ? `${command.name} ${columnsStr} FROM ${command.tableName} WHERE ${command.where.columnName}${command.where.sign}${command.where.value} -query executed succesfully`
+            : `${command.name} ${columnsStr} FROM ${command.tableName} -query was executed successfully`
         return {
-            result: `${command.name} ${columnsStr} FROM ${command.tableName} -query was executed successfully`,
-            rows,
+            result,
+            rows: rowsToReturn,
         }
     }
 

@@ -61,6 +61,7 @@ describe.each([
     'SELECT * FROM',
     'SELECT * FROM Taulu)a;',
     'SELECT * FRM Taulu;',
+    'SELECT * FRM Taulu additonal ;',
 ])('Invalid SELECT * -query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = invalidCommand
@@ -118,7 +119,9 @@ describe.each([
     'SELECT * FROM Tuotteet WHERE price7;',
     "SELECT * FROM Tuotteet WHERE name = ' test '",
     "SELECT * FROM Tuotteet WHERE name='';",
-    "SELECT * FROM Tuotteet WHERE name name='test ';",
+    "SELECT * FROM Tuotteet WHERE name name='test';",
+    "SELECT * FROM Tuotteet WHERE name='test' additional;",
+    "SELECT * FROM Tuotteet WHERE name='test' ';",
 ])('Invalid SELECT * FROM ... WHERE ...-query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = invalidCommand

@@ -41,23 +41,12 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
 
 const parseSelectAll = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
-    const validationResult = SelectAllSchema.validate(parsedCommand)
-
-    /* if there is something additional between the table name and ending semicolon
-        an error about the nonbelonging part is created and added to existing
-        validation errors or an error object is added into the validation object */
-    if (fullCommandAsStringArray.length > 5) {
-        const additional = fullCommandAsStringArray
-            .slice(4, fullCommandAsStringArray.length - 1)
-            .join(' ')
-        const errorMessage = `The following part of the query is probably incorrect and causing it to fail: '${additional}'`
-
-        validationResult.error
-            ? validationResult.error.details.push({ message: errorMessage })
-            : (validationResult.error = {
-                details: [{ message: errorMessage }],
-            })
-    }
+    let validationResult = SelectAllSchema.validate(parsedCommand)
+    validationResult = checkForAdditional(
+        fullCommandAsStringArray,
+        validationResult,
+        5
+    )
 
     return validationResult
 }
@@ -98,7 +87,36 @@ const parseSelectAllWhere = (fullCommandAsStringArray) => {
         fullCommandAsStringArray.slice(4)
     )
 
-    return SelectAllWhereSchema.validate(parsedCommand)
+    let validationResult = SelectAllWhereSchema.validate(parsedCommand)
+    validationResult = checkForAdditional(
+        fullCommandAsStringArray,
+        validationResult,
+        5 + validationResult.value.where.indexCounter
+    )
+
+    return validationResult
+}
+
+/* if there is something additional between expected end of query and the ending semicolon
+  an error about the nonbelonging part is created and added to the given validation object */
+const checkForAdditional = (
+    fullCommandAsStringArray,
+    validationResult,
+    expectedLength
+) => {
+    if (fullCommandAsStringArray.length > expectedLength) {
+        const additional = fullCommandAsStringArray
+            .slice(expectedLength - 1, fullCommandAsStringArray.length - 1)
+            .join(' ')
+        const errorMessage = `The following part of the query is probably incorrect and causing it to fail: '${additional}'`
+
+        validationResult.error
+            ? validationResult.error.details.push({ message: errorMessage })
+            : (validationResult.error = {
+                  details: [{ message: errorMessage }],
+              })
+    }
+    return validationResult
 }
 
 module.exports = { parseCommand }

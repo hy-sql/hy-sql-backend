@@ -29,9 +29,16 @@ Content-Type: application/json
   "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4);",
   "INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu',8);",
   "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
-  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',1);",
   "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',6);",
+<<<<<<< HEAD
   "SELECT nimi, hinta FROM Tuotteet ORDER BY nimi ASC;"
+=======
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',3);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',2);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',5);",
+  "SELECT * FROM Tuotteet WHERE hinta<=3 ORDER BY hinta DESC;"
+>>>>>>> master
   ]
 }
 
