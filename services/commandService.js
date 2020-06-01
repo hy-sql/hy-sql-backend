@@ -2,6 +2,7 @@ const createTableCommand = require('../commands/createTableCommand')
 const insertIntoCommand = require('../commands/insertIntoCommand')
 const selectCommand = require('../commands/selectCommand')
 const selectAllCommand = require('../commands/selectAllCommand')
+const updateCommand = require('../commands/updateCommand')
 
 const parseCommand = (fullCommandAsStringArray) => {
     //tämä pitää siistiä käyttämään yksi- ja kaksisanaisia komentoja
@@ -18,6 +19,8 @@ const parseCommand = (fullCommandAsStringArray) => {
             if (fullCommandAsStringArray[1] === '*')
                 return selectAllCommand.parseCommand(fullCommandAsStringArray)
             return selectCommand.parseCommand(fullCommandAsStringArray)
+        case 'UPDATE':
+            return updateCommand.parseCommand(fullCommandAsStringArray)
         default:
             console.log('sth went wrong')
             return null
