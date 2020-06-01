@@ -17,6 +17,7 @@ const OrderBySchema = Joi.object({
 
     columnName: Joi.string()
         .pattern(/[;]/, { invert: true })
+        .pattern(/^ASC$|^DESC$/i, { name: 'keywordCheck', invert: true })
         .pattern(/^\w+$/)
         .max(64)
         .required()
@@ -27,6 +28,8 @@ const OrderBySchema = Joi.object({
                 'Only letters, numbers and underscore allowed in a column name',
             'string.max': 'A column name is too long',
             'any.required': 'A column name is missing',
+            'string.pattern.invert.name':
+                'Keywords ASC and DESC must appear after column name',
         }),
 
     order: Joi.string()
