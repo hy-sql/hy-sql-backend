@@ -27,6 +27,8 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
     let sign = findSign(columnSignValue)
     let valueType = 'INTEGER'
     let value = undefined
+    let startQuotes = false
+    let endQuotes = false
 
     let signSet = false
 
@@ -50,17 +52,23 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
                 ? signValueOption
                 : columnSignValue.split(sign)[1]
         value === signValueOption ? index++ : ''
+        startQuotes =
+            value === signValueOption
+                ? columnSignValue.endsWith("'") || value.startsWith("'")
+                : value.startsWith("'")
         signSet = true
     }
 
     if (!sign) {
         value = signValueOption
+        startQuotes = value.startsWith("'")
         index++
     } else if (sign && !signSet) {
         value = signValueOption.endsWith(sign)
             ? valueOption
             : signValueOption.split(sign)[1]
         index += value === valueOption ? 2 : 1
+        startQuotes = value.startsWith("'")
 
         if (signValueOption.endsWith(sign) && valueOption === "'") {
             value = slicedCommandAsStringList[index]
@@ -85,11 +93,22 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
     columnName === '' ? (columnName = undefined) : ''
     value === '' ? (value = undefined) : ''
 
-    valueType === 'TEXT' &&
-    slicedCommandAsStringList[index] === "'" &&
-    !unmodifiedValue.endsWith("'")
+    endQuotes =
+        value && valueType === 'TEXT'
+            ? unmodifiedValue.endsWith("'") ||
+              slicedCommandAsStringList[index] === "'"
+            : false
+
+    valueType === 'TEXT' && slicedCommandAsStringList[index] === "'"
         ? index++
         : ''
+
+    const correctQuotes =
+        value && valueType === 'TEXT'
+            ? startQuotes &&
+              endQuotes &&
+              !checkExtraQuotes(slicedCommandAsStringList, index, 2)
+            : !checkExtraQuotes(slicedCommandAsStringList, index, 0)
 
     return {
         keyword,
@@ -98,6 +117,7 @@ const parseWhereToCommandObject = (slicedCommandAsStringList) => {
         valueType,
         value,
         indexCounter: index,
+        correctQuotes,
     }
 }
 
@@ -115,6 +135,20 @@ const findSign = (string) => {
     }
 
     return undefined
+}
+
+const checkExtraQuotes = (
+    slicedCommandAsStringList,
+    indexCounter,
+    expectedQuotes
+) => {
+    const whereAsString = slicedCommandAsStringList
+        .slice(0, indexCounter)
+        .join('')
+    const charactersOfWhere = [...whereAsString]
+    const quotes = charactersOfWhere.filter((c) => c === "'").length
+
+    return quotes > expectedQuotes
 }
 
 module.exports = { queryContainsWhereKeyword, parseWhereToCommandObject }
