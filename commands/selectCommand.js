@@ -142,7 +142,7 @@ const parseSelectColumnsWhereOrderBy = (fullCommandAsStringArray) => {
 
     const unparsed = parsedBaseCommand.value.unparsedBeforeFinalSemicolon
 
-    const indexOfOrder = unparsed.findIndex((c) => c === 'ORDER')
+    const indexOfOrder = unparsed.findIndex((c) => c.toUpperCase() === 'ORDER')
 
     parsedBaseCommand.value.where = parseWhereToCommandObject(
         unparsed.slice(0, indexOfOrder)
@@ -152,6 +152,7 @@ const parseSelectColumnsWhereOrderBy = (fullCommandAsStringArray) => {
 
     delete parsedBaseCommand.value.unparsedBeforeFinalSemicolon
     delete parsedBaseCommand.value.parserCounter
+    delete parsedBaseCommand.value.where.indexCounter
 
     const validationResult = SelectColumnsWhereOrderBySchema.validate(
         parsedBaseCommand.value
