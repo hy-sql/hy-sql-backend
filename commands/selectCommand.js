@@ -103,9 +103,13 @@ const parseSelectColumnsWhere = (fullCommandAsStringArray) => {
         parsedBaseCommand.value.unparsedBeforeFinalSemicolon
     )
 
+    /* + 1 lisätty koska osassa valideja kyselyitä parserCounter palauttaa yhtä pienemmän luvun kuin tulisi,
+      jolloin kyselyn validaatio hylkää kyseisen kyselyn väärin perustein.
+      Jos parserCounterin laskutapaa muutetaan voi +1 todennäköisesti poistaa tarpeettomana*/
     parsedBaseCommand.value.parserCounter =
         parsedBaseCommand.value.parserCounter +
-        parsedBaseCommand.value.where.indexCounter
+        parsedBaseCommand.value.where.indexCounter +
+        1
 
     delete parsedBaseCommand.value.unparsedBeforeFinalSemicolon
 

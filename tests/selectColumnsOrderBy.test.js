@@ -46,7 +46,7 @@ describe.each([
             .replace(/\s\s+/g, ' ')
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-        test('valid command is parsed but validation fails', () => {
+        test('invalid command is parsed but validation fails', () => {
             const parsedCommand = selectCommand.parseCommand(
                 fullCommandAsStringList
             )
