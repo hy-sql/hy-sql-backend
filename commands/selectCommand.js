@@ -3,15 +3,22 @@ const {
     parseWhereToCommandObject,
     queryContainsWhereKeyword,
 } = require('./whereCommand')
-const { parseOrderBy, hasOrderByKeywords } = require('./orderByCommand')
+const {
+    parseOrderBy,
+    hasOrderByKeywords,
+    hasWhereOrderByKeywords,
+} = require('./orderByCommand')
 const { SelectSchema } = require('../models/SelectSchema')
 const {
     SelectColumnsWhereSchema,
     SelectColumnsOrderBySchema,
+    SelectColumnsWhereOrderBySchema,
 } = require('../models/SelectSchema')
 
 const parseCommand = (fullCommandAsStringArray) => {
-    if (hasOrderByKeywords(fullCommandAsStringArray)) {
+    if (hasWhereOrderByKeywords(fullCommandAsStringArray)) {
+        return parseSelectColumnsWhereOrderBy(fullCommandAsStringArray)
+    } else if (hasOrderByKeywords(fullCommandAsStringArray)) {
         return parseSelectColumnsOrderBy(fullCommandAsStringArray)
     } else if (queryContainsWhereKeyword(fullCommandAsStringArray)) {
         return parseSelectColumnsWhere(fullCommandAsStringArray)
@@ -124,6 +131,30 @@ const parseSelectColumnsOrderBy = (fullCommandAsStringArray) => {
     delete parsedBaseCommand.value.parserCounter
 
     const validationResult = SelectColumnsOrderBySchema.validate(
+        parsedBaseCommand.value
+    )
+
+    return validationResult
+}
+
+const parseSelectColumnsWhereOrderBy = (fullCommandAsStringArray) => {
+    const parsedBaseCommand = parseSelectColumns(fullCommandAsStringArray)
+
+    const unparsed = parsedBaseCommand.value.unparsedBeforeFinalSemicolon
+
+    const indexOfOrder = unparsed.findIndex((c) => c.toUpperCase() === 'ORDER')
+
+    parsedBaseCommand.value.where = parseWhereToCommandObject(
+        unparsed.slice(0, indexOfOrder)
+    )
+
+    parsedBaseCommand.value.orderBy = parseOrderBy(unparsed.slice(indexOfOrder))
+
+    delete parsedBaseCommand.value.unparsedBeforeFinalSemicolon
+    delete parsedBaseCommand.value.parserCounter
+    delete parsedBaseCommand.value.where.indexCounter
+
+    const validationResult = SelectColumnsWhereOrderBySchema.validate(
         parsedBaseCommand.value
     )
 
