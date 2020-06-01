@@ -142,8 +142,6 @@ class StateService {
         const table = this.findTable(command.tableName)
         let rows = table.rows
 
-        console.log(command.orderBy)
-
         if (command.where) {
             const filter = this.createFilter(command.where)
             rows = _.filter(rows, filter)

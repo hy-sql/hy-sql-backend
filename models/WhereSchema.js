@@ -67,7 +67,7 @@ const WhereSchema = Joi.object({
             }),
     }),
 
-    indexCounter: Joi.number(),
+    indexCounter: Joi.number().optional(),
 })
 
 module.exports = WhereSchema
