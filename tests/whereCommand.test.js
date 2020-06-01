@@ -49,6 +49,10 @@ describe.each([
     'WHERE price7;',
     "WHERE name='';",
     "WHERE name name='test ';",
+    "WHERE name='test ''",
+    "WHERE name=''test'",
+    "WHERE name=''test''",
+    'WHERE name=test',
 ])('Invalid WHERE-part of a query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = invalidCommand
