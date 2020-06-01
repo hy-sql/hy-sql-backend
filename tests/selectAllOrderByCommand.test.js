@@ -62,6 +62,8 @@ describe.each([
     'SELECT * FROM Taulu order asc by;',
     'SELECT * FROM Taulu by order',
     'SELECT * FROM Taulu order by)a;',
+    'SELECT nimi, hinta FROM Tuotteet ORDER BY DESC;',
+    'SELECT nimi, hinta FROM Tuotteet ORDER BY ASC;',
 ])('Invalid SELECT * -query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = invalidCommand
