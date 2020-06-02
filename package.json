@@ -26,6 +26,7 @@
     },
     "homepage": "https://github.com/hy-sql/hy-sql#readme",
     "dependencies": {
+        "@hapi/formula": "^3.0.0",
         "@hapi/joi": "^17.1.1",
         "cors": "^2.8.5",
         "cross-env": "^7.0.2",
@@ -35,6 +36,8 @@
     },
     "devDependencies": {
         "eslint": "^7.0.0",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-plugin-prettier": "^3.1.3",
         "husky": "^4.2.5",
         "jest": "^26.0.1",
         "lint-staged": "^10.2.2",

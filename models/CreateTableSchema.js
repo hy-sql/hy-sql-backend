@@ -1,4 +1,5 @@
 const Joi = require('@hapi/joi')
+const { constraintsPattern } = require('../utils/regex')
 
 const ColumnsSchema = Joi.object({
     name: Joi.string()
@@ -30,7 +31,7 @@ const ColumnsSchema = Joi.object({
     constraints: Joi.array().items(
         Joi.string()
             .pattern(/[;]/, { invert: true })
-            .pattern(/^PRIMARY KEY$/)
+            .pattern(constraintsPattern)
             .insensitive()
             .optional()
             .messages({

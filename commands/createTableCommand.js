@@ -43,23 +43,12 @@ const parseColumns = (columnsAsStringList) => {
 }
 
 const parseColumnConstraints = (constraintsAsStringArray) => {
-    // const constraints = new RegExp(
-    //     [
-    //         '(?<=CHECK)|(?=CHECK)',
-    //         '(?<=NOT NULL)|(?=NOT NULL)|',
-    //         '(?<=UNIQUE)|(?=UNIQUE)',
-    //         '(?<=PRIMARY KEY)|(?=PRIMARY KEY)|',
-    //         '(?<=FOREIGN KEY)|(?=FOREIGN KEY)|',
-    //         '(?<=INDEX)|(?=INDEX)',
-    //     ].join('')
-    // )
-
-    const primaryKey = new RegExp(['(?<=PRIMARY KEY)|(?=PRIMARY KEY)'].join(''))
+    const { constraintsPatternForSplit } = require('../utils/regex')
 
     const separatedConstraintsAsStringList = constraintsAsStringArray
         .join(' ')
         .toUpperCase()
-        .split(primaryKey)
+        .split(constraintsPatternForSplit)
         .map((c) => c.trim())
         .filter(Boolean)
 
