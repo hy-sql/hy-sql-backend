@@ -1,7 +1,22 @@
 const Joi = require('@hapi/joi')
 
+const ColumnsSchema = Joi.object({
+    columnName: Joi.string(),
+    value: Joi.any(), //??
+})
+
 const UpdateSchema = Joi.object({
-    name: Joi.string().required().valid('UPDATE').insensitive().messages({}),
+    name: Joi.string()
+        .pattern(/[;]./, { invert: true })
+        .required()
+        .valid('UPDATE')
+        .insensitive()
+        .messages({
+            'string.pattern.invert.base':
+                'Semicolon should be only found at the end of a query',
+            'any.only': 'Query must begin with UPDATE',
+            'any.required': 'Query must begin with UPDATE',
+        }),
 
     tableName: Joi.string()
         .required()
@@ -17,10 +32,12 @@ const UpdateSchema = Joi.object({
         }),
 
     /*SET*/
-    set: Joi.string().required().valid('SET').insensitive().messages({}),
+    set: Joi.string().required().valid('SET').insensitive().messages({
+        'any.required': 'Query must contain SET',
+    }),
     //column-value parit tähän
 
-    // columns: Joi.array().min(1).items(ColumnsSchema).required().messages({}),
+    columns: Joi.array().min(1).items(ColumnsSchema).required().messages({}),
 
     //WHERE-parsiminen tähän TODO
 
@@ -29,11 +46,5 @@ const UpdateSchema = Joi.object({
         'any.required': 'Query must end with ;',
     }),
 })
-
-// const ColumnsSchema = Joi.object({
-//     columnName: Joi.string(),
-//     sign: Joi.string(),
-//     value: Joi.string(),
-// })
 
 module.exports = { UpdateSchema }
