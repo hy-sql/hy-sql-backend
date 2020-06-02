@@ -1,20 +1,19 @@
-const arithmeticOperator = RegExp('[+|-|*|/|%]', 'g')
-const comparisonOperator = RegExp('[=|>|<|>=|<=|<>]', 'g')
-const logicalOperator = RegExp(
-    '[ALL|AND|ANY|BETWEEN|EXISTS|IN|LIKE|NOT|OR|SOME]',
-    'g'
-)
+const {
+    arithmeticOperatorPattern,
+    comparisonOperatorPattern,
+    logicalOperatorPattern,
+} = require('../utils/regex')
 
 const containsArithmeticOperator = (input) => {
-    return arithmeticOperator.test(input)
+    return arithmeticOperatorPattern.test(input)
 }
 
 const containsComparisonOperator = (input) => {
-    return comparisonOperator.test(input)
+    return comparisonOperatorPattern.test(input)
 }
 
 const containsLogicalOperator = (input) => {
-    return logicalOperator.test(input)
+    return logicalOperatorPattern.test(input)
 }
 
 const containsFunctions = [
