@@ -48,6 +48,7 @@ describe.each([
     'SELECT * FROM Taulu where #=5 order by 5;',
     'SELECT * FROM Taulu where is=true order by false',
     'SELECT * FROM Taulu where "this"="that" order by that;',
+    "SELECT * FROM Taulu76 where name='test' ' order by column;",
 ])('Invalid SELECT * -query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = invalidCommand

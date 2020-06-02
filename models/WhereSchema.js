@@ -68,6 +68,13 @@ const WhereSchema = Joi.object({
     }),
 
     indexCounter: Joi.number().optional(),
+
+    correctQuotes: Joi.boolean().valid(true).required().messages({
+        'any.only':
+            'In a query all string values must be in quotes. There is either extra quotes or quotes missing',
+        'any.required':
+            'In a query all string values must be in quotes. There is either extra quotes or quotes missing',
+    }),
 })
 
 module.exports = WhereSchema
