@@ -143,3 +143,34 @@ describe.each([
         })
     }
 )
+
+describe.each([
+    'SELECT this+5, LENGTH(this), hinta FROM Taulu;',
+    'SELECT is*going+to-work, hinta, length(caseTest) FROM Taulu;',
+    'SELECT hinta, lengTH(onceMoreBackwards), this+that*5 FROM Taulu;',
+    'SELECT testi, CASE+test, testiKaksi, length(test) FROM Taulu;',
+    'SELECT hello, length(test), does, once*MORE+tHat, it, work FROM Taulu;',
+])(
+    'SELECT query with valid arithmetic and function operation and standard column',
+    (validCommand) => {
+        describe(validCommand, () => {
+            const command = validCommand
+                .trim()
+                .replace(/\s\s+/g, ' ')
+                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+                .filter(Boolean)
+
+            test('contains "fields" field', () => {
+                expect(
+                    selectAdvancedCommand.parseCommand(command).value
+                ).toBeDefined()
+                expect(
+                    selectAdvancedCommand.parseCommand(command).value.fields
+                ).toBeDefined()
+                expect(
+                    selectAdvancedCommand.parseCommand(command).error
+                ).not.toBeDefined()
+            })
+        })
+    }
+)

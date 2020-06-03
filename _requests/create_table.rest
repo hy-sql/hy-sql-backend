@@ -31,7 +31,7 @@ Content-Type: application/json
   "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri', 4, 30);",
   "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri', 6, 70);",
   "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('null', 6, 70);",
-  "SELECT length(nimi), 5+hinta*4 FROM Tuotteet;"
+  "SELECT length(nimi), 5+hinta*4, lkm FROM Tuotteet;"
   ]
 }
 

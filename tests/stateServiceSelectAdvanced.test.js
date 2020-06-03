@@ -209,4 +209,59 @@ describe('selectAdvanced()', () => {
         const result = stateService.updateState(parsedCommand.value)
         expect(result.rows).toEqual(expectedRows)
     })
+
+    test('returns rows asked by select function, arithmetic expression and standart column', () => {
+        const expectedRows = [
+            {
+                'length(nimi)': 7,
+                '5+hinta*4': 33,
+                lkm: 20,
+            },
+            {
+                'length(nimi)': 8,
+                '5+hinta*4': 25,
+                lkm: 40,
+            },
+            {
+                'length(nimi)': 6,
+                '5+hinta*4': 21,
+                lkm: 40,
+            },
+            {
+                'length(nimi)': 6,
+                '5+hinta*4': 37,
+                lkm: 20,
+            },
+            {
+                'length(nimi)': 7,
+                '5+hinta*4': 21,
+                lkm: 30,
+            },
+            {
+                'length(nimi)': 7,
+                '5+hinta*4': 29,
+                lkm: 70,
+            },
+            {
+                'length(nimi)': 4,
+                '5+hinta*4': 29,
+                lkm: 70,
+            },
+        ]
+
+        const selectCommand =
+            'SELECT length(nimi), 5+hinta*4, lkm FROM Tuotteet;'
+
+        const commandArray = selectCommand
+            .trim()
+            .replace(/\s\s+/g, ' ')
+            .replace(/\s+,/g, ',')
+            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+            .filter(Boolean)
+
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual(expectedRows)
+    })
 })
