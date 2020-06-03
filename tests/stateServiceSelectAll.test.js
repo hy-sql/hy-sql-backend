@@ -361,7 +361,6 @@ describe('selectAllFromTable() with command.where and command.orderBy', () => {
 
         const result = stateService.updateState(parsedCommand.value)
 
-        console.log(result.rows)
         expect(result.rows).toEqual(expectedRows)
     })
 
