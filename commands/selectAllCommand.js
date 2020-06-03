@@ -13,6 +13,7 @@ const {
     hasOrderByKeywords,
     hasWhereOrderByKeywords,
 } = require('./orderByCommand')
+const checkForAdditionalAtEnd = require('./parserTools/checkForAdditional')
 
 const parseCommand = (fullCommandAsStringArray) => {
     if (hasWhereOrderByKeywords(fullCommandAsStringArray)) {
@@ -42,7 +43,7 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
 const parseSelectAll = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
     let validationResult = SelectAllSchema.validate(parsedCommand)
-    validationResult = checkForAdditional(
+    validationResult = checkForAdditionalAtEnd(
         fullCommandAsStringArray,
         validationResult,
         5
@@ -88,34 +89,12 @@ const parseSelectAllWhere = (fullCommandAsStringArray) => {
     )
 
     let validationResult = SelectAllWhereSchema.validate(parsedCommand)
-    validationResult = checkForAdditional(
+    validationResult = checkForAdditionalAtEnd(
         fullCommandAsStringArray,
         validationResult,
         5 + validationResult.value.where.indexCounter
     )
 
-    return validationResult
-}
-
-/* if there is something additional between expected end of query and the ending semicolon
-  an error about the nonbelonging part is created and added to the given validation object */
-const checkForAdditional = (
-    fullCommandAsStringArray,
-    validationResult,
-    expectedLength
-) => {
-    if (fullCommandAsStringArray.length > expectedLength) {
-        const additional = fullCommandAsStringArray
-            .slice(expectedLength - 1, fullCommandAsStringArray.length - 1)
-            .join(' ')
-        const errorMessage = `The following part of the query is probably incorrect and causing it to fail: '${additional}'`
-
-        validationResult.error
-            ? validationResult.error.details.push({ message: errorMessage })
-            : (validationResult.error = {
-                details: [{ message: errorMessage }],
-            })
-    }
     return validationResult
 }
 
