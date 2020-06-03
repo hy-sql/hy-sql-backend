@@ -6,7 +6,6 @@ const selectWithOperatorsCommand = require('../commands/selectAdvancedCommand')
 const updateCommand = require('../commands/updateCommand')
 const { containsOperator } = require('../utils/containsOperator')
 
-
 const parseCommand = (fullCommandAsStringArray) => {
     //tämä pitää siistiä käyttämään yksi- ja kaksisanaisia komentoja
     switch (fullCommandAsStringArray[0].toUpperCase()) {
