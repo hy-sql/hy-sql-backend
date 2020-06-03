@@ -212,6 +212,11 @@ class StateService {
                 return (item) => {
                     return item[column] <= value
                 }
+            case '<>':
+                return (item) => {
+                    // eslint-disable-next-line
+                    return item[column] != value
+                }
             default:
                 return { [column]: value }
         }
