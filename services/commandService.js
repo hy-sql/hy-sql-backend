@@ -3,7 +3,7 @@ const insertIntoCommand = require('../commands/insertIntoCommand')
 const selectCommand = require('../commands/selectCommand')
 const selectAllCommand = require('../commands/selectAllCommand')
 const selectWithOperatorsCommand = require('../commands/selectAdvancedCommand')
-
+const updateCommand = require('../commands/updateCommand')
 const { containsOperator } = require('../utils/containsOperator')
 
 const parseCommand = (fullCommandAsStringArray) => {
@@ -26,6 +26,8 @@ const parseCommand = (fullCommandAsStringArray) => {
                 )
             }
             return selectCommand.parseCommand(fullCommandAsStringArray)
+        case 'UPDATE':
+            return updateCommand.parseCommand(fullCommandAsStringArray)
         default:
             console.log('sth went wrong')
             return null
