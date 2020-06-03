@@ -4,7 +4,10 @@ const {
     parseColumnsFromExpression,
 } = require('../utils/parseColumnsFromExpression')
 const { parseColumnFromFunction } = require('../utils/parseColumnFromFunction')
-const { executeFunction } = require('../utils/executeFunction')
+const {
+    executeStringFunction,
+    executeAggregateFunction,
+} = require('../utils/executeFunction')
 
 class StateService {
     constructor(state) {
@@ -49,8 +52,21 @@ class StateService {
     }
 
     createAdvancedRows(command, existingRows) {
+        if (command.fields[0].type === 'aggregateFunction') {
+            console.log(command.fields[0])
+            return this.createAggregateFunctionRow(
+                command.fields[0],
+                existingRows
+            )
+        }
+
+        return this.createFunctionRow(command, existingRows)
+    }
+
+    createFunctionRow(command, existingRows) {
         return existingRows.reduce((rowsToReturn, row) => {
             const newRow = {}
+
             command.fields.forEach((field) => {
                 if (field.type === 'column') {
                     newRow[field.value] = row[field.value]
@@ -64,18 +80,30 @@ class StateService {
                         context
                     )
                     console.log('newRow', newRow)
-                } else if (field.type === 'function') {
-                    const columnToOperateOn = parseColumnFromFunction(
-                        field.value
-                    )
-                    console.log(columnToOperateOn)
+                } else if (field.type === 'stringFunction') {
+                    const columnToOperateOn = parseColumnFromFunction(field)
                     const columnValue = row[columnToOperateOn]
-                    newRow[field.value] = executeFunction(field, columnValue)
+                    newRow[field.value] = executeStringFunction(
+                        field,
+                        columnValue
+                    )
                 }
             })
             rowsToReturn.push(newRow)
+
             return rowsToReturn
         }, [])
+    }
+
+    createAggregateFunctionRow(functionField, existingRows) {
+        return [
+            {
+                [functionField.value]: executeAggregateFunction(
+                    functionField,
+                    existingRows
+                ),
+            },
+        ]
     }
 
     createTable(command) {
