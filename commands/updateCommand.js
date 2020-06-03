@@ -19,13 +19,13 @@ const parseCommand = (fullCommandAsStringList) => {
     const columnsAndValuesAsStringList =
         containsWhere === -1 && set !== undefined
             ? fullCommandAsStringList.slice(
-                3,
-                fullCommandAsStringList.indexOf(';')
-            )
+                  3,
+                  fullCommandAsStringList.indexOf(';')
+              )
             : fullCommandAsStringList.slice(
-                3,
-                fullCommandAsStringList.indexOf('WHERE')
-            )
+                  3,
+                  fullCommandAsStringList.indexOf('WHERE')
+              )
 
     const parsedCommand = {
         name: fullCommandAsStringList[0],
