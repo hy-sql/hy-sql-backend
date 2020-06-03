@@ -267,8 +267,6 @@ describe('selectColumnsFromTable() with ORDER BY -command', () => {
             parsedSelectAllOrderByCommand.value
         )
 
-        console.log(result)
-
         expect(result.rows).toEqual(expectedRows)
     })
 })
@@ -354,8 +352,6 @@ describe('selectColumnsFromTable() with ORDER BY DESC -command (numbers)', () =>
             parsedSelectAllOrderByCommand.value
         )
 
-        console.log(result)
-
         expect(result.rows).toEqual(expectedRows)
     })
 })
@@ -440,8 +436,6 @@ describe('selectColumnsFromTable() with ORDER BY ASC -command', () => {
         const result = stateService.updateState(
             parsedSelectAllOrderByCommand.value
         )
-
-        console.log(result)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -643,7 +637,6 @@ describe('selectColumnsFromTable() with command.where and command.orderBy', () =
 
         const result = stateService.updateState(parsedCommand.value)
 
-        console.log(result.rows)
         expect(result.rows).toEqual(expectedRows)
     })
 

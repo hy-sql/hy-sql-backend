@@ -1,4 +1,13 @@
 const _ = require('lodash')
+const { calculateExpression } = require('../utils/calculateExpression')
+const {
+    parseColumnsFromExpression,
+} = require('../utils/parseColumnsFromExpression')
+const { parseColumnFromFunction } = require('../utils/parseColumnFromFunction')
+const {
+    executeStringFunction,
+    executeAggregateFunction,
+} = require('../utils/executeFunction')
 
 class StateService {
     constructor(state) {
@@ -15,9 +24,83 @@ class StateService {
                 return this.selectAllFromTable(parsedCommand)
             case 'SELECT':
                 return this.selectColumnsFromTable(parsedCommand)
+            case 'SELECT ADVANCED':
+                return this.selectAdvanced(parsedCommand)
             default:
                 break
         }
+    }
+
+    selectAdvanced(command) {
+        const error = this.checkIfTableExists(command.tableName)
+        if (error) return { error: error }
+
+        const table = this.findTable(command.tableName)
+        let existingRows = table.rows
+
+        const rows = this.createAdvancedRows(command, existingRows)
+
+        const result = `SELECT ${command.fields
+            .map((c) => c.value)
+            .join(', ')} FROM ${command.tableName} -query executed succesfully`
+
+        return {
+            result,
+            rows,
+        }
+    }
+
+    createAdvancedRows(command, existingRows) {
+        if (command.fields[0].type === 'aggregateFunction') {
+            return this.createAggregateFunctionRow(
+                command.fields[0],
+                existingRows
+            )
+        }
+
+        return this.createFunctionRow(command, existingRows)
+    }
+
+    createFunctionRow(command, existingRows) {
+        return existingRows.reduce((rowsToReturn, row) => {
+            const newRow = {}
+
+            command.fields.forEach((field) => {
+                if (field.type === 'column') {
+                    newRow[field.value] = row[field.value]
+                } else if (field.type === 'expression') {
+                    const context = {}
+                    parseColumnsFromExpression(field.value).map((column) => {
+                        context[column] = row[column]
+                    })
+                    newRow[field.value] = calculateExpression(
+                        field.value,
+                        context
+                    )
+                } else if (field.type === 'stringFunction') {
+                    const columnToOperateOn = parseColumnFromFunction(field)
+                    const columnValue = row[columnToOperateOn]
+                    newRow[field.value] = executeStringFunction(
+                        field,
+                        columnValue
+                    )
+                }
+            })
+            rowsToReturn.push(newRow)
+
+            return rowsToReturn
+        }, [])
+    }
+
+    createAggregateFunctionRow(functionField, existingRows) {
+        return [
+            {
+                [functionField.value]: executeAggregateFunction(
+                    functionField,
+                    existingRows
+                ),
+            },
+        ]
     }
 
     createTable(command) {
@@ -151,10 +234,10 @@ class StateService {
                     command.orderBy.order &&
                     command.orderBy.order.toUpperCase() === 'DESC'
                         ? _.orderBy(
-                            rows,
-                            [command.orderBy.columnName],
-                            ['desc']
-                        )
+                              rows,
+                              [command.orderBy.columnName],
+                              ['desc']
+                          )
                         : _.orderBy(rows, [command.orderBy.columnName], ['asc'])
             }
         } else if (command.orderBy) {
