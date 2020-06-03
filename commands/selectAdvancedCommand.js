@@ -1,6 +1,9 @@
 const { SelectAdvancedSchema } = require('../models/SelectAdvancedSchema')
-const arithmeticPattern = /^\w+(( )?[+-/*%]{1}( )?\w+)+$/
-const functionPattern = /^LENGTH\(\w+\)$/
+const {
+    arithmeticExpressionPattern,
+    stringFunctionExpressionPattern,
+    aggregateFunctionExpressionPattern,
+} = require('../utils/regex')
 
 const parseCommand = (fullCommandAsStringArray) => {
     return parseSelectAdvancedCommand(fullCommandAsStringArray)
@@ -45,15 +48,21 @@ const parseFields = (fieldArray) => {
 
 const createFieldObject = (parsedField) => {
     switch (true) {
-        case arithmeticPattern.test(parsedField):
+        case arithmeticExpressionPattern.test(parsedField):
             return {
                 type: 'expression',
                 value: parsedField,
             }
-        case functionPattern.test(parsedField):
+        case stringFunctionExpressionPattern.test(parsedField):
             return {
-                type: 'function',
-                name: 'LENGTH',
+                type: 'stringFunction',
+                name: parsedField.split('(')[0].toUpperCase(),
+                value: parsedField,
+            }
+        case aggregateFunctionExpressionPattern.test(parsedField):
+            return {
+                type: 'aggregateFunction',
+                name: parsedField.split('(')[0].toUpperCase(),
                 value: parsedField,
             }
         default:

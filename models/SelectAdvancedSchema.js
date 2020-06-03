@@ -2,8 +2,13 @@ const Joi = require('@hapi/joi')
 // const WhereSchema = require('./WhereSchema')
 // const OrderBySchema = require('./OrderBySchema')
 
-const arithmeticPattern = /^\w+(( )?[+-/*%]( )?\w+)+$/
-const functionPattern = /^LENGTH\(\w+\)$/
+const {
+    arithmeticExpressionPattern,
+    stringFunctionsPattern,
+    stringFunctionExpressionPattern,
+    aggregateFunctionsPattern,
+    aggregateFunctionExpressionPattern,
+} = require('../utils/regex')
 
 const SelectAdvancedSchema = Joi.object({
     name: Joi.string().valid('SELECT ADVANCED'),
@@ -16,12 +21,27 @@ const SelectAdvancedSchema = Joi.object({
             }),
             Joi.object({
                 type: Joi.string().valid('expression').required(),
-                value: Joi.string().pattern(arithmeticPattern).required(),
+                value: Joi.string()
+                    .pattern(arithmeticExpressionPattern)
+                    .required(),
             }),
             Joi.object({
-                name: Joi.string().valid('LENGTH').required(),
-                type: Joi.string().valid('function').required(),
-                value: Joi.string().pattern(functionPattern).required(),
+                name: Joi.string().pattern(stringFunctionsPattern).required(),
+                type: Joi.string().valid('stringFunction').required(),
+                value: Joi.string()
+                    .pattern(stringFunctionExpressionPattern)
+                    .insensitive()
+                    .required(),
+            }),
+            Joi.object({
+                name: Joi.string()
+                    .pattern(aggregateFunctionsPattern)
+                    .required(),
+                type: Joi.string().valid('aggregateFunction').required(),
+                value: Joi.string()
+                    .pattern(aggregateFunctionExpressionPattern)
+                    .insensitive()
+                    .required(),
             })
         )
         .required()
