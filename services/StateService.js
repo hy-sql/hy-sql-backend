@@ -32,7 +32,6 @@ class StateService {
     }
 
     selectAdvanced(command) {
-        console.log(command)
         const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
 
@@ -53,7 +52,6 @@ class StateService {
 
     createAdvancedRows(command, existingRows) {
         if (command.fields[0].type === 'aggregateFunction') {
-            console.log(command.fields[0])
             return this.createAggregateFunctionRow(
                 command.fields[0],
                 existingRows
@@ -79,7 +77,6 @@ class StateService {
                         field.value,
                         context
                     )
-                    console.log('newRow', newRow)
                 } else if (field.type === 'stringFunction') {
                     const columnToOperateOn = parseColumnFromFunction(field)
                     const columnValue = row[columnToOperateOn]

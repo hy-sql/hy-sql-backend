@@ -24,13 +24,14 @@ Content-Type: application/json
 {
   "commandArray": [
   "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER, lkm INTEGER);",
-  "INSERT INTO Tuotteet (nimi, hinta,lkm) VALUES ('retiisi',7,20);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('porkkana',5, 40);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('nauris',4, 40);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('lanttu',8, 20);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri',4, 30);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri',6, 70);",
-  "SELECT 5*hinta+lkm, nimi, LENGTH(nimi) FROM Tuotteet;"
+  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('retiisi', 7, 20);",
+  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('porkkana', 5, 40);",
+  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('nauris', 4, 40);",
+  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('lanttu', 8, 20);",
+  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri', 4, 30);",
+  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri', 6, 70);",
+  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('null', 6, 70);",
+  "SELECT length(nimi), 5+hinta*4 FROM Tuotteet;"
   ]
 }
 

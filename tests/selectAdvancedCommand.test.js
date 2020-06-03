@@ -16,9 +16,6 @@ describe.each([
             .filter(Boolean)
 
         test('does not contain expression type in fields', () => {
-            console.log(
-                selectAdvancedCommand.parseCommand(command).value.fields
-            )
             expect(
                 selectAdvancedCommand.parseCommand(command).value
             ).toBeDefined()
@@ -47,7 +44,6 @@ describe.each([
             .filter(Boolean)
 
         test('contains "fields" field and its type is expression', () => {
-            console.log(selectAdvancedCommand.parseCommand(command))
             expect(
                 selectAdvancedCommand.parseCommand(command).value
             ).toBeDefined()
@@ -75,9 +71,6 @@ describe.each([
             .filter(Boolean)
 
         test('contains "fields" field but does not contain field type function and has errors', () => {
-            console.log(
-                selectAdvancedCommand.parseCommand(command).value.fields
-            )
             expect(
                 selectAdvancedCommand.parseCommand(command).value.fields[0]
             ).toBeDefined()

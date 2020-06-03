@@ -14,7 +14,6 @@ const executeStringFunction = (functionField, columnValue) => {
 
 const executeAggregateFunction = (functionField, rows) => {
     const columnToOperateOn = parseColumnFromFunction(functionField)
-    console.log(columnToOperateOn)
     switch (functionField.name) {
         case 'AVG':
             return 'function not implemented yet'
