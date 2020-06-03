@@ -14,7 +14,7 @@ test('API endpoint responds to query', async (done) => {
     const query = {
         commandArray: [
             'CREATE TABLE Tuotteet    (id INTEGER PRIMARY KEY,    nimi TEXT,    hinta INTEGER);',
-            'INSERT INTO Tuotteet (nimi, hinta) VALUES (\'retiisi\', 7);',
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
         ],
     }
 

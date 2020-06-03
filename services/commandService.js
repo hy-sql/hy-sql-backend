@@ -2,6 +2,9 @@ const createTableCommand = require('../commands/createTableCommand')
 const insertIntoCommand = require('../commands/insertIntoCommand')
 const selectCommand = require('../commands/selectCommand')
 const selectAllCommand = require('../commands/selectAllCommand')
+const selectWithOperatorsCommand = require('../commands/selectAdvancedCommand')
+
+const { containsOperator } = require('../utils/containsOperator')
 
 const parseCommand = (fullCommandAsStringArray) => {
     //tämä pitää siistiä käyttämään yksi- ja kaksisanaisia komentoja
@@ -15,8 +18,13 @@ const parseCommand = (fullCommandAsStringArray) => {
                 return insertIntoCommand.parseCommand(fullCommandAsStringArray)
             return null
         case 'SELECT':
-            if (fullCommandAsStringArray[1] === '*')
+            if (fullCommandAsStringArray[1] === '*') {
                 return selectAllCommand.parseCommand(fullCommandAsStringArray)
+            } else if (containsOperator(fullCommandAsStringArray[1])) {
+                return selectWithOperatorsCommand.parseCommand(
+                    fullCommandAsStringArray
+                )
+            }
             return selectCommand.parseCommand(fullCommandAsStringArray)
         default:
             console.log('sth went wrong')
