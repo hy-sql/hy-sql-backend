@@ -1,7 +1,7 @@
 const selectAllCommand = require('../commands/selectAllCommand')
 const commandService = require('../services/commandService')
 
-describe.each(['SELEC * FROM Taulu;'])(
+describe.each(['SELEC * FROM Taulu;', 'SELECT FROM Taulu;'])(
     'Query beginning with misspelled SELECT *',
     (wrongCommand) => {
         describe(wrongCommand, () => {
