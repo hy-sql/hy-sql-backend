@@ -1,8 +1,45 @@
 const Joi = require('@hapi/joi')
 
 const ColumnsSchema = Joi.object({
-    columnName: Joi.string(),
-    value: Joi.any(), //??
+    columnName: Joi.string()
+        .required()
+        .pattern(/;/, { invert: true })
+        .pattern(/^\w+$/)
+        .max(64)
+        .messages({
+            'any.required': 'SET should be followed by column name',
+            'string.pattern.invert.base':
+                'Semicolon should only be found at the end of a query',
+            'string.pattern.base':
+                'Number and string values in the query should only contain alphanumeric characters and underscores',
+            'string.max': 'A string value is too long',
+        }),
+    sign: Joi.boolean().required().valid(true).messages({
+        'any.only': 'After SET there should be = sign',
+        'any.required': 'After SET there should be = sign',
+    }),
+    valueType: Joi.string().valid('INTEGER', 'TEXT').insensitive().required(),
+    value: Joi.alternatives().conditional('valueType', {
+        is: 'INTEGER',
+        then: Joi.number().required().messages({
+            'any.required':
+                'value type without singlequotes is expected to be number',
+        }),
+        otherwise: Joi.string()
+            .required()
+            .pattern(/;/, { invert: true })
+            .pattern(/^\w+$/)
+            .max(64)
+            .messages({
+                'any.required':
+                    'If singlequotes are given value should be a string',
+                'string.pattern.invert.base':
+                    'Semicolon should only be found at the end of a query',
+                'string.pattern.base':
+                    'Number and string values in the query should only contain alphanumeric characters and underscores',
+                'string.max': 'A string value is too long',
+            }),
+    }),
 })
 
 const UpdateSchema = Joi.object({
@@ -31,11 +68,9 @@ const UpdateSchema = Joi.object({
             'string.max': 'The table name is too long',
         }),
 
-    /*SET*/
     set: Joi.string().required().valid('SET').insensitive().messages({
         'any.required': 'Query must contain SET',
     }),
-    //column-value parit tähän
 
     columns: Joi.array().min(1).items(ColumnsSchema).required().messages({}),
 

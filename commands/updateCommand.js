@@ -17,13 +17,13 @@ const parseCommand = (fullCommandAsStringList) => {
             : undefined
 
     const columnsAndValuesAsStringList =
-        containsWhere === -1
+        containsWhere === -1 && set !== undefined
             ? fullCommandAsStringList.slice(
-                fullCommandAsStringList.indexOf('SET') + 1,
+                3,
                 fullCommandAsStringList.indexOf(';')
             )
             : fullCommandAsStringList.slice(
-                fullCommandAsStringList.indexOf('SET') + 1,
+                3,
                 fullCommandAsStringList.indexOf('WHERE')
             )
 
@@ -42,10 +42,10 @@ const parseCommand = (fullCommandAsStringList) => {
 }
 
 const parseUpdatedColumns = (columnsAndValuesAsStringList) => {
-    if (!columnsAndValuesAsStringList) return null
+    if (!columnsAndValuesAsStringList) return undefined
 
     const parsedUpdatedColumns = []
-    console.log('ORIGINAL', columnsAndValuesAsStringList)
+    // console.log('ORIGINAL', columnsAndValuesAsStringList)
 
     // console.log('join:', columnsAndValuesAsStringList.join(''))
     /*first change array to string and then remove unnecessary commas (,) and change back to array*/
@@ -56,18 +56,33 @@ const parseUpdatedColumns = (columnsAndValuesAsStringList) => {
 
     /*every item of the array is {column=value}, this loop parses them into pairs and removes singlequotes*/
     separatedColumnsAsList.forEach((element) => {
+        if (element.indexOf('=') === -1) {
+            parsedUpdatedColumns.push({
+                columnName: 'equal_sign_missing',
+                sign: false,
+                valueType: undefined,
+                value: 'equal_sign_missing',
+            })
+            return
+        }
+
         const columnValuePairAsList = element.split('=')
 
+        let valueType = 'INTEGER'
         const valueContainsQuotes = columnValuePairAsList[1].charAt(0) === "'"
         /*remove quotes if they exist around string*/
         if (valueContainsQuotes) {
             columnValuePairAsList[1] = columnValuePairAsList[1]
                 .split("'")
                 .join('')
+
+            valueType = 'TEXT'
         }
         /*new pair for return*/
         const columnValuePair = {
             columnName: columnValuePairAsList[0],
+            sign: true,
+            valueType,
             value: columnValuePairAsList[1],
         }
         // console.log('FINAL OBJECT', columnValuePair)

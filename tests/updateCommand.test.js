@@ -34,21 +34,25 @@ describe.each([
     })
 })
 
-describe.each(['UPDATE Tuotteet;', 'update tuotteet 123 set;'])(
-    'Invalid command testing',
-    (command) => {
-        const fullCommandAsStringList = command
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+describe.each([
+    'UPDATE Tuotteet;',
+    'update tuotteet 123 set;',
+    'UPDATE tuotteet set 123;',
+    "update tuotteet set 'nauris';",
+    "update tuotteet 'nauris';",
+    "update tuotteet 'nauris'",
+])('Invalid command testing', (command) => {
+    const fullCommandAsStringList = command
+        .trim()
+        .replace(/\s\s+/g, ' ')
+        .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-        test(`invalid command ${command} is parsed but error returned`, () => {
-            const parsedCommand = commandService.parseCommand(
-                fullCommandAsStringList
-            )
-            // console.log(parsedCommand)
+    test(`invalid command ${command} is parsed but error returned`, () => {
+        const parsedCommand = commandService.parseCommand(
+            fullCommandAsStringList
+        )
+        // console.log(parsedCommand)
 
-            expect(parsedCommand.error).toBeDefined
-        })
-    }
-)
+        expect(parsedCommand.error).toBeDefined()
+    })
+})
