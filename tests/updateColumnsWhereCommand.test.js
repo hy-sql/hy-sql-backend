@@ -2,10 +2,10 @@ const commandService = require('../services/commandService')
 const updateCommand = require('../commands/updateCommand')
 
 describe.each([
-    'UPDATE Tuotteet SET hinta=6;',
-    "update tuotteet SET hinta=6, nimi='nauris';",
-    'update tuotteet set hinta=6;',
-    "uPdAtE Tuotteet sEt nimi='nauris';",
+    "UPDATE Tuotteet SET hinta=6 WHERE nimi='nauris';",
+    "update tuotteet SET hinta=6, nimi='nauris' WHERE nimi='retiisi';",
+    "update tuotteet set hinta=6 where nimi='ananas';",
+    "uPdAtE Tuotteet sEt nimi='nauris' WheRe hinta=6;",
 ])('Valid UPDATE command testing', (command) => {
     describe(command, () => {
         const fullCommandAsStringList = command
@@ -37,13 +37,13 @@ describe.each([
 })
 
 describe.each([
-    'UPDATE Tuotteet;',
-    'update tuotteet 123 set;',
-    'UPDATE tuotteet set 123;',
-    "update tuotteet set 'nauris';",
-    "update tuotteet 'nauris';",
-    "update tuotteet 'nauris'",
-    "update tuotteet set nimi: 'nauris';",
+    'UPDATE Tuotteet where hinta=6;',
+    'update tuotteet 123 set hinta=6 WHERE hinta=5;',
+    'UPDATE tuotteet set 123 WHEre hinta=6;',
+    "update tuotteet set 'nauris' where hinta=6;",
+    "update tuotteet 'nauris' where hinta=6;",
+    "update tuotteet 'nauris' where 6",
+    "update tuotteet set nimi: 'nauris' WHERE hinta=6;",
 ])('Invalid UPDATE command testing', (command) => {
     describe(command, () => {
         const fullCommandAsStringList = command
