@@ -14,9 +14,10 @@ const checkForAdditionalAtEnd = (
         validationResult.error
             ? validationResult.error.details.push({ message: errorMessage })
             : (validationResult.error = {
-                details: [{ message: errorMessage }],
-            })
+                  details: [{ message: errorMessage }],
+              })
     }
+
     return validationResult
 }
 
