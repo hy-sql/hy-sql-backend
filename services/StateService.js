@@ -26,9 +26,67 @@ class StateService {
                 return this.selectColumnsFromTable(parsedCommand)
             case 'SELECT ADVANCED':
                 return this.selectAdvanced(parsedCommand)
+            case 'UPDATE':
+                return this.updateTable(parsedCommand)
             default:
                 break
         }
+    }
+
+    /*
+     *For executing UPDATE ... or UPDATE ... WHERE; queries
+     *Input is parsed command object and output either result or error object
+     */
+    updateTable(command) {
+        const error = this.checkIfTableExists(command.tableName)
+        if (error) return { error: error }
+
+        const table = this.findTable(command.tableName)
+
+        let newRows = []
+        let rowsToUpdate = table.rows
+
+        /*
+         * If command object has property 'where' it's filtered in order
+         * to update only the rows that are spesified in query
+         */
+        if (command.where) {
+            const filter = this.createFilter(command.where)
+            rowsToUpdate = _.filter(rowsToUpdate, filter)
+            console.log('TO BE UPDATED:', rowsToUpdate)
+            let notChangedRows = _.difference(table.rows, rowsToUpdate)
+            console.log('NOT CHANGED:', notChangedRows)
+            notChangedRows.forEach((row) => newRows.push(row))
+        }
+
+        rowsToUpdate.forEach((row) => {
+            newRows.push(this.updateRow(row, command.columns))
+        })
+
+        const tableIndex = this.findTableIndex(command.tableName)
+
+        newRows = _.sortBy(newRows, 'id')
+        this.state.updateRows(tableIndex, newRows)
+
+        const result = `Rows in table ${command.tableName} updated`
+
+        return { result }
+    }
+
+    /**
+     * Help function for updateTable().
+     * Updates wanted columns in given row.
+     * @param {*} row Row object
+     * @param {*} columns Object that contains columnName and value
+     */
+    updateRow(row, columns) {
+        for (let i = 0; i < columns.length; i++) {
+            const column = columns[i].columnName
+            //check jos valuetype on väärä???
+            const value = columns[i].value
+            row[column] = value
+        }
+        return row
     }
 
     selectAdvanced(command) {
