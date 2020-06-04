@@ -448,7 +448,7 @@ describe('selectAllFromTable() with command.where and command.orderBy', () => {
             .replace(/\s+,/g, ',')
             .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
             .filter(Boolean)
-        const parsedCommand = commandService.parseCommand(commandArray)
+        const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand.value)
         expect(result.rows).toEqual(expectedRows)
@@ -478,7 +478,7 @@ describe('selectAllFromTable() with command.where and command.orderBy', () => {
             .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
             .filter(Boolean)
 
-        const parsedCommand = commandService.parseCommand(commandArray)
+        const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand.value)
         expect(result.rows).toEqual(expectedRows)

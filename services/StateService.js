@@ -40,7 +40,7 @@ class StateService {
         if (command.where) {
             console.log(command.where)
             rows = command.where.conditions.map((c) => this.filterRows(c, rows))
-            rows = _.uniq(_.flattenDeep(rows))
+            rows = _.chain(rows).flattenDeep(rows).uniq()
         }
 
         const result = `SELECT ${command.fields
