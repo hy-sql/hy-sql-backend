@@ -1,6 +1,7 @@
 const State = require('../models/State')
 const StateService = require('../services/StateService')
 const commandService = require('../services/commandService')
+const selectAllCommand = require('../commands/selectAllCommand')
 
 describe('selectAllFromTable()', () => {
     test('returns error when table does not exist', () => {
@@ -120,7 +121,7 @@ describe('selectAllFromTable() with ORDER BY -command', () => {
             .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
             .filter(Boolean)
 
-        const parsedSelectAllOrderByCommand = commandService.parseCommand(
+        const parsedSelectAllOrderByCommand = selectAllCommand.parseCommand(
             splitSelectAllOrderByCommand
         )
 
@@ -170,7 +171,7 @@ describe('selectAllFromTable() with command.where', () => {
             .replace(/\s+,/g, ',')
             .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
             .filter(Boolean)
-        const parsedCommand = commandService.parseCommand(commandArray)
+        const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.selectAllFromTable(parsedCommand.value)
         expect(result.result).toBe(
@@ -188,7 +189,7 @@ describe('selectAllFromTable() with command.where', () => {
             .replace(/\s+,/g, ',')
             .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
             .filter(Boolean)
-        const parsedCommand = commandService.parseCommand(commandArray)
+        const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.selectAllFromTable(parsedCommand.value)
         expect(result.result).toBe(
@@ -206,7 +207,7 @@ describe('selectAllFromTable() with command.where', () => {
             .replace(/\s+,/g, ',')
             .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
             .filter(Boolean)
-        const parsedCommand = commandService.parseCommand(commandArray)
+        const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.selectAllFromTable(parsedCommand.value)
         expect(result.result).toBe(
@@ -224,7 +225,7 @@ describe('selectAllFromTable() with command.where', () => {
             .replace(/\s+,/g, ',')
             .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
             .filter(Boolean)
-        const parsedCommand = commandService.parseCommand(commandArray)
+        const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.selectAllFromTable(parsedCommand.value)
         expect(result.result).toBe(
@@ -242,7 +243,7 @@ describe('selectAllFromTable() with command.where', () => {
             .replace(/\s+,/g, ',')
             .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
             .filter(Boolean)
-        const parsedCommand = commandService.parseCommand(commandArray)
+        const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.selectAllFromTable(parsedCommand.value)
         expect(result.result).toBe(
@@ -323,7 +324,7 @@ describe('selectAllFromTable() with command.where and command.orderBy', () => {
             .replace(/\s+,/g, ',')
             .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
             .filter(Boolean)
-        const parsedCommand = commandService.parseCommand(commandArray)
+        const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand.value)
 
@@ -357,7 +358,7 @@ describe('selectAllFromTable() with command.where and command.orderBy', () => {
             .replace(/\s+,/g, ',')
             .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
             .filter(Boolean)
-        const parsedCommand = commandService.parseCommand(commandArray)
+        const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand.value)
 
@@ -402,7 +403,7 @@ describe('selectAllFromTable() with command.where and command.orderBy', () => {
             .replace(/\s+,/g, ',')
             .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
             .filter(Boolean)
-        const parsedCommand = commandService.parseCommand(commandArray)
+        const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand.value)
 
