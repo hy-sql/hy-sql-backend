@@ -5,6 +5,10 @@ const selectAllCommand = require('../commands/selectAllCommand')
 const selectWithOperatorsCommand = require('../commands/selectAdvancedCommand')
 const updateCommand = require('../commands/updateCommand')
 const { containsOperator } = require('../utils/containsOperator')
+const {
+    arithmeticExpressionPattern,
+    stringFunctionsPattern,
+} = require('../utils/regex')
 
 const parseCommand = (fullCommandAsStringArray) => {
     //tämä pitää siistiä käyttämään yksi- ja kaksisanaisia komentoja
@@ -18,12 +22,15 @@ const parseCommand = (fullCommandAsStringArray) => {
                 return insertIntoCommand.parseCommand(fullCommandAsStringArray)
             return null
         case 'SELECT':
-            if (fullCommandAsStringArray[1] === '*') {
-                return selectAllCommand.parseCommand(fullCommandAsStringArray)
-            } else if (containsOperator(fullCommandAsStringArray[1])) {
+            if (
+                containsOperator(fullCommandAsStringArray[1]) ||
+                containsExpressionOrFunction(fullCommandAsStringArray)
+            ) {
                 return selectWithOperatorsCommand.parseCommand(
                     fullCommandAsStringArray
                 )
+            } else if (fullCommandAsStringArray[1] === '*') {
+                return selectAllCommand.parseCommand(fullCommandAsStringArray)
             }
             return selectCommand.parseCommand(fullCommandAsStringArray)
         case 'UPDATE':
@@ -33,5 +40,12 @@ const parseCommand = (fullCommandAsStringArray) => {
             return null
     }
 }
+
+const containsExpressionOrFunction = (fullCommandAsStringArray) =>
+    fullCommandAsStringArray.find(
+        (k) =>
+            k.match(arithmeticExpressionPattern) ||
+            k.match(stringFunctionsPattern)
+    )
 
 module.exports = { parseCommand }
