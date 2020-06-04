@@ -1,11 +1,27 @@
-const { SelectAdvancedSchema } = require('../models/SelectAdvancedSchema')
+const {
+    SelectAdvancedSchema,
+    SelectAdvancedWhereSchema,
+} = require('../models/SelectAdvancedSchema')
+const { parseWhereAdvanced } = require('./whereAdvancedCommand')
+const { queryContainsWhereKeyword } = require('./whereCommand')
 const {
     arithmeticExpressionPattern,
     stringFunctionExpressionPattern,
     aggregateFunctionExpressionPattern,
 } = require('../utils/regex')
+const {
+    parseColumnsFromExpression,
+} = require('../utils/parseColumnsFromExpression')
+const {
+    parseColumnFromStringFunction,
+    parseColumnFromAggregateFunction,
+} = require('../utils/parseColumnFromFunction')
 
 const parseCommand = (fullCommandAsStringArray) => {
+    if (queryContainsWhereKeyword(fullCommandAsStringArray)) {
+        return parseWhereAdvancedCommand(fullCommandAsStringArray)
+    }
+
     return parseSelectAdvancedCommand(fullCommandAsStringArray)
 }
 
@@ -36,33 +52,57 @@ const parseSelectAdvancedCommand = (fullCommandAsStringArray) => {
     return validatedParsedCommand
 }
 
+const parseWhereAdvancedCommand = (fullCommandAsStringArray) => {
+    const indexOfWhere = fullCommandAsStringArray.findIndex(
+        (k) => k.toUpperCase() === 'WHERE'
+    )
+
+    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
+
+    parsedCommand.where = parseWhereAdvanced(
+        fullCommandAsStringArray.slice(indexOfWhere)
+    )
+
+    const validatedCommand = SelectAdvancedWhereSchema.validate(parsedCommand)
+
+    return validatedCommand
+}
+
 const parseFields = (fieldArray) => {
     const fieldObjects = fieldArray
         .join('')
         .split(',')
         .filter(Boolean)
-        .map((f) => createFieldObject(f))
+        .map((f) => parseQueryField(f))
 
     return fieldObjects
 }
 
-const createFieldObject = (parsedField) => {
+const parseQueryField = (parsedField) => {
     switch (true) {
         case arithmeticExpressionPattern.test(parsedField):
             return {
                 type: 'expression',
                 value: parsedField,
+                columns: parseColumnsFromExpression(parsedField),
             }
         case stringFunctionExpressionPattern.test(parsedField):
             return {
                 type: 'stringFunction',
                 name: parsedField.split('(')[0].toUpperCase(),
                 value: parsedField,
+                column: parseColumnFromStringFunction(parsedField),
             }
         case aggregateFunctionExpressionPattern.test(parsedField):
             return {
                 type: 'aggregateFunction',
                 name: parsedField.split('(')[0].toUpperCase(),
+                value: parsedField,
+                column: parseColumnFromAggregateFunction(parsedField),
+            }
+        case /^\*$/.test(parsedField):
+            return {
+                type: 'all',
                 value: parsedField,
             }
         default:
