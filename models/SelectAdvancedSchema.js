@@ -1,5 +1,5 @@
 const Joi = require('@hapi/joi')
-// const WhereSchema = require('./WhereSchema')
+const { WhereAdvancedSchema } = require('./WhereAdvancedSchema')
 // const OrderBySchema = require('./OrderBySchema')
 
 const {
@@ -16,6 +16,10 @@ const SelectAdvancedSchema = Joi.object({
     fields: Joi.array()
         .items(
             Joi.object({
+                type: Joi.string().valid('all').required(),
+                value: Joi.string().valid('*').required(),
+            }),
+            Joi.object({
                 type: Joi.string().valid('column').required(),
                 value: Joi.string().pattern(/^\w+$/).required(),
             }),
@@ -24,24 +28,29 @@ const SelectAdvancedSchema = Joi.object({
                 value: Joi.string()
                     .pattern(arithmeticExpressionPattern)
                     .required(),
+                columns: Joi.array()
+                    .items(Joi.string().pattern(/^\w+$/).required())
+                    .optional(),
             }),
             Joi.object({
-                name: Joi.string().pattern(stringFunctionsPattern).required(),
                 type: Joi.string().valid('stringFunction').required(),
+                name: Joi.string().pattern(stringFunctionsPattern).required(),
                 value: Joi.string()
                     .pattern(stringFunctionExpressionPattern)
                     .insensitive()
                     .required(),
+                column: Joi.string().pattern(/^\w+$/).required(),
             }),
             Joi.object({
+                type: Joi.string().valid('aggregateFunction').required(),
                 name: Joi.string()
                     .pattern(aggregateFunctionsPattern)
                     .required(),
-                type: Joi.string().valid('aggregateFunction').required(),
                 value: Joi.string()
                     .pattern(aggregateFunctionExpressionPattern)
                     .insensitive()
                     .required(),
+                column: Joi.string().pattern(/^\w+$/).required(),
             })
         )
         .required()
@@ -67,15 +76,17 @@ const SelectAdvancedSchema = Joi.object({
     }),
 })
 
-const SelectWithOperatorsOrderBySchema = SelectAdvancedSchema.keys({})
+const SelectAdvancedWhereSchema = SelectAdvancedSchema.keys({
+    where: WhereAdvancedSchema,
+})
 
-const SelectWithOperatorsWhereSchema = SelectAdvancedSchema.keys({})
+const SelectAdvancedOrderBySchema = SelectAdvancedSchema.keys({})
 
-const SelectWithOperatorsWhereOrderBySchema = SelectAdvancedSchema.keys({})
+const SelectAdvancedWhereOrderBySchema = SelectAdvancedSchema.keys({})
 
 module.exports = {
     SelectAdvancedSchema,
-    SelectWithOperatorsOrderBySchema,
-    SelectWithOperatorsWhereSchema,
-    SelectWithOperatorsWhereOrderBySchema,
+    SelectAdvancedWhereSchema,
+    SelectAdvancedOrderBySchema,
+    SelectAdvancedWhereOrderBySchema,
 }
