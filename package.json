@@ -8,6 +8,7 @@
         "dev": "nodemon index.js",
         "test": "cross-env NODE_ENV=test jest --verbose --detectOpenHandles",
         "testcoverage": "jest --coverage",
+        "prettier": "prettier --write .",
         "lint": "eslint .",
         "fix": "eslint . --fix"
     },
