@@ -3,6 +3,7 @@ const {
     comparisonOperatorPattern,
     logicalOperatorPattern,
     stringFunctionsPattern,
+    aggregateFunctionsPattern,
 } = require('../utils/regex')
 
 const containsArithmeticOperator = (input) => {
@@ -21,11 +22,16 @@ const containsStringFunctionsPattern = (input) => {
     return stringFunctionsPattern.test(input)
 }
 
+const containsAggregateFunctionsPattern = (input) => {
+    return aggregateFunctionsPattern.test(input)
+}
+
 const containsFunctions = [
     containsArithmeticOperator,
     containsComparisonOperator,
     containsLogicalOperator,
     containsStringFunctionsPattern,
+    containsAggregateFunctionsPattern,
 ]
 
 const containsOperator = (input) => {
@@ -33,8 +39,10 @@ const containsOperator = (input) => {
 }
 
 module.exports = module.exports = module.exports = module.exports = {
-    containsOperator,
-    containsLogicalOperator,
-    containsComparisonOperator,
     containsArithmeticOperator,
+    containsComparisonOperator,
+    containsLogicalOperator,
+    containsStringFunctionsPattern,
+    containsAggregateFunctionsPattern,
+    containsOperator,
 }
