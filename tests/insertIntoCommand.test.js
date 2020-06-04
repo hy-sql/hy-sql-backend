@@ -1,6 +1,7 @@
 const insertIntoCommand = require('../commands/insertIntoCommand')
 const { InsertIntoSchema } = require('../models/InsertIntoSchema')
 const commandService = require('../services/commandService')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe.each([
     "INSERT INTO Tuotteet (id, nimi, hinta) VALUES (1, 'nauris', 3);",
@@ -10,10 +11,7 @@ describe.each([
     "   insert inTO    tuoTTeet (id       , NIMI, hintA) VALUES (16,     'tomaatti', 6);",
     "InSERt        INTO Tuotteet (id, nimi, hinta) VALUES (17, 'sipuli', 65);",
 ])('valid command INSERT INTO ... VALUES testing', (command) => {
-    const fullCommandAsStringList = command
-        .trim()
-        .replace(/\s\s+/g, ' ')
-        .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+    const fullCommandAsStringList = cleanCommand(command)
 
     test('valid command is recognized and true returned', () => {
         const result = commandService.parseCommand(fullCommandAsStringList)
@@ -40,10 +38,7 @@ describe.each([
     "INSERT INTO Tuotteet (id, nimi, hinta) VALUES (13, 'kurkku', 17, 18);", //liikaa arvoja
     "INSERT INTO Tuotteet (id, nimi, hinta) VALUES (1, 'porkkana');", //liian vähän arvoja
 ])('invalid command with the right name (CREATE TABLE) testing', (command) => {
-    const fullCommandAsStringList = command
-        .trim()
-        .replace(/\s\s+/g, ' ')
-        .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+    const fullCommandAsStringList = cleanCommand(command)
 
     test('valid command is parsed but validation fails', () => {
         const parsedCommand = insertIntoCommand.parseCommand(
@@ -62,10 +57,7 @@ describe.each([
     "INSERT INTO! Tuotteet (id, nimi, hinta) VALUES (1, 'nauris', 3);",
     "    INSERT_INTO Tuotteet (id, nimi, hinta) VALUES (1, 'nauris', 3);",
 ])('invalid command name testing', (command) => {
-    const fullCommandAsStringList = command
-        .trim()
-        .replace(/\s\s+/g, ' ')
-        .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+    const fullCommandAsStringList = cleanCommand(command)
 
     test('invalid command is NOT recognized and false returned', () => {
         const result = commandService.parseCommand(fullCommandAsStringList)
@@ -76,10 +68,7 @@ describe.each([
 describe.each(["INSERT INTO Tuotteet (id, nimi, hinta) (1, 'nauris', 3);"])(
     'missing VALUES keyword testing',
     (command) => {
-        const fullCommandAsStringList = command
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const fullCommandAsStringList = cleanCommand(command)
 
         test('missing VALUES keyword returns an error', () => {
             const parsedCommand = insertIntoCommand.parseCommand(
