@@ -1,6 +1,7 @@
 const selectCommand = require('../commands/selectCommand')
 const { SelectColumnsOrderBySchema } = require('../models/SelectSchema')
 const commandService = require('../services/commandService')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe.each([
     "SELECT id, nimi, hinta FROM Tuotteet WHERE this='that';",
@@ -11,10 +12,7 @@ describe.each([
     '   selecT     id       , NIMI, hintA FRoM tuoTTeet   WHERE    hinta>=5;',
     'select id, NIMI, hinta fROM                    Tuotteet;',
 ])('valid command SELECT ... FROM WHERE testing', (command) => {
-    const fullCommandAsStringList = command
-        .trim()
-        .replace(/\s\s+/g, ' ')
-        .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+    const fullCommandAsStringList = cleanCommand(command)
 
     test('valid command is recognized and true returned', () => {
         const result = commandService.parseCommand(fullCommandAsStringList)
@@ -41,10 +39,7 @@ describe.each([
 ])(
     'invalid command with the right name (SELECT) and WHERE keyword testing',
     (command) => {
-        const fullCommandAsStringList = command
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const fullCommandAsStringList = cleanCommand(command)
 
         test('invalid command is parsed but validation fails', () => {
             const parsedCommand = selectCommand.parseCommand(

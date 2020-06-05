@@ -1,6 +1,7 @@
 const State = require('../models/State')
 const StateService = require('../services/StateService')
 const commandService = require('../services/commandService')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe.each([
     "UPDATE Tuotteet SET hinta=6 WHERE nimi='nauris';",
@@ -45,11 +46,7 @@ describe.each([
         const state = new State(initArray)
         const stateService = new StateService(state)
 
-        const fullCommandAsStringList = command
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
-
+        const fullCommandAsStringList = cleanCommand(command)
         const parsedCommand = commandService.parseCommand(
             fullCommandAsStringList
         )
@@ -82,11 +79,7 @@ describe.each([
         const state = new State(initArray)
         const stateService = new StateService(state)
 
-        const fullCommandAsStringList = command
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
-
+        const fullCommandAsStringList = cleanCommand(command)
         const parsedCommand = commandService.parseCommand(
             fullCommandAsStringList
         )
@@ -141,11 +134,7 @@ describe.each(["UPDATE Tuotteet SET nimi=6 where nimi='nauris';"])(
             const state = new State(initArray)
             const stateService = new StateService(state)
 
-            const fullCommandAsStringList = command
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
-
+            const fullCommandAsStringList = cleanCommand(command)
             const parsedCommand = commandService.parseCommand(
                 fullCommandAsStringList
             )
