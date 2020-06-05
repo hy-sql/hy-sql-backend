@@ -35,7 +35,14 @@ const parseCommand = (fullCommandAsStringList) => {
         parsedCommand.parserCounter++
     }
 
-    parsedCommand = parseColumnNames(fullCommandAsStringList, parsedCommand)
+    const { pccolumns, columns } = parseColumnNames(
+        fullCommandAsStringList,
+        parsedCommand.parserCounter
+    )
+    if (columns) {
+        parsedCommand.parserCounter = pccolumns
+        parsedCommand.columns = columns
+    }
 
     if (fullCommandAsStringList[parsedCommand.parserCounter] === ')') {
         parsedCommand.columnsClosingBracket = ')'
