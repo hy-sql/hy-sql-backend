@@ -35,6 +35,11 @@ const stringFunctionExpressionPattern = new RegExp(
     'i'
 )
 
+const endsWithStringFunctionExpressionPattern = new RegExp(
+    `(${stringFunctions.join('|')})\\(\\w+\\)$`,
+    'i'
+)
+
 const aggregateFunctions = ['AVG', 'COUNT', 'MAX', 'MIN', 'SUM']
 
 const aggregateFunctionsPattern = new RegExp(aggregateFunctions.join('|'), 'i')
@@ -55,4 +60,5 @@ module.exports = {
     aggregateFunctionExpressionPattern,
     comparisonOperatorPattern,
     logicalOperatorPattern,
+    endsWithStringFunctionExpressionPattern,
 }
