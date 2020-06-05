@@ -30,8 +30,13 @@ class State {
         this.tablelist[tableIndex].rows = newRows
     }
 
+    /*
+     * Deletes rows in given table by replacing the table rows with the rows remaining
+     * after deletion. Input is table's
+     * index and object that contains new rows for the table.
+     */
     deleteFromTable(tableIndex, remainingRows) {
-        this.tablelist = this.tablelist[tableIndex].rows = remainingRows
+        this.tablelist[tableIndex].rows = remainingRows
     }
 }
 

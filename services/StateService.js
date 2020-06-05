@@ -96,6 +96,11 @@ class StateService {
         return row
     }
 
+    /*
+     *For executing DELETE FROM Table_name; or DELETE FROM Table_name WHERE...; queries
+     *Expected input is a parsed DELETE-command object. Output is an object either containing
+     the key result or error and respectively the value result string or error string respectively.
+     */
     deleteFromTable(command) {
         const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
@@ -105,14 +110,13 @@ class StateService {
         let rows = table.rows
 
         if (command.where) {
-            const filter = this.createFilter(command.where)
+            const filter = this.createOppositeFilter(command.where)
             rows = _.filter(rows, filter)
         } else {
             rows = []
         }
-        console.log('BEFORE', this.state.tables)
+
         this.state.deleteFromTable(tableIndex, rows)
-        console.log('AFTER', this.state.tables)
 
         const result = command.where
             ? `DELETE FROM ${command.tableName} WHERE ${command.where.columnName}${command.where.sign}${command.where.value} -query was executed succesfully`
@@ -306,6 +310,36 @@ class StateService {
                 }
             default:
                 return { [column]: value }
+        }
+    }
+
+    /*Creates filter that gives the opposite results than filter created with createFilter()*/
+    createOppositeFilter(whereObject) {
+        const column = whereObject.columnName
+        const value = whereObject.value
+        const sign = whereObject.sign
+
+        switch (sign) {
+            case '>':
+                return (item) => {
+                    return item[column] <= value
+                }
+            case '<':
+                return (item) => {
+                    return item[column] >= value
+                }
+            case '>=':
+                return (item) => {
+                    return item[column] < value
+                }
+            case '<=':
+                return (item) => {
+                    return item[column] > value
+                }
+            default:
+                return (item) => {
+                    return item[column] !== value
+                }
         }
     }
 

@@ -23,7 +23,7 @@ Content-Type: application/json
   ]
 }
 
-### Valid queries demonstrating keyword case-insensitive
+### Valid queries demonstrating keyword case-insensitivity
 
 POST http://localhost:3001/api/query
 Content-Type: application/json
@@ -200,5 +200,25 @@ Content-Type: application/json
     "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 5);",
     "UPDATE Tuotteet SET nimi=6 WHERE nimi='retiisi';",
     "SELECT * FROM Tuotteet;"
+  ]
+}
+
+### DELETE testing
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": [
+  "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+  "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('porkkana',5);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu',4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',1);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',6);",
+  "DELETE FROM Tuotteet WHERE hinta=4;",
+  "SELECT * FROM Tuotteet ORDER BY hinta;"
   ]
 }
