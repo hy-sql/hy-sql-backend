@@ -26,9 +26,72 @@ class StateService {
                 return this.selectColumnsFromTable(parsedCommand)
             case 'SELECT ADVANCED':
                 return this.selectAdvanced(parsedCommand)
+            case 'UPDATE':
+                return this.updateTable(parsedCommand)
             default:
                 break
         }
+    }
+
+    /*
+     *For executing UPDATE ... or UPDATE ... WHERE; queries
+     *Input is parsed command object and output either result or error object
+     */
+    updateTable(command) {
+        let error = this.checkIfTableExists(command.tableName)
+        if (error) return { error: error }
+
+        const table = this.findTable(command.tableName)
+
+        /* Check if trying to update wrong type of data to column */
+        command.columns.forEach((pair) => {
+            const column = _.find(table.columns, { name: pair.columnName })
+            if (column.type !== pair.valueType)
+                error = `Wrong datatype: expected ${column.type} but was ${pair.valueType}`
+        })
+        if (error) return { error: error }
+
+        let newRows = []
+        let rowsToUpdate = table.rows
+
+        /*
+         * If command object has property 'where' it's filtered in order
+         * to update only the rows that are spesified in query
+         */
+        if (command.where) {
+            const filter = this.createFilter(command.where)
+            rowsToUpdate = _.filter(rowsToUpdate, filter)
+            let notChangedRows = _.difference(table.rows, rowsToUpdate)
+            notChangedRows.forEach((row) => newRows.push(row))
+        }
+
+        rowsToUpdate.forEach((row) => {
+            newRows.push(this.updateRow(row, command.columns, table.columns))
+        })
+
+        const tableIndex = this.findTableIndex(command.tableName)
+
+        newRows = _.sortBy(newRows, 'id')
+        this.state.updateRows(tableIndex, newRows)
+
+        const result = `Rows in table ${command.tableName} updated`
+
+        return { result }
+    }
+
+    /**
+     * Help function for updateTable().
+     * Updates wanted columns in given row.
+     * @param {*} row Row object
+     * @param {*} columnsToUpdate Object that contains columnName and value which will be updated
+     */
+    updateRow(row, columnsToUpdate) {
+        for (let i = 0; i < columnsToUpdate.length; i++) {
+            const columnName = columnsToUpdate[i].columnName
+            const value = columnsToUpdate[i].value
+            row[columnName] = value
+        }
+        return row
     }
 
     selectAdvanced(command) {
