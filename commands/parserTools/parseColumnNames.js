@@ -1,14 +1,14 @@
 const { namify, cleanStringArray } = require('./smallTools')
 
-const parseColumnNames = (stringArray, parsedCommand) => {
-    let laskuri = parsedCommand.parserCounter
-    parsedCommand.columnsOpenBrackets = 0
+const parseColumnNames = (stringArray, parserCounter) => {
+    let laskuri = parserCounter
+    let columnsOpenBrackets = 0
     const columns = []
     loop1: for (; laskuri < stringArray.length; laskuri++) {
         const element = stringArray[laskuri]
         switch (element.toUpperCase()) {
             case '(':
-                parsedCommand.columnsOpenBrackets++
+                columnsOpenBrackets++
                 continue loop1
             case ',':
                 continue loop1
@@ -23,26 +23,27 @@ const parseColumnNames = (stringArray, parsedCommand) => {
             case 'HAVING':
             case 'WHERE':
             case 'FROM':
-                if (parsedCommand.columnsOpenBrackets === 0) break loop1
+                if (columnsOpenBrackets === 0) break loop1
                 continue loop1
             case ')':
-                if (parsedCommand.columnsOpenBrackets > 0) {
-                    parsedCommand.columnsOpenBrackets--
+                if (columnsOpenBrackets > 0) {
+                    columnsOpenBrackets--
                     continue loop1
                 }
                 break loop1
             default:
-                if (parsedCommand.columnsOpenBrackets > 0) continue loop1
+                if (columnsOpenBrackets > 0) continue loop1
                 columns.push(element)
         }
     }
+
     if (laskuri !== stringArray.length) {
-        parsedCommand.parserCounter = laskuri
-        parsedCommand.columns = namify(cleanStringArray(columns))
+        return {
+            pccolumns: laskuri,
+            columns: namify(cleanStringArray(columns)),
+        }
     }
-    if (parsedCommand.columnsOpenBrackets === 0)
-        delete parsedCommand.columnsOpenBrackets
-    return parsedCommand
+    return { pccolumns: parserCounter }
 }
 
 module.exports = { parseColumnNames }
