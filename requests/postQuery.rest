@@ -187,3 +187,18 @@ Content-Type: application/json
     "SELECT * FROM Tuotteet;"
   ]
 }
+
+### UPDATE ... SET ... WHERE ...; with wrong datatype as value
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": [
+    "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 5);",
+    "UPDATE Tuotteet SET nimi=6 WHERE nimi='retiisi';",
+    "SELECT * FROM Tuotteet;"
+  ]
+}

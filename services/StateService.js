@@ -38,10 +38,18 @@ class StateService {
      *Input is parsed command object and output either result or error object
      */
     updateTable(command) {
-        const error = this.checkIfTableExists(command.tableName)
+        let error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
 
         const table = this.findTable(command.tableName)
+
+        /* Check if trying to update wrong type of data to column */
+        command.columns.forEach((pair) => {
+            const column = _.find(table.columns, { name: pair.columnName })
+            if (column.type !== pair.valueType)
+                error = `Wrong datatype: expected ${column.type} but was ${pair.valueType}`
+        })
+        if (error) return { error: error }
 
         let newRows = []
         let rowsToUpdate = table.rows
@@ -53,14 +61,12 @@ class StateService {
         if (command.where) {
             const filter = this.createFilter(command.where)
             rowsToUpdate = _.filter(rowsToUpdate, filter)
-            console.log('TO BE UPDATED:', rowsToUpdate)
             let notChangedRows = _.difference(table.rows, rowsToUpdate)
-            console.log('NOT CHANGED:', notChangedRows)
             notChangedRows.forEach((row) => newRows.push(row))
         }
 
         rowsToUpdate.forEach((row) => {
-            newRows.push(this.updateRow(row, command.columns))
+            newRows.push(this.updateRow(row, command.columns, table.columns))
         })
 
         const tableIndex = this.findTableIndex(command.tableName)
@@ -77,14 +83,13 @@ class StateService {
      * Help function for updateTable().
      * Updates wanted columns in given row.
      * @param {*} row Row object
-     * @param {*} columns Object that contains columnName and value
+     * @param {*} columnsToUpdate Object that contains columnName and value which will be updated
      */
-    updateRow(row, columns) {
-        for (let i = 0; i < columns.length; i++) {
-            const column = columns[i].columnName
-            //check jos valuetype on väärä???
-            const value = columns[i].value
-            row[column] = value
+    updateRow(row, columnsToUpdate) {
+        for (let i = 0; i < columnsToUpdate.length; i++) {
+            const columnName = columnsToUpdate[i].columnName
+            const value = columnsToUpdate[i].value
+            row[columnName] = value
         }
         return row
     }
