@@ -5,6 +5,7 @@ const selectAllCommand = require('../commands/selectAllCommand')
 const selectWithOperatorsCommand = require('../commands/selectAdvancedCommand')
 const updateCommand = require('../commands/updateCommand')
 const { containsOperator } = require('../utils/containsOperator')
+const deleteCommand = require('../commands/deleteCommand')
 
 const parseCommand = (fullCommandAsStringArray) => {
     //tämä pitää siistiä käyttämään yksi- ja kaksisanaisia komentoja
@@ -28,6 +29,8 @@ const parseCommand = (fullCommandAsStringArray) => {
             return selectCommand.parseCommand(fullCommandAsStringArray)
         case 'UPDATE':
             return updateCommand.parseCommand(fullCommandAsStringArray)
+        case 'DELETE':
+            return deleteCommand.parseCommand(fullCommandAsStringArray)
         default:
             console.log('sth went wrong')
             return null

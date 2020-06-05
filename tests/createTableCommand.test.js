@@ -1,5 +1,6 @@
 const createTableCommand = require('../commands/createTableCommand')
 const commandService = require('../services/commandService')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe.each([
     'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
@@ -9,10 +10,7 @@ describe.each([
     '   create taBle    tuoTTeet (id inTEger    primary KEY, NIMI    text, hintA    inTEger);',
     'crEAte        TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
 ])('valid command testing', (command) => {
-    const fullCommandAsStringList = command
-        .trim()
-        .replace(/\s\s+/g, ' ')
-        .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+    const fullCommandAsStringList = cleanCommand(command)
 
     test('valid command is recognized and true returned', () => {
         const result = commandService.parseCommand(fullCommandAsStringList)
@@ -44,10 +42,7 @@ describe.each([
     '   create taBle    tuoTTeet ',
     '   create      ',
 ])('invalid command with the right name (CREATE TABLE) testing', (command) => {
-    const fullCommandAsStringList = command
-        .trim()
-        .replace(/\s\s+/g, ' ')
-        .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+    const fullCommandAsStringList = cleanCommand(command)
 
     test('valid command is parsed but validation fails', () => {
         const parsedCommand = createTableCommand.parseCommand(
@@ -64,10 +59,7 @@ describe.each([
     'create taBle! tuoTTeet id inTEger primary KEY, NIMI text, hintA inTEger);',
     '   create taBle_    tuoTTeet (id     primary KEY, NIMI    text, hintA    inTEger);',
 ])('invalid command name testing', (command) => {
-    const fullCommandAsStringList = command
-        .trim()
-        .replace(/\s\s+/g, ' ')
-        .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+    const fullCommandAsStringList = cleanCommand(command)
 
     test('invalid command is not recognized and false returned', () => {
         const result = commandService.parseCommand(fullCommandAsStringList)
