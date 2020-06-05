@@ -36,7 +36,15 @@ const parseSelectColumns = (fullCommandAsStringList) => {
     }
 
     // SARAKKEIDEN OSIO - (*AS -- TODO*)
-    parsedCommand = parseColumnNames(fullCommandAsStringList, parsedCommand)
+    //return { pccolumns: laskuri, columns: namify(cleanStringArray(columns)) }
+    const { pccolumns, columns } = parseColumnNames(
+        fullCommandAsStringList,
+        parsedCommand.parserCounter
+    )
+    if (columns) {
+        parsedCommand.parserCounter = pccolumns
+        parsedCommand.columns = columns
+    }
 
     //FROM  (* etsiminen muualtakin -- TODO*)
     if (
