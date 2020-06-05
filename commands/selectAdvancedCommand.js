@@ -1,9 +1,15 @@
 const {
     SelectAdvancedSchema,
     SelectAdvancedWhereSchema,
+    SelectAdvancedOrderBySchema,
+    SelectAdvancedWhereOrderBySchema,
 } = require('../models/SelectAdvancedSchema')
 const { parseWhereAdvanced } = require('./whereAdvancedCommand')
 const { queryContainsWhereKeyword } = require('./whereCommand')
+const {
+    hasOrderByKeywords,
+    hasWhereOrderByKeywords,
+} = require('./orderByCommand')
 const {
     arithmeticExpressionPattern,
     stringFunctionExpressionPattern,
@@ -18,8 +24,13 @@ const {
 } = require('../utils/parseColumnFromFunction')
 
 const parseCommand = (fullCommandAsStringArray) => {
+    if (hasWhereOrderByKeywords(fullCommandAsStringArray)) {
+        return parseWhereOrderBy(fullCommandAsStringArray)
+    } else if (hasOrderByKeywords(fullCommandAsStringArray)) {
+        return parseOrderBy(fullCommandAsStringArray)
+    }
     if (queryContainsWhereKeyword(fullCommandAsStringArray)) {
-        return parseWhereAdvancedCommand(fullCommandAsStringArray)
+        return parseWhere(fullCommandAsStringArray)
     }
 
     return parseSelectAdvancedCommand(fullCommandAsStringArray)
@@ -52,7 +63,7 @@ const parseSelectAdvancedCommand = (fullCommandAsStringArray) => {
     return validatedParsedCommand
 }
 
-const parseWhereAdvancedCommand = (fullCommandAsStringArray) => {
+const parseWhere = (fullCommandAsStringArray) => {
     const indexOfWhere = fullCommandAsStringArray.findIndex(
         (k) => k.toUpperCase() === 'WHERE'
     )
@@ -66,6 +77,53 @@ const parseWhereAdvancedCommand = (fullCommandAsStringArray) => {
     const validatedCommand = SelectAdvancedWhereSchema.validate(parsedCommand)
 
     return validatedCommand
+}
+
+const parseOrderBy = (fullCommandAsStringArray) => {
+    const indexOfOrder = fullCommandAsStringArray.findIndex(
+        (k) => k.toUpperCase() === 'ORDER'
+    )
+
+    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
+    parsedCommand.orderBy = parseOrderBy(
+        fullCommandAsStringArray.slice(
+            indexOfOrder,
+            fullCommandAsStringArray.length - 1
+        )
+    )
+
+    const validationResult = SelectAdvancedOrderBySchema.validate(parsedCommand)
+
+    return validationResult
+}
+
+const parseWhereOrderBy = (fullCommandAsStringArray) => {
+    const indexOfWhere = fullCommandAsStringArray.findIndex(
+        (k) => k.toUpperCase() === 'WHERE'
+    )
+
+    const indexOfOrder = fullCommandAsStringArray.findIndex(
+        (k) => k.toUpperCase() === 'ORDER'
+    )
+
+    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
+
+    parsedCommand.where = parseWhereAdvanced(
+        fullCommandAsStringArray.slice(indexOfWhere)
+    )
+
+    parsedCommand.orderBy = parseOrderBy(
+        fullCommandAsStringArray.slice(
+            indexOfOrder,
+            fullCommandAsStringArray.length - 1
+        )
+    )
+
+    const validationResult = SelectAdvancedWhereOrderBySchema.validate(
+        parsedCommand
+    )
+
+    return validationResult
 }
 
 const parseFields = (fieldArray) => {

@@ -38,9 +38,8 @@ class StateService {
         rows = this.createAdvancedRows(command, existingRows)
 
         if (command.where) {
-            console.log(command.where)
-            rows = command.where.conditions.map((c) => this.filterRows(c, rows))
-            rows = _.chain(rows).flattenDeep(rows).uniq()
+            const filteredRows = this.filterRows(command.where.conditions, rows)
+            rows = _.chain(filteredRows).flattenDeep(filteredRows).uniq()
         }
 
         const result = `SELECT ${command.fields
@@ -50,68 +49,6 @@ class StateService {
         return {
             result,
             rows,
-        }
-    }
-
-    filterRows(condition, existingRows) {
-        const filter = (condition, row) => {
-            switch (condition.operator) {
-                case '=':
-                    return (
-                        this.evaluateCondition(condition.left, row) ===
-                        this.evaluateCondition(condition.right, row)
-                    )
-                case '>':
-                    return (
-                        this.evaluateCondition(condition.left, row) >
-                        this.evaluateCondition(condition.right, row)
-                    )
-                case '<':
-                    return (
-                        this.evaluateCondition(condition.left, row) <
-                        this.evaluateCondition(condition.right, row)
-                    )
-                case '>=':
-                    return (
-                        this.evaluateCondition(condition.left, row) >=
-                        this.evaluateCondition(condition.right, row)
-                    )
-                case '<=':
-                    return (
-                        this.evaluateCondition(condition.left, row) <=
-                        this.evaluateCondition(condition.right, row)
-                    )
-                case '<>':
-                    return (
-                        this.evaluateCondition(condition.left, row) !==
-                        this.evaluateCondition(condition.right, row)
-                    )
-            }
-        }
-
-        return _.filter(existingRows, (row) => filter(condition, row))
-    }
-
-    evaluateCondition(condition, row) {
-        const context = {}
-        switch (condition.type) {
-            case 'expression':
-                condition.columns.map((column) => {
-                    column
-                    context[column] = row[column]
-                })
-                return (row[condition.columns[0]] = calculateExpression(
-                    condition.value,
-                    context
-                ))
-            case 'stringFunction':
-                return executeStringFunction(condition, row)
-            case 'string':
-                return condition.value
-            case 'integer':
-                return condition.value
-            case 'column':
-                return row[condition.value]
         }
     }
 
@@ -128,6 +65,16 @@ class StateService {
         }
 
         return this.createQueriedRows(command.fields, existingRows)
+    }
+
+    filterRows(conditions, existingRows) {
+        const filteredRows = conditions.reduce((rowsToReturn, condition) => {
+            return _.filter(existingRows, (row) =>
+                this.createAdvancedFilter(row, condition)
+            )
+        }, existingRows)
+
+        return filteredRows
     }
 
     createQueriedRows(queries, existingRows) {
@@ -169,6 +116,65 @@ class StateService {
                 ),
             },
         ]
+    }
+
+    createAdvancedFilter(row, condition) {
+        console.log('HELLO FILTER')
+        switch (condition.operator) {
+            case '=':
+                return (
+                    this.evaluateCondition(condition.left, row) ===
+                    this.evaluateCondition(condition.right, row)
+                )
+            case '>':
+                return (
+                    this.evaluateCondition(condition.left, row) >
+                    this.evaluateCondition(condition.right, row)
+                )
+            case '<':
+                return (
+                    this.evaluateCondition(condition.left, row) <
+                    this.evaluateCondition(condition.right, row)
+                )
+            case '>=':
+                return (
+                    this.evaluateCondition(condition.left, row) >=
+                    this.evaluateCondition(condition.right, row)
+                )
+            case '<=':
+                return (
+                    this.evaluateCondition(condition.left, row) <=
+                    this.evaluateCondition(condition.right, row)
+                )
+            case '<>':
+                return (
+                    this.evaluateCondition(condition.left, row) !==
+                    this.evaluateCondition(condition.right, row)
+                )
+        }
+    }
+
+    evaluateCondition(condition, row) {
+        const context = {}
+        switch (condition.type) {
+            case 'expression':
+                condition.columns.map((column) => {
+                    column
+                    context[column] = row[column]
+                })
+                return (row[condition.columns[0]] = calculateExpression(
+                    condition.value,
+                    context
+                ))
+            case 'stringFunction':
+                return executeStringFunction(condition, row)
+            case 'string':
+                return condition.value
+            case 'integer':
+                return condition.value
+            case 'column':
+                return row[condition.value]
+        }
     }
 
     createTable(command) {

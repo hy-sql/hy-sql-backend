@@ -10,4 +10,4 @@ const WhereAdvancedSchema = Joi.object({
     conditions: Joi.array(),
 })
 
-module.exports = { WhereAdvancedSchema }
+module.exports = WhereAdvancedSchema

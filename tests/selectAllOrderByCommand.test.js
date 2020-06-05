@@ -1,5 +1,4 @@
 const selectAllCommand = require('../commands/selectAllCommand')
-const commandService = require('../services/commandService')
 
 describe.each([
     'SELEC * FROM Taulu;',
@@ -36,8 +35,10 @@ describe.each([
             .replace(/\s\s+/g, ' ')
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
+        console.log(command)
+
         test('is recognised as a command', () => {
-            expect(commandService.parseCommand(command)).toBeTruthy()
+            expect(selectAllCommand.parseCommand(command)).toBeTruthy()
         })
 
         test('is parsed and validated succesfully', () => {
@@ -72,7 +73,7 @@ describe.each([
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
         test('is recognised as a command', () => {
-            expect(commandService.parseCommand(command)).toBeTruthy()
+            expect(selectAllCommand.parseCommand(command)).toBeTruthy()
         })
 
         test('fails validation after parsed to command object', () => {

@@ -1,5 +1,6 @@
 const Joi = require('@hapi/joi')
-const { WhereAdvancedSchema } = require('./WhereAdvancedSchema')
+const WhereAdvancedSchema = require('./WhereAdvancedSchema')
+const OrderBySchema = require('./OrderBySchema')
 // const OrderBySchema = require('./OrderBySchema')
 
 const {
@@ -80,9 +81,14 @@ const SelectAdvancedWhereSchema = SelectAdvancedSchema.keys({
     where: WhereAdvancedSchema,
 })
 
-const SelectAdvancedOrderBySchema = SelectAdvancedSchema.keys({})
+const SelectAdvancedOrderBySchema = SelectAdvancedSchema.keys({
+    orderBy: OrderBySchema,
+})
 
-const SelectAdvancedWhereOrderBySchema = SelectAdvancedSchema.keys({})
+const SelectAdvancedWhereOrderBySchema = SelectAdvancedSchema.keys({
+    where: WhereAdvancedSchema,
+    orderBy: OrderBySchema,
+})
 
 module.exports = {
     SelectAdvancedSchema,
