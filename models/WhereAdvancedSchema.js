@@ -7,7 +7,7 @@ const WhereAdvancedSchema = Joi.object({
         .pattern(/^([Ww][Hh][Ee][Rr][Ee])$/)
         .messages({}),
 
-    conditions: Joi.array(),
+    conditions: Joi.object(),
 })
 
 module.exports = WhereAdvancedSchema
