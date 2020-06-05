@@ -26,8 +26,37 @@ class StateService {
                 return this.selectColumnsFromTable(parsedCommand)
             case 'SELECT ADVANCED':
                 return this.selectAdvanced(parsedCommand)
+            case 'DELETE':
+                return this.deleteFromTable(parsedCommand)
             default:
                 break
+        }
+    }
+
+    deleteFromTable(command) {
+        const error = this.checkIfTableExists(command.tableName)
+        if (error) return { error: error }
+
+        const table = this.findTable(command.tableName)
+        const tableIndex = this.findTableIndex(command.tableName)
+        let rows = table.rows
+
+        if (command.where) {
+            const filter = this.createFilter(command.where)
+            rows = _.filter(rows, filter)
+        } else {
+            rows = []
+        }
+        console.log('BEFORE', this.state.tables)
+        this.state.deleteFromTable(tableIndex, rows)
+        console.log('AFTER', this.state.tables)
+
+        const result = command.where
+            ? `DELETE FROM ${command.tableName} WHERE ${command.where.columnName}${command.where.sign}${command.where.value} -query was executed succesfully`
+            : `DELETE FROM ${command.tableName} -query was executed succesfully`
+
+        return {
+            result,
         }
     }
 

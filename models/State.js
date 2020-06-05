@@ -14,6 +14,10 @@ class State {
     insertIntoTable(tableIndex, newRow) {
         this.tablelist[tableIndex].rows.push(newRow)
     }
+
+    deleteFromTable(tableIndex, remainingRows) {
+        this.tablelist = this.tablelist[tableIndex].rows = remainingRows
+    }
 }
 
 module.exports = State
