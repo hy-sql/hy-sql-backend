@@ -75,8 +75,6 @@ const UpdateSchema = Joi.object({
 
     columns: Joi.array().min(1).items(ColumnsSchema).required().messages({}),
 
-    //WHERE-parsiminen tähän TODO
-
     finalSemicolon: Joi.string().required().valid(';').messages({
         'any.only': 'Query must end with ;',
         'any.required': 'Query must end with ;',
