@@ -32,15 +32,27 @@ class StateService {
         if (error) return { error: error }
 
         const table = this.findTable(command.tableName)
-        let existingRows = table.rows
-        let rows
-
-        rows = this.createAdvancedRows(command, existingRows)
+        let rows = table.rows
 
         if (command.where) {
-            const filteredRows = this.filterRows(command.where.conditions, rows)
-            rows = _.chain(filteredRows).flattenDeep(filteredRows).uniq()
+            const filteredAndRows = this.filterAndRows(
+                command.where.conditions.AND,
+                rows
+            )
+            const filteredOrRows = this.filterOrRows(
+                command.where.conditions.OR,
+                rows
+            )
+            const andRows = _.chain(filteredAndRows)
+                .flattenDeep()
+                .uniq()
+                .value()
+            const orRows = _.chain(filteredOrRows).flattenDeep().uniq().value()
+
+            rows = _.intersection(andRows, orRows)
         }
+
+        rows = this.createAdvancedRows(command, rows)
 
         const result = `SELECT ${command.fields
             .map((c) => c.value)
@@ -67,12 +79,38 @@ class StateService {
         return this.createQueriedRows(command.fields, existingRows)
     }
 
-    filterRows(conditions, existingRows) {
-        const filteredRows = conditions.reduce((rowsToReturn, condition) => {
-            return _.filter(existingRows, (row) =>
-                this.createAdvancedFilter(row, condition)
-            )
-        }, existingRows)
+    filterAndRows(conditions, existingRows) {
+        const filteredRows = Object.values(conditions).reduce(
+            (rowsToReturn, condition) => {
+                return _.filter(existingRows, (row) =>
+                    this.createAdvancedFilter(row, condition)
+                )
+            },
+            existingRows
+        )
+
+        return filteredRows
+    }
+
+    filterOrRows(conditions, existingRows) {
+        const filteredRows = Object.values(conditions).reduce(
+            (rowsToReturn, condition) => {
+                let filtered
+
+                if (condition.AND) {
+                    filtered = this.filterAndRows(condition.AND, existingRows)
+                } else if (condition.OR) {
+                    filtered = this.filterOrRows(condition.OR, existingRows)
+                } else {
+                    filtered = _.filter(existingRows, (row) =>
+                        this.createAdvancedFilter(row, condition)
+                    )
+                }
+
+                return rowsToReturn.concat(filtered)
+            },
+            []
+        )
 
         return filteredRows
     }
@@ -119,7 +157,6 @@ class StateService {
     }
 
     createAdvancedFilter(row, condition) {
-        console.log('HELLO FILTER')
         switch (condition.operator) {
             case '=':
                 return (
@@ -162,10 +199,10 @@ class StateService {
                     column
                     context[column] = row[column]
                 })
-                return (row[condition.columns[0]] = calculateExpression(
-                    condition.value,
-                    context
-                ))
+                return (
+                    row[condition.columns[0]] ===
+                    calculateExpression(condition.value, context)
+                )
             case 'stringFunction':
                 return executeStringFunction(condition, row)
             case 'string':

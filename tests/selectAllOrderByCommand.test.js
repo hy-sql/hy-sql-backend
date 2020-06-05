@@ -35,8 +35,6 @@ describe.each([
             .replace(/\s\s+/g, ' ')
             .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
 
-        console.log(command)
-
         test('is recognised as a command', () => {
             expect(selectAllCommand.parseCommand(command)).toBeTruthy()
         })
