@@ -7,19 +7,20 @@ Content-Type: application/json
   "commandArray": [
     "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
     "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
-    "SELECT nimi,hinta FROM Tuotteet;"
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('lanttu', 3);",
+    "SELECT nimi,hinta FROM Tuotteet WHERE id=1;"
   ]
 }
 
 
-### puuttuu taulun nimi
+### validi select where (ehto) kysely
 
 POST http://localhost:3001/api/query
 Content-Type: application/json
 
 {
   "commandArray": [
-    "SELECT nimi,hinta FROM WHERE id=1;"
+    "SELECT nimi,hinta FROM Tuotteet WHERE id=1;"
   ]
 }
 
