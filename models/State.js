@@ -29,6 +29,10 @@ class State {
     updateRows(tableIndex, newRows) {
         this.tablelist[tableIndex].rows = newRows
     }
+
+    deleteFromTable(tableIndex, remainingRows) {
+        this.tablelist = this.tablelist[tableIndex].rows = remainingRows
+    }
 }
 
 module.exports = State
