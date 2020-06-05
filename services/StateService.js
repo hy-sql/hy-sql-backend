@@ -119,8 +119,8 @@ class StateService {
         this.state.deleteFromTable(tableIndex, rows)
 
         const result = command.where
-            ? `DELETE FROM ${command.tableName} WHERE ${command.where.columnName}${command.where.sign}${command.where.value} -query was executed succesfully`
-            : `DELETE FROM ${command.tableName} -query was executed succesfully`
+            ? `Requested rows from table ${command.tableName} deleted succesfully`
+            : `All rows from table ${command.tableName} deleted succesfully`
 
         return {
             result,
