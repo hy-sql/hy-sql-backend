@@ -1,4 +1,5 @@
 const selectAdvancedCommand = require('../commands/selectAdvancedCommand')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe.each([
     'SELECT this+5* FROM Taulu;',
@@ -9,11 +10,7 @@ describe.each([
     'SELECT *this* that FROM Taulu;',
 ])('SELECT query with invalid arithmetic operation', (invalidCommand) => {
     describe(invalidCommand, () => {
-        const command = invalidCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
-            .filter(Boolean)
+        const command = cleanCommand(invalidCommand)
 
         test('does not contain expression type in fields', () => {
             expect(
@@ -37,11 +34,7 @@ describe.each([
     'SELECT once*MORE+tHat FROM Taulu;',
 ])('SELECT query with valid arithmetic operation', (validCommand) => {
     describe(validCommand, () => {
-        const command = validCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(validCommand)
 
         test('contains "fields" field and its type is expression', () => {
             expect(
@@ -64,11 +57,7 @@ describe.each([
     'SELECT lengTH(onceMore)) FROM Taulu;',
 ])('SELECT query with invalid function operation', (invalidCommand) => {
     describe(invalidCommand, () => {
-        const command = invalidCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(invalidCommand)
 
         test('contains "fields" field but does not contain field type function and has errors', () => {
             expect(
@@ -93,11 +82,7 @@ describe.each([
     'SELECT lengTH(onceMore) FROM Taulu;',
 ])('SELECT query with valid function operation', (validCommand) => {
     describe(validCommand, () => {
-        const command = validCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(validCommand)
 
         test('contains "fields" field', () => {
             expect(
@@ -123,11 +108,7 @@ describe.each([
     'SELECT query with valid arithmetic and function operation',
     (validCommand) => {
         describe(validCommand, () => {
-            const command = validCommand
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-                .filter(Boolean)
+            const command = cleanCommand(validCommand)
 
             test('contains "fields" field', () => {
                 expect(
@@ -154,11 +135,7 @@ describe.each([
     'SELECT query with valid arithmetic and function operation and standard column',
     (validCommand) => {
         describe(validCommand, () => {
-            const command = validCommand
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-                .filter(Boolean)
+            const command = cleanCommand(validCommand)
 
             test('contains "fields" field', () => {
                 expect(

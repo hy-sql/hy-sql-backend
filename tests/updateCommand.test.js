@@ -1,5 +1,6 @@
 const commandService = require('../services/commandService')
 const updateCommand = require('../commands/updateCommand')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe.each([
     'UPDATE Tuotteet SET hinta=6;',
@@ -8,14 +9,10 @@ describe.each([
     "uPdAtE Tuotteet sEt nimi='nauris';",
 ])('Valid UPDATE command testing', (command) => {
     describe(command, () => {
-        const fullCommandAsStringList = command
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const fullCommandAsStringList = cleanCommand(command)
 
         test('is recognized as UPDATE command', () => {
             const result = commandService.parseCommand(fullCommandAsStringList)
-            // console.log(result)
 
             expect(result).toBeTruthy()
         })
@@ -46,14 +43,10 @@ describe.each([
     "update tuotteet set nimi: 'nauris';",
 ])('Invalid UPDATE command testing', (command) => {
     describe(command, () => {
-        const fullCommandAsStringList = command
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const fullCommandAsStringList = cleanCommand(command)
 
         test('is recognized as UPDATE command', () => {
             const result = commandService.parseCommand(fullCommandAsStringList)
-            // console.log(result)
 
             expect(result).toBeTruthy()
         })
@@ -62,7 +55,6 @@ describe.each([
             const parsedCommand = commandService.parseCommand(
                 fullCommandAsStringList
             )
-            // console.log(parsedCommand)
 
             expect(parsedCommand.error).toBeDefined()
         })

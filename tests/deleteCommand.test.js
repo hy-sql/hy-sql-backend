@@ -1,16 +1,12 @@
 const deleteCommand = require('../commands/deleteCommand')
 const commandService = require('../services/commandService')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe.each(['DEL FROM Taulu;'])(
     'Query beginning with misspelled DELETE',
     (wrongCommand) => {
         describe(wrongCommand, () => {
-            const command = wrongCommand
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .replace(/\s+,/g, ',')
-                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-                .filter(Boolean)
+            const command = cleanCommand(wrongCommand)
 
             test('does not pass validation', () => {
                 expect(deleteCommand.parseCommand(command).error).toBeDefined()
@@ -26,12 +22,7 @@ describe.each([
     'DELETE    FROM      Taulu    ;',
 ])('Valid DELETE-query', (validCommand) => {
     describe(validCommand, () => {
-        const command = validCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(validCommand)
 
         test('is recognised as a command', () => {
             expect(commandService.parseCommand(command)).toBeTruthy()
@@ -61,12 +52,7 @@ describe.each([
     'DELETE FROM Taulu additonal ;',
 ])('Invalid DELETE-query', (invalidCommand) => {
     describe(invalidCommand, () => {
-        const command = invalidCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(invalidCommand)
 
         test('is recognised as a command', () => {
             expect(commandService.parseCommand(command)).toBeTruthy()
@@ -89,12 +75,7 @@ describe.each([
     "DELETE FROM Tuotteet WHERE name='test';",
 ])('Valid DELETE FROM ... WHERE ...-query', (validCommand) => {
     describe(validCommand, () => {
-        const command = validCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(validCommand)
 
         test('is recognised as a command', () => {
             expect(commandService.parseCommand(command)).toBeTruthy()
@@ -121,12 +102,7 @@ describe.each([
     "DELETE FROM Tuotteet WHERE name='test' ';",
 ])('Invalid DELETE FROM ... WHERE ...-query', (invalidCommand) => {
     describe(invalidCommand, () => {
-        const command = invalidCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(invalidCommand)
 
         test('is recognised as a command', () => {
             expect(commandService.parseCommand(command)).toBeTruthy()
