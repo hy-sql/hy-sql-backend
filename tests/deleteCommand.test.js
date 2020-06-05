@@ -1,8 +1,8 @@
-const selectAllCommand = require('../commands/selectAllCommand')
+const deleteCommand = require('../commands/deleteCommand')
 const commandService = require('../services/commandService')
 
-describe.each(['SELEC * FROM Taulu;', 'SELECT FROM Taulu;'])(
-    'Query beginning with misspelled SELECT *',
+describe.each(['DEL FROM Taulu;'])(
+    'Query beginning with misspelled DELETE',
     (wrongCommand) => {
         describe(wrongCommand, () => {
             const command = wrongCommand
@@ -13,20 +13,18 @@ describe.each(['SELEC * FROM Taulu;', 'SELECT FROM Taulu;'])(
                 .filter(Boolean)
 
             test('does not pass validation', () => {
-                expect(
-                    selectAllCommand.parseCommand(command).error
-                ).toBeDefined()
+                expect(deleteCommand.parseCommand(command).error).toBeDefined()
             })
         })
     }
 )
 
 describe.each([
-    'SELECT * FROM Taulu76;',
-    'SELECT    * FROM        Taulu;',
-    'seLEcT * FrOm Taulu;',
-    'SELECT * FROM Taulun_nimi;',
-])('Valid SELECT * -query', (validCommand) => {
+    'DELETE FROM Taulu8;',
+    'DELETE FROM Taulu_8;',
+    'dElEtE FrOm Taulu;',
+    'DELETE    FROM      Taulu    ;',
+])('Valid DELETE-query', (validCommand) => {
     describe(validCommand, () => {
         const command = validCommand
             .trim()
@@ -40,7 +38,7 @@ describe.each([
         })
 
         test('is parsed and validated succesfully', () => {
-            const parsedCommand = selectAllCommand.parseCommand(command)
+            const parsedCommand = deleteCommand.parseCommand(command)
 
             expect(parsedCommand.value).toBeDefined()
             expect(parsedCommand.value).toHaveProperty('name')
@@ -54,14 +52,14 @@ describe.each([
 })
 
 describe.each([
-    'SELECT * FRM Taulu;',
-    'SELECT * FROM Tau&lu;',
-    'SELECT * FROM Taulu:',
-    'SELECT * FROM Taulu',
-    'SELECT * FROM',
-    'SELECT * FROM Taulu)a;',
-    'SELECT * FROM Taulu additonal ;',
-])('Invalid SELECT * -query', (invalidCommand) => {
+    'DELETE FRM Taulu;',
+    'DELETE FROM Tau&lu;',
+    'DELETE FROM Taulu:',
+    'DELETE FROM Taulu',
+    'DELETE FROM',
+    'DELETE FROM Taulu)a;',
+    'DELETE FROM Taulu additonal ;',
+])('Invalid DELETE-query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = invalidCommand
             .trim()
@@ -75,21 +73,21 @@ describe.each([
         })
 
         test('fails validation after parsed to command object', () => {
-            expect(selectAllCommand.parseCommand(command).error).toBeDefined()
+            expect(deleteCommand.parseCommand(command).error).toBeDefined()
         })
     })
 })
 
 describe.each([
-    'SELECT * FROM Tuotteet WHERE price=7;',
-    'SELECT * FROM Tuotteet WhEre price=7;',
-    'SELECT * FROM Tuotteet WHERE price = 7;',
-    'SELECT * FROM Tuotteet WHERE price =7;',
-    "SELECT * FROM Tuotteet WHERE name = ' test ';",
-    "SELECT * FROM Tuotteet WHERE name=' test';",
-    "SELECT * FROM Tuotteet WHERE name='test ';",
-    "SELECT * FROM Tuotteet WHERE name='test';",
-])('Valid SELECT * FROM ... WHERE ...-query', (validCommand) => {
+    'DELETE FROM Tuotteet WHERE price=7;',
+    'DELETE FROM Tuotteet WhEre price=7;',
+    'DELETE FROM Tuotteet WHERE price = 7;',
+    'DELETE FROM Tuotteet WHERE price =7;',
+    "DELETE FROM Tuotteet WHERE name = ' test ';",
+    "DELETE FROM Tuotteet WHERE name=' test';",
+    "DELETE FROM Tuotteet WHERE name='test ';",
+    "DELETE FROM Tuotteet WHERE name='test';",
+])('Valid DELETE FROM ... WHERE ...-query', (validCommand) => {
     describe(validCommand, () => {
         const command = validCommand
             .trim()
@@ -103,7 +101,7 @@ describe.each([
         })
 
         test('is parsed and validated succesfully', () => {
-            const parsedCommand = selectAllCommand.parseCommand(command)
+            const parsedCommand = deleteCommand.parseCommand(command)
 
             expect(parsedCommand.value).toBeDefined()
             expect(parsedCommand.value).toHaveProperty('where')
@@ -113,15 +111,15 @@ describe.each([
 })
 
 describe.each([
-    'SELECT * FROM Tuotteet WHERE  = 7;',
-    'SELECT * FROM Tuotteet WHERE price 7;',
-    'SELECT * FROM Tuotteet WHERE price7;',
-    "SELECT * FROM Tuotteet WHERE name = ' test '",
-    "SELECT * FROM Tuotteet WHERE name='';",
-    "SELECT * FROM Tuotteet WHERE name name='test';",
-    "SELECT * FROM Tuotteet WHERE name='test' additional;",
-    "SELECT * FROM Tuotteet WHERE name='test' ';",
-])('Invalid SELECT * FROM ... WHERE ...-query', (invalidCommand) => {
+    'DELETE FROM Tuotteet WHERE  = 7;',
+    'DELETE FROM Tuotteet WHERE price 7;',
+    'DELETE FROM Tuotteet WHERE price7;',
+    "DELETE FROM Tuotteet WHERE name = ' test '",
+    "DELETE FROM Tuotteet WHERE name='';",
+    "DELETE FROM Tuotteet WHERE price name='test';",
+    "DELETE FROM Tuotteet WHERE name='test' additional;",
+    "DELETE FROM Tuotteet WHERE name='test' ';",
+])('Invalid DELETE FROM ... WHERE ...-query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = invalidCommand
             .trim()
@@ -135,7 +133,7 @@ describe.each([
         })
 
         test('fails validation after parsed to command object', () => {
-            const parsedCommand = selectAllCommand.parseCommand(command)
+            const parsedCommand = deleteCommand.parseCommand(command)
 
             expect(parsedCommand.value).toBeDefined()
             expect(parsedCommand.value).toHaveProperty('where')
@@ -143,32 +141,3 @@ describe.each([
         })
     })
 })
-
-describe.each([
-    'SELECT * FROM Tuotteet WHEE price=7;',
-    'SELECT * FROM Tuotteet  price=7;',
-])(
-    'SELECT * FROM ... WHERE ...-query with misspelled or missing WHERE',
-    (validCommand) => {
-        describe(validCommand, () => {
-            const command = validCommand
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .replace(/\s+,/g, ',')
-                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-                .filter(Boolean)
-
-            test('is recognised as a command', () => {
-                expect(commandService.parseCommand(command)).toBeTruthy()
-            })
-
-            test('fails validation after parsed to command object', () => {
-                const parsedCommand = selectAllCommand.parseCommand(command)
-
-                expect(parsedCommand.value).toBeDefined()
-                expect(parsedCommand.value).not.toHaveProperty('where')
-                expect(parsedCommand.error).toBeDefined()
-            })
-        })
-    }
-)
