@@ -64,24 +64,6 @@ const isFunctionPattern = new RegExp(
     'i'
 )
 
-const fun = 'COUNT(*)+2*hinta'
-
-console.log(isFunctionPattern.test(fun))
-
-console.log(fun.replace(isFunctionPattern), '$0, $2')
-
-// console.log(aggregateFunctionPattern)
-
-// const name = 'COUNT'
-
-// console.log(aggregateFunctionsNamePattern.test(name))
-
-// const query = 'COUNT(nimi)'
-
-// console.log(aggregateFunctionPattern.test(query))
-
-// console.log(query.split(aggregateFunctionPattern))
-
 module.exports = {
     constraintsNamePatternForSplit,
     constraintsNamePattern,

@@ -1,4 +1,3 @@
-const util = require('util')
 const {
     SelectAdvancedSchema,
     SelectAdvancedWhereSchema,
@@ -17,7 +16,6 @@ const {
     arithmeticExpressionPattern,
     stringFunctionPattern,
     aggregateFunctionPattern,
-    containsAggregateFunctionPattern,
 } = require('../utils/regex')
 const {
     parseColumnFromStringFunction,
@@ -60,8 +58,6 @@ const parseSelectAdvancedCommand = (fullCommandAsStringArray) => {
     const validatedParsedCommand = SelectAdvancedSchema.validate(
         parsedBaseCommand
     )
-
-    console.log(validatedParsedCommand)
 
     return validatedParsedCommand
 }
@@ -130,8 +126,6 @@ const parseWhereOrderBy = (fullCommandAsStringArray) => {
 }
 
 const parseFields = (fieldArray) => {
-    console.log(fieldArray)
-
     const fieldObjects = fieldArray
         .join('')
         .split(',')
@@ -139,10 +133,6 @@ const parseFields = (fieldArray) => {
         .map((f) => {
             return parseQueryField(f)
         })
-
-    console.log(
-        util.inspect(fieldObjects, false, null, true /* enable colors */)
-    )
 
     return fieldObjects
 }
@@ -195,11 +185,6 @@ const parseQueryField = (parsedField) => {
 }
 
 const parseExpression = (expression) => {
-    console.log(expression)
-
-    if (containsAggregateFunctionPattern.test(expression)) {
-        console.log(expression.split(aggregateFunctionPattern))
-    }
     const splitExpression = expression.split(arithmeticOperatorPattern)
 
     return splitExpression.map((e) => parseExpressionFields(e))
