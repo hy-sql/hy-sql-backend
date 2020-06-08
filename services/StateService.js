@@ -310,8 +310,7 @@ class StateService {
                 }
             case '<>':
                 return (item) => {
-                    // eslint-disable-next-line
-                    return item[column] != value
+                    return item[column] !== value
                 }
             default:
                 return { [column]: value }
@@ -325,6 +324,10 @@ class StateService {
         const sign = whereObject.sign
 
         switch (sign) {
+            case '<>':
+                return (item) => {
+                    return item[column] === value
+                }
             case '>':
                 return (item) => {
                     return item[column] <= value
