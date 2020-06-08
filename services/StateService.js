@@ -174,7 +174,8 @@ class StateService {
         switch (condition.operator) {
             case '=':
                 return (
-                    this.evaluateExpressionPart(condition.left, row) ===
+                    // eslint-disable-next-line
+                    this.evaluateExpressionPart(condition.left, row) ==
                     this.evaluateExpressionPart(condition.right, row)
                 )
             case '>':
@@ -199,7 +200,8 @@ class StateService {
                 )
             case '<>':
                 return (
-                    this.evaluateExpressionPart(condition.left, row) !==
+                    // eslint-disable-next-line
+                    this.evaluateExpressionPart(condition.left, row) !=
                     this.evaluateExpressionPart(condition.right, row)
                 )
         }
