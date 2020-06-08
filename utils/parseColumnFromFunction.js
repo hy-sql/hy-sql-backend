@@ -1,15 +1,18 @@
-const { stringFunctionsPattern, aggregateFunctionsPattern } = require('./regex')
+const {
+    stringFunctionsNamePattern,
+    aggregateFunctionsNamePattern,
+} = require('./regex')
 
 const parseColumnFromStringFunction = (functionAsString) => {
     return functionAsString
-        .replace(stringFunctionsPattern, '')
+        .replace(stringFunctionsNamePattern, '')
         .replace('(', '')
         .replace(')', '')
 }
 
 const parseColumnFromAggregateFunction = (functionAsString) => {
     return functionAsString
-        .replace(aggregateFunctionsPattern, '')
+        .replace(aggregateFunctionsNamePattern, '')
         .replace('(', '')
         .replace(')', '')
 }
