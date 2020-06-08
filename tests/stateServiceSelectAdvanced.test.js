@@ -233,4 +233,87 @@ describe('selectAdvanced()', () => {
         const result = stateService.updateState(parsedCommand.value)
         expect(result.rows).toEqual(expectedRows)
     })
+
+    test('returns row asked by select function expression', () => {
+        const expectedRows = [
+            {
+                'COUNT(nimi)': 7,
+            },
+        ]
+
+        const selectCommand = 'SELECT COUNT(nimi) FROM Tuotteet;'
+
+        const commandArray = cleanCommand(selectCommand)
+
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual(expectedRows)
+    })
+
+    test('returns row asked by select function expression', () => {
+        const expectedRows = [
+            {
+                'COUNT(*)': 7,
+            },
+        ]
+
+        const selectCommand = 'SELECT COUNT(*) FROM Tuotteet;'
+
+        const commandArray = cleanCommand(selectCommand)
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand.value)
+
+        expect(result.rows).toEqual(expectedRows)
+    })
+
+    // Should these or some of them work in the future? (Maybe in next sprint?)
+
+    // test('returns row asked by select function expression with arithmetic expression', () => {
+    //     const expectedRows = [
+    //         {
+    //             'COUNT(*)*2': 14,
+    //         },
+    //     ]
+
+    //     const selectCommand = 'SELECT COUNT(*)*2 FROM Tuotteet;'
+
+    //     const commandArray = cleanCommand(selectCommand)
+    //     const parsedCommand = commandService.parseCommand(commandArray)
+    //     const result = stateService.updateState(parsedCommand.value)
+
+    //     expect(result.rows).toEqual(expectedRows)
+    // })
+
+    // test('returns row asked by select function expression', () => {
+    //     const expectedRows = [
+    //         {
+    //             "LENGTH('string')": 6,
+    //         },
+    //     ]
+
+    //     const selectCommand = "SELECT LENGTH('string');"
+
+    //     const commandArray = cleanCommand(selectCommand)
+    //     const parsedCommand = commandService.parseCommand(commandArray)
+    //     const result = stateService.updateState(parsedCommand.value)
+
+    //     expect(result.rows).toEqual(expectedRows)
+    // })
+
+    // test('returns row asked by select function expression', () => {
+    //     const expectedRows = [
+    //         {
+    //             "LENGTH('string')*2": 12,
+    //         },
+    //     ]
+
+    //     const selectCommand = "SELECT LENGTH('string')*2;"
+
+    //     const commandArray = cleanCommand(selectCommand)
+    //     const parsedCommand = commandService.parseCommand(commandArray)
+    //     const result = stateService.updateState(parsedCommand.value)
+
+    //     expect(result.rows).toEqual(expectedRows)
+    // })
 })

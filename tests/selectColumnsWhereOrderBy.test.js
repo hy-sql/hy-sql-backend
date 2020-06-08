@@ -1,4 +1,4 @@
-const commandService = require('../services/commandService')
+const selectCommand = require('../commands/selectCommand')
 const cleanCommand = require('../utils/cleanCommand')
 
 describe.each([
@@ -11,7 +11,7 @@ describe.each([
         const command = cleanCommand(wrongCommand)
 
         test('does not contain where field', () => {
-            const parsedCommand = commandService.parseCommand(command)
+            const parsedCommand = selectCommand.parseCommand(command)
             expect(parsedCommand.value).not.toHaveProperty('where')
         })
     })
@@ -29,7 +29,7 @@ describe.each([
             const command = cleanCommand(wrongCommand)
 
             test('does not contain orderBy field or format invalid', () => {
-                const parsedCommand = commandService.parseCommand(command)
+                const parsedCommand = selectCommand.parseCommand(command)
                 expect(parsedCommand.value).not.toHaveProperty('orderBy')
             })
         })
@@ -49,11 +49,11 @@ describe.each([
         const command = cleanCommand(invalidCommand)
 
         test('is recognised as a command', () => {
-            expect(commandService.parseCommand(command)).toBeTruthy()
+            expect(selectCommand.parseCommand(command)).toBeTruthy()
         })
 
         test('fails validation after parsed to command object', () => {
-            const parsedCommand = commandService.parseCommand(command)
+            const parsedCommand = selectCommand.parseCommand(command)
             expect(parsedCommand.value).toHaveProperty('where')
             expect(parsedCommand.value).toHaveProperty('orderBy')
             expect(parsedCommand.error).toBeDefined()
@@ -73,17 +73,17 @@ describe.each([
         const command = cleanCommand(validCommand)
 
         test('is recognised as a command', () => {
-            expect(commandService.parseCommand(command)).toBeTruthy()
+            expect(selectCommand.parseCommand(command)).toBeTruthy()
         })
 
         test('is parsed and validated succesfully', () => {
-            const parsedCommand = commandService.parseCommand(command)
+            const parsedCommand = selectCommand.parseCommand(command)
 
             expect(parsedCommand.value).toBeDefined()
             expect(parsedCommand.value).toHaveProperty('where')
             expect(parsedCommand.value).toHaveProperty('orderBy')
 
-            expect(commandService.parseCommand(command).error).toBeUndefined()
+            expect(selectCommand.parseCommand(command).error).toBeUndefined()
         })
     })
 })

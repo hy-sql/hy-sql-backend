@@ -1,10 +1,9 @@
 const _ = require('lodash')
-const { parseColumnFromFunction } = require('./parseColumnFromFunction')
 
-const executeStringFunction = (functionField, columnValue) => {
-    switch (functionField.name) {
+const executeStringFunction = (functionDetails, row) => {
+    switch (functionDetails.name) {
         case 'LENGTH':
-            return columnValue.length
+            return row[functionDetails.column].length
         case 'CONCAT':
             return 'function not implemented yet'
         case 'SUBSTRING':
@@ -12,15 +11,14 @@ const executeStringFunction = (functionField, columnValue) => {
     }
 }
 
-const executeAggregateFunction = (functionField, rows) => {
-    const columnToOperateOn = parseColumnFromFunction(functionField)
-    switch (functionField.name) {
+const executeAggregateFunction = (functionDetails, rows) => {
+    switch (functionDetails.name) {
         case 'AVG':
             return 'function not implemented yet'
         case 'COUNT':
-            return columnToOperateOn === '*'
+            return functionDetails.column === '*'
                 ? rows.length
-                : _.filter(rows, columnToOperateOn).filter(Boolean).length
+                : _.filter(rows, functionDetails.column).filter(Boolean).length
         case 'MAX':
             return 'function not implemented yet'
         case 'MIN':

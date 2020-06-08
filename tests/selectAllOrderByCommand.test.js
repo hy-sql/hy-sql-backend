@@ -1,5 +1,4 @@
 const selectAllCommand = require('../commands/selectAllCommand')
-const commandService = require('../services/commandService')
 const cleanCommand = require('../utils/cleanCommand')
 
 describe.each([
@@ -32,7 +31,7 @@ describe.each([
         const command = cleanCommand(validCommand)
 
         test('is recognised as a command', () => {
-            expect(commandService.parseCommand(command)).toBeTruthy()
+            expect(selectAllCommand.parseCommand(command)).toBeTruthy()
         })
 
         test('is parsed and validated succesfully', () => {
@@ -64,7 +63,7 @@ describe.each([
         const command = cleanCommand(invalidCommand)
 
         test('is recognised as a command', () => {
-            expect(commandService.parseCommand(command)).toBeTruthy()
+            expect(selectAllCommand.parseCommand(command)).toBeTruthy()
         })
 
         test('fails validation after parsed to command object', () => {

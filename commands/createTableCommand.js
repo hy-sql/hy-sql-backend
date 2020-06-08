@@ -43,12 +43,12 @@ const parseColumns = (columnsAsStringList) => {
 }
 
 const parseColumnConstraints = (constraintsAsStringArray) => {
-    const { constraintsPatternForSplit } = require('../utils/regex')
+    const { constraintsNamePatternForSplit } = require('../utils/regex')
 
     const separatedConstraintsAsStringList = constraintsAsStringArray
         .join(' ')
         .toUpperCase()
-        .split(constraintsPatternForSplit)
+        .split(constraintsNamePatternForSplit)
         .map((c) => c.trim())
         .filter(Boolean)
 

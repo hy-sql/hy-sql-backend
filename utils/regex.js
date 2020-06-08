@@ -1,4 +1,4 @@
-const constraintsPatternForSplit = new RegExp(
+const constraintsNamePatternForSplit = new RegExp(
     [
         '(?<=PRIMARY KEY)|(?=PRIMARY KEY)',
         '(?<=CHECK)|(?=CHECK)',
@@ -9,50 +9,73 @@ const constraintsPatternForSplit = new RegExp(
     ].join('|')
 )
 
-const constraintsPattern = new RegExp(
+const constraintsNamePattern = new RegExp(
     ['CHECK', 'NOT NULL', 'UNIQUE', 'PRIMARY KEY', 'FOREIGN KEY', 'INDEX'].join(
         '|'
     )
 )
 
-const arithmeticOperatorPattern = RegExp('[+|-|*|/|%]', 'g')
+const arithmeticOperatorPattern = new RegExp('([+|\\-|*|/|%])', 'g')
 
-const arithmeticExpressionPattern = /^\w+(( )?[+-/*%]{1}( )?\w+)+$/
+const arithmeticExpressionPattern = new RegExp('.+([+|\\-|*|/|%]).+')
 
-const comparisonOperatorPattern = RegExp('[=|>|<|>=|<=|<>]')
+const comparisonOperatorPattern = RegExp('(>=|<=|<>|=|>|<)')
 
-const logicalOperatorPattern = RegExp(
+const logicalOperatorsNamePattern = RegExp(
     '[ALL|AND|ANY|BETWEEN|EXISTS|IN|LIKE|NOT|OR|SOME]',
     'g'
 )
 
 const stringFunctions = ['LENGTH', 'CONCAT', 'SUBSTRING']
 
-const stringFunctionsPattern = new RegExp(stringFunctions.join('|'), 'i')
+const stringFunctionsNamePattern = new RegExp(stringFunctions.join('|'), 'i')
 
-const stringFunctionExpressionPattern = new RegExp(
-    `^(${stringFunctions.join('|')})\\(\\w+\\)$`,
+const stringFunctionPattern = new RegExp(
+    `^(${stringFunctions.join('|')})\\((\\w+|\\*)\\)$`,
+    'i'
+)
+
+const containsStringFunctionPattern = new RegExp(
+    `((${stringFunctions.join('|')})\\((\\w+|\\*)\\))`,
     'i'
 )
 
 const aggregateFunctions = ['AVG', 'COUNT', 'MAX', 'MIN', 'SUM']
 
-const aggregateFunctionsPattern = new RegExp(aggregateFunctions.join('|'), 'i')
+const aggregateFunctionsNamePattern = new RegExp(
+    aggregateFunctions.join('|'),
+    'i'
+)
 
-const aggregateFunctionExpressionPattern = new RegExp(
-    `^(${aggregateFunctions.join('|')})\\(\\w+\\)$|\\(\\*\\)$`,
+const aggregateFunctionPattern = new RegExp(
+    `^(${aggregateFunctions.join('|')})\\((\\w+|\\*)\\)$`,
+    'i'
+)
+
+const containsAggregateFunctionPattern = new RegExp(
+    `((${aggregateFunctions.join('|')})\\((\\w+|\\*)\\))`,
+    'i'
+)
+
+const isFunctionPattern = new RegExp(
+    `((${stringFunctions.join('|')}|${aggregateFunctions.join(
+        '|'
+    )})\\((\\w+|\\*)\\))`,
     'i'
 )
 
 module.exports = {
-    constraintsPatternForSplit,
-    constraintsPattern,
+    constraintsNamePatternForSplit,
+    constraintsNamePattern,
     arithmeticOperatorPattern,
     arithmeticExpressionPattern,
-    stringFunctionsPattern,
-    stringFunctionExpressionPattern,
-    aggregateFunctionsPattern,
-    aggregateFunctionExpressionPattern,
+    stringFunctionsNamePattern,
+    stringFunctionPattern,
+    aggregateFunctionsNamePattern,
+    aggregateFunctionPattern,
     comparisonOperatorPattern,
-    logicalOperatorPattern,
+    logicalOperatorsNamePattern,
+    containsStringFunctionPattern,
+    containsAggregateFunctionPattern,
+    isFunctionPattern,
 }
