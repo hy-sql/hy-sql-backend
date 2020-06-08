@@ -71,7 +71,7 @@ describe('selectAdvanced()', () => {
         expect(result.rows).toEqual(expectedRows)
     })
 
-    /* Ei toimi tällä hetkellä
+    //  Ei toimi tällä hetkellä
     //SELECT nimi FROM Tuotteet WHERE hinta=2+3;
     test(`returns expected rows for: ${queries[1]}`, () => {
         const expectedRows = [
@@ -101,7 +101,6 @@ describe('selectAdvanced()', () => {
 
         expect(result.rows).toEqual(expectedRows)
     })
-    */
 
     test(`returns expected rows for: ${queries[3]}`, () => {
         const expectedRows = [
@@ -117,7 +116,7 @@ describe('selectAdvanced()', () => {
         expect(result.rows).toEqual(expectedRows)
     })
 
-    /* Ei toimi tällä hetkellä
+    //  Ei toimi tällä hetkellä
     //SELECT COUNT(*) FROM Tuotteet WHERE hinta<>5;
     test(`returns expected rows for: ${queries[4]}`, () => {
         const expectedRows = [
@@ -171,9 +170,8 @@ describe('selectAdvanced()', () => {
 
         expect(result.rows).toEqual(expectedRows)
     })
-    */
 
-    /* Ei toimi, palauttaa myös rivin { hinta:4, nimi:'nauris'} vaikka tällä lkm=40
+    //  Ei toimi, palauttaa myös rivin { hinta:4, nimi:'nauris'} vaikka tällä lkm=40
     //SELECT hinta, nimi FROM Tuotteet WHERE hinta=4 AND lkm<40;
     test(`returns expected rows for: ${queries[7]}`, () => {
         const expectedRows = [
@@ -189,9 +187,8 @@ describe('selectAdvanced()', () => {
 
         expect(result.rows).toEqual(expectedRows)
     })
-    */
 
-    /* ei palauta riviä jolla hinta=5
+    //  ei palauta riviä jolla hinta=5
     //SELECT hinta, nimi FROM Tuotteet WHERE hinta=5 OR lkm>60;
     test(`returns expected rows for: ${queries[8]}`, () => {
         const expectedRows = [
@@ -215,9 +212,8 @@ describe('selectAdvanced()', () => {
 
         expect(result.rows).toEqual(expectedRows)
     })
-    */
 
-    /*Ei palauta riviä {hinta:4, nimi:selleri}
+    // Ei palauta riviä {hinta:4, nimi:selleri}
     //SELECT hinta, nimi FROM Tuotteet WHERE hinta=5 OR (hinta=4 AND lkm=30);
     test(`returns expected rows for: ${queries[9]}`, () => {
         const expectedRows = [
@@ -237,9 +233,8 @@ describe('selectAdvanced()', () => {
 
         expect(result.rows).toEqual(expectedRows)
     })
-    */
 
-    /* palauttaa vain rivin { hinta: 5, nimi: 'porkkana' }
+    //  palauttaa vain rivin { hinta: 5, nimi: 'porkkana' }
     //SELECT hinta, nimi FROM Tuotteet WHERE hinta=5 OR nimi='maito' OR lkm=30;
     test(`returns expected rows for: ${queries[10]}`, () => {
         const expectedRows = [
@@ -263,9 +258,8 @@ describe('selectAdvanced()', () => {
 
         expect(result.rows).toEqual(expectedRows)
     })
-    */
 
-    /* palauttaa rivin { hinta: 5, nimi: 'porkkana' }
+    //  palauttaa rivin { hinta: 5, nimi: 'porkkana' }
     //SELECT hinta, nimi FROM Tuotteet WHERE hinta=5 AND nimi='maito';
     test(`returns expected rows for: ${queries[11]}`, () => {
         const expectedRows = []
@@ -276,9 +270,8 @@ describe('selectAdvanced()', () => {
 
         expect(result.rows).toEqual(expectedRows)
     })
-    */
 
-    /* palauttaa kaikki rivit jotka toteuttaa ensimmäisen ehdon hinta<7
+    //  palauttaa kaikki rivit jotka toteuttaa ensimmäisen ehdon hinta<7
     //SELECT hinta, nimi FROM Tuotteet WHERE hinta<7 AND nimi='selleri' AND lkm=70;
     test(`returns expected rows for: ${queries[12]}`, () => {
         const expectedRows = [
@@ -294,9 +287,8 @@ describe('selectAdvanced()', () => {
 
         expect(result.rows).toEqual(expectedRows)
     })
-    */
 
-    /* palauttaa rivin { hinta: 5, nimi: 'porkkana' } jonka lkm=40
+    //  palauttaa rivin { hinta: 5, nimi: 'porkkana' } jonka lkm=40
     //SELECT hinta, nimi FROM Tuotteet WHERE hinta=5 AND nimi='porkkana' AND lkm=30;
     test(`returns expected rows for: ${queries[13]}`, () => {
         const expectedRows = []
@@ -307,9 +299,8 @@ describe('selectAdvanced()', () => {
 
         expect(result.rows).toEqual(expectedRows)
     })
-    */
 
-    /* palauttaa vain retiisi rivin
+    //  palauttaa vain retiisi rivin
     //SELECT nimi, hinta, LENGTH(nimi) FROM Tuotteet WHERE hinta=LENGTH(nimi) OR (hinta+1=5 AND nimi<>'selleri') OR hinta=2*hinta;
     test(`returns expected rows for: ${queries[14]}`, () => {
         const expectedRows = [
@@ -331,5 +322,4 @@ describe('selectAdvanced()', () => {
 
         expect(result.rows).toEqual(expectedRows)
     })
-    */
 })
