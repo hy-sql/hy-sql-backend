@@ -310,10 +310,14 @@ class StateService {
                 }
             case '<>':
                 return (item) => {
-                    return item[column] !== value
+                    // eslint-disable-next-line
+                    return item[column] != value
                 }
             default:
-                return { [column]: value }
+                return (item) => {
+                    // eslint-disable-next-line
+                    return item[column] == value
+                }
         }
     }
 
@@ -326,7 +330,8 @@ class StateService {
         switch (sign) {
             case '<>':
                 return (item) => {
-                    return item[column] === value
+                    // eslint-disable-next-line
+                    return item[column] == value
                 }
             case '>':
                 return (item) => {
@@ -346,7 +351,8 @@ class StateService {
                 }
             default:
                 return (item) => {
-                    return item[column] !== value
+                    // eslint-disable-next-line
+                    return item[column] != value
                 }
         }
     }
