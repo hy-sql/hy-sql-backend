@@ -1,13 +1,11 @@
 const _ = require('lodash')
 const {
+    arithmeticOperatorPattern,
     arithmeticExpressionPattern,
     comparisonOperatorPattern,
-    stringFunctionExpressionPattern,
+    stringFunctionPattern,
     endsWithStringFunctionExpressionPattern,
 } = require('../utils/regex')
-const {
-    parseColumnsFromExpression,
-} = require('../utils/parseColumnsFromExpression')
 const {
     parseColumnFromStringFunction,
 } = require('../utils/parseColumnFromFunction')
@@ -40,10 +38,18 @@ const parseConditions = (slicedCommandArray) => {
 
     const conditions = { AND: [], OR: [] }
 
-    const indexOfAnd = _.findIndex(conditionArray)
-    const indexOfOr = _.findIndex(conditionArray)
+    const indexOfAnd = _.indexOf(conditionArray, 'AND')
+    const indexOfOr = _.indexOf(conditionArray, 'OR')
 
-    let AndOrSwitch = indexOfAnd < indexOfOr ? 'AND' : 'OR'
+    let AndOrSwitch = 'AND'
+
+    if (indexOfAnd < 0 && indexOfOr >= 0) {
+        AndOrSwitch = 'OR'
+    } else if (indexOfAnd >= 0 && indexOfOr < 0) {
+        AndOrSwitch = 'AND'
+    } else {
+        AndOrSwitch = indexOfAnd <= indexOfOr ? 'AND' : 'OR'
+    }
 
     for (let i = 0; i < conditionArray.length; i++) {
         if (conditionArray[i] === '(') {
@@ -62,16 +68,13 @@ const parseConditions = (slicedCommandArray) => {
         } else if (conditionArray[i] === 'OR') {
             AndOrSwitch = 'OR'
         } else {
-            const indexOfOperator = conditionArray[i].search(
-                comparisonOperatorPattern
-            )
             const splitExpression = conditionArray[i].split(
                 comparisonOperatorPattern
             )
             const condition = {
                 left: parseConditionPart(splitExpression[0]),
-                operator: conditionArray[i][indexOfOperator],
-                right: parseConditionPart(splitExpression[1]),
+                operator: splitExpression[1],
+                right: parseConditionPart(splitExpression[2]),
             }
             conditions[AndOrSwitch].push(condition)
         }
@@ -92,7 +95,8 @@ const prepareConditionsForParsing = (slicedCommandArray) => {
         if (!c.match(endsWithStringFunctionExpressionPattern)) {
             newArray.push(c.replace('(', ' ( ').replace(')', ' ) ').split(' '))
         } else {
-            newArray.push(c)
+            const splitArray = splitBracketsFromFunctionExpressionArray(c)
+            splitArray.forEach((e) => newArray.push(e))
         }
 
         return newArray
@@ -117,15 +121,33 @@ const findIndexOfClosingBracket = (conditionsArray, IndexOfOpeningBracket) => {
     }
 }
 
+const splitBracketsFromFunctionExpressionArray = (
+    functionConditionSurroundedWithBrackets
+) => {
+    let regex = new RegExp(/(LENGTH\(\w+\)=\w+)|(\w+=LENGTH\(\w+\))/gi)
+    const arr = functionConditionSurroundedWithBrackets
+        .split(regex)
+        .filter(Boolean)
+
+    const newArr = arr.map((e) => {
+        if (!regex.test(e)) {
+            return e.split(/(\()|(\))/).filter(Boolean)
+        }
+        return e
+    })
+
+    return _.flatten(newArr)
+}
+
 const parseConditionPart = (parsedField) => {
     switch (true) {
         case arithmeticExpressionPattern.test(parsedField):
             return {
                 type: 'expression',
-                value: parsedField,
-                columns: parseColumnsFromExpression(parsedField),
+                value: parseExpression(parsedField),
+                stringValue: parsedField,
             }
-        case stringFunctionExpressionPattern.test(parsedField):
+        case stringFunctionPattern.test(parsedField):
             return {
                 type: 'stringFunction',
                 name: parsedField.split('(')[0].toUpperCase(),
@@ -146,6 +168,44 @@ const parseConditionPart = (parsedField) => {
             return {
                 type: 'column',
                 value: parsedField,
+            }
+    }
+}
+
+const parseExpression = (expression) => {
+    const splitExpression = expression.split(arithmeticOperatorPattern)
+
+    return splitExpression.map((e) => parseExpressionFields(e))
+}
+
+const parseExpressionFields = (expressionElement) => {
+    switch (true) {
+        case stringFunctionPattern.test(expressionElement):
+            return {
+                type: 'stringFunction',
+                name: expressionElement.split('(')[0].toUpperCase(),
+                value: expressionElement,
+                column: parseColumnFromStringFunction(expressionElement),
+            }
+        case /^'\w+'/.test(expressionElement):
+            return {
+                type: 'string',
+                value: expressionElement.replace(/'/g, ''),
+            }
+        case !isNaN(expressionElement):
+            return {
+                type: 'integer',
+                value: Number(expressionElement),
+            }
+        case /^[+\-*%]$/.test(expressionElement):
+            return {
+                type: 'operator',
+                value: expressionElement,
+            }
+        default:
+            return {
+                type: 'column',
+                value: expressionElement,
             }
     }
 }

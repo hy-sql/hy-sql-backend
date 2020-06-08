@@ -1,3 +1,4 @@
+const util = require('util')
 const _ = require('lodash')
 const { calculateExpression } = require('../utils/calculateExpression')
 const {
@@ -35,14 +36,22 @@ class StateService {
         let rows = table.rows
 
         if (command.where) {
-            const filteredAndRows = this.filterAndRows(
-                command.where.conditions.AND,
-                rows
-            )
-            const filteredOrRows = this.filterOrRows(
-                command.where.conditions.OR,
-                rows
-            )
+            console.log(util.inspect(command.where, false, null, true))
+
+            const filteredAndRows =
+                command.where.conditions.AND.length > 0
+                    ? this.filterAndRows(command.where.conditions.AND, rows)
+                    : rows
+
+            console.log('filteredAndRows', filteredAndRows)
+
+            const filteredOrRows =
+                command.where.conditions.OR.length > 0
+                    ? this.filterOrRows(command.where.conditions.OR, rows)
+                    : rows
+
+            console.log('filteredOrRows', filteredOrRows)
+
             const andRows = _.chain(filteredAndRows)
                 .flattenDeep()
                 .uniq()
@@ -54,9 +63,17 @@ class StateService {
 
         rows = this.createAdvancedRows(command, rows)
 
+        if (command.orderBy) {
+            rows =
+                command.orderBy.order &&
+                command.orderBy.order.toUpperCase() === 'DESC'
+                    ? _.orderBy(rows, [command.orderBy.columnName], ['desc'])
+                    : _.orderBy(rows, [command.orderBy.columnName], ['asc'])
+        }
+
         const result = `SELECT ${command.fields
             .map((c) => c.value)
-            .join(', ')} FROM ${command.tableName} -query executed succesfully`
+            .join(', ')} FROM ${command.tableName} -query executed successfully`
 
         return {
             result,
@@ -82,7 +99,7 @@ class StateService {
     filterAndRows(conditions, existingRows) {
         const filteredRows = Object.values(conditions).reduce(
             (rowsToReturn, condition) => {
-                return _.filter(existingRows, (row) =>
+                return _.filter(rowsToReturn, (row) =>
                     this.createAdvancedFilter(row, condition)
                 )
             },
@@ -124,17 +141,13 @@ class StateService {
                 if (query.type === 'column') {
                     newRow[query.value] = row[query.value]
                 } else if (query.type === 'expression') {
-                    const context = {}
-
-                    query.columns.map((column) => {
-                        column
-                        context[column] = row[column]
-                    })
-
-                    newRow[query.value] = calculateExpression(
+                    const expressionResult = this.evaluateExpression(
                         query.value,
-                        context
+                        row,
+                        existingRows
                     )
+
+                    newRow[query.stringValue] = expressionResult
                 } else if (query.type === 'stringFunction') {
                     newRow[query.value] = executeStringFunction(query, row)
                 }
@@ -143,6 +156,14 @@ class StateService {
 
             return rowsToReturn
         }, [])
+    }
+
+    evaluateExpression(expressionArray, row) {
+        const mappedExpression = expressionArray
+            .map((e) => this.evaluateExpressionPart(e, row))
+            .join('')
+
+        return calculateExpression(mappedExpression)
     }
 
     createAggregateFunctionRow(functionField, existingRows) {
@@ -160,57 +181,58 @@ class StateService {
         switch (condition.operator) {
             case '=':
                 return (
-                    this.evaluateCondition(condition.left, row) ===
-                    this.evaluateCondition(condition.right, row)
+                    this.evaluateExpressionPart(condition.left, row) ===
+                    this.evaluateExpressionPart(condition.right, row)
                 )
             case '>':
                 return (
-                    this.evaluateCondition(condition.left, row) >
-                    this.evaluateCondition(condition.right, row)
+                    this.evaluateExpressionPart(condition.left, row) >
+                    this.evaluateExpressionPart(condition.right, row)
                 )
             case '<':
                 return (
-                    this.evaluateCondition(condition.left, row) <
-                    this.evaluateCondition(condition.right, row)
+                    this.evaluateExpressionPart(condition.left, row) <
+                    this.evaluateExpressionPart(condition.right, row)
                 )
             case '>=':
                 return (
-                    this.evaluateCondition(condition.left, row) >=
-                    this.evaluateCondition(condition.right, row)
+                    this.evaluateExpressionPart(condition.left, row) >=
+                    this.evaluateExpressionPart(condition.right, row)
                 )
             case '<=':
                 return (
-                    this.evaluateCondition(condition.left, row) <=
-                    this.evaluateCondition(condition.right, row)
+                    this.evaluateExpressionPart(condition.left, row) <=
+                    this.evaluateExpressionPart(condition.right, row)
                 )
             case '<>':
                 return (
-                    this.evaluateCondition(condition.left, row) !==
-                    this.evaluateCondition(condition.right, row)
+                    this.evaluateExpressionPart(condition.left, row) !==
+                    this.evaluateExpressionPart(condition.right, row)
                 )
         }
     }
 
-    evaluateCondition(condition, row) {
-        const context = {}
-        switch (condition.type) {
-            case 'expression':
-                condition.columns.map((column) => {
-                    column
-                    context[column] = row[column]
-                })
-                return (
-                    row[condition.columns[0]] ===
-                    calculateExpression(condition.value, context)
+    evaluateExpressionPart(expressionPart, row) {
+        switch (expressionPart.type) {
+            case 'expression': {
+                const expressionResult = this.evaluateExpression(
+                    expressionPart.value,
+                    row
                 )
+                return expressionResult
+            }
             case 'stringFunction':
-                return executeStringFunction(condition, row)
+                return executeStringFunction(expressionPart, row)
+            case 'aggregateFunction':
+                return executeAggregateFunction(expressionPart)
             case 'string':
-                return condition.value
+                return expressionPart.value
             case 'integer':
-                return condition.value
+                return expressionPart.value
             case 'column':
-                return row[condition.value]
+                return row[expressionPart.value]
+            case 'operator':
+                return expressionPart.value
         }
     }
 

@@ -4,11 +4,10 @@ const OrderBySchema = require('./OrderBySchema')
 // const OrderBySchema = require('./OrderBySchema')
 
 const {
-    arithmeticExpressionPattern,
-    stringFunctionsPattern,
-    stringFunctionExpressionPattern,
-    aggregateFunctionsPattern,
-    aggregateFunctionExpressionPattern,
+    stringFunctionsNamePattern,
+    stringFunctionPattern,
+    aggregateFunctionsNamePattern,
+    aggregateFunctionPattern,
 } = require('../utils/regex')
 
 const SelectAdvancedSchema = Joi.object({
@@ -26,18 +25,16 @@ const SelectAdvancedSchema = Joi.object({
             }),
             Joi.object({
                 type: Joi.string().valid('expression').required(),
-                value: Joi.string()
-                    .pattern(arithmeticExpressionPattern)
-                    .required(),
-                columns: Joi.array()
-                    .items(Joi.string().pattern(/^\w+$/).required())
-                    .optional(),
+                value: Joi.array(),
+                stringValue: Joi.string(),
             }),
             Joi.object({
                 type: Joi.string().valid('stringFunction').required(),
-                name: Joi.string().pattern(stringFunctionsPattern).required(),
+                name: Joi.string()
+                    .pattern(stringFunctionsNamePattern)
+                    .required(),
                 value: Joi.string()
-                    .pattern(stringFunctionExpressionPattern)
+                    .pattern(stringFunctionPattern)
                     .insensitive()
                     .required(),
                 column: Joi.string().pattern(/^\w+$/).required(),
@@ -45,13 +42,15 @@ const SelectAdvancedSchema = Joi.object({
             Joi.object({
                 type: Joi.string().valid('aggregateFunction').required(),
                 name: Joi.string()
-                    .pattern(aggregateFunctionsPattern)
+                    .pattern(aggregateFunctionsNamePattern)
                     .required(),
                 value: Joi.string()
-                    .pattern(aggregateFunctionExpressionPattern)
+                    .pattern(aggregateFunctionPattern)
                     .insensitive()
                     .required(),
-                column: Joi.string().pattern(/^\w+$/).required(),
+                column: Joi.string()
+                    .pattern(/^(\w+|\*)$/)
+                    .required(),
             })
         )
         .required()
