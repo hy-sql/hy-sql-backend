@@ -22,8 +22,104 @@ class StateService {
                 return this.selectColumnsFromTable(command)
             case 'SELECT ADVANCED':
                 return this.selectAdvanced(command)
+            case 'UPDATE':
+                return this.updateTable(command)
+            case 'DELETE':
+                return this.deleteFromTable(command)
             default:
                 break
+        }
+    }
+
+    /*
+     *For executing UPDATE ... or UPDATE ... WHERE; queries
+     *Input is parsed command object and output either result or error object
+     */
+    updateTable(command) {
+        let error = this.checkIfTableExists(command.tableName)
+        if (error) return { error: error }
+
+        const table = this.findTable(command.tableName)
+
+        /* Check if trying to update wrong type of data to column */
+        command.columns.forEach((pair) => {
+            const column = _.find(table.columns, { name: pair.columnName })
+            if (column.type !== pair.valueType)
+                error = `Wrong datatype: expected ${column.type} but was ${pair.valueType}`
+        })
+        if (error) return { error: error }
+
+        let newRows = []
+        let rowsToUpdate = table.rows
+
+        /*
+         * If command object has property 'where' it's filtered in order
+         * to update only the rows that are spesified in query
+         */
+        if (command.where) {
+            const filter = this.createFilter(command.where)
+            rowsToUpdate = _.filter(rowsToUpdate, filter)
+            let notChangedRows = _.difference(table.rows, rowsToUpdate)
+            notChangedRows.forEach((row) => newRows.push(row))
+        }
+
+        rowsToUpdate.forEach((row) => {
+            newRows.push(this.updateRow(row, command.columns, table.columns))
+        })
+
+        const tableIndex = this.findTableIndex(command.tableName)
+
+        newRows = _.sortBy(newRows, 'id')
+        this.state.updateRows(tableIndex, newRows)
+
+        const result = `Rows in table ${command.tableName} updated`
+
+        return { result }
+    }
+
+    /**
+     * Help function for updateTable().
+     * Updates wanted columns in given row.
+     * @param {*} row Row object
+     * @param {*} columnsToUpdate Object that contains columnName and value which will be updated
+     */
+    updateRow(row, columnsToUpdate) {
+        for (let i = 0; i < columnsToUpdate.length; i++) {
+            const columnName = columnsToUpdate[i].columnName
+            const value = columnsToUpdate[i].value
+            row[columnName] = value
+        }
+        return row
+    }
+
+    /*
+     *For executing DELETE FROM Table_name; or DELETE FROM Table_name WHERE...; queries
+     *Expected input is a parsed DELETE-command object. Output is an object either containing
+     the key result or error and respectively the value result string or error string respectively.
+     */
+    deleteFromTable(command) {
+        const error = this.checkIfTableExists(command.tableName)
+        if (error) return { error: error }
+
+        const table = this.findTable(command.tableName)
+        const tableIndex = this.findTableIndex(command.tableName)
+        let rows = table.rows
+
+        if (command.where) {
+            const filter = this.createOppositeFilter(command.where)
+            rows = _.filter(rows, filter)
+        } else {
+            rows = []
+        }
+
+        this.state.deleteFromTable(tableIndex, rows)
+
+        const result = command.where
+            ? `Requested rows from table ${command.tableName} deleted succesfully`
+            : `All rows from table ${command.tableName} deleted succesfully`
+
+        return {
+            result,
         }
     }
 
@@ -340,8 +436,52 @@ class StateService {
                 return (item) => {
                     return item[column] <= value
                 }
+            case '<>':
+                return (item) => {
+                    // eslint-disable-next-line
+                    return item[column] != value
+                }
             default:
-                return { [column]: value }
+                return (item) => {
+                    // eslint-disable-next-line
+                    return item[column] == value
+                }
+        }
+    }
+
+    /*Creates filter that gives the opposite results than filter created with createFilter()*/
+    createOppositeFilter(whereObject) {
+        const column = whereObject.columnName
+        const value = whereObject.value
+        const sign = whereObject.sign
+
+        switch (sign) {
+            case '<>':
+                return (item) => {
+                    // eslint-disable-next-line
+                    return item[column] == value
+                }
+            case '>':
+                return (item) => {
+                    return item[column] <= value
+                }
+            case '<':
+                return (item) => {
+                    return item[column] >= value
+                }
+            case '>=':
+                return (item) => {
+                    return item[column] < value
+                }
+            case '<=':
+                return (item) => {
+                    return item[column] > value
+                }
+            default:
+                return (item) => {
+                    // eslint-disable-next-line
+                    return item[column] != value
+                }
         }
     }
 

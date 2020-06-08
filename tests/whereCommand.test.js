@@ -2,8 +2,8 @@ const {
     queryContainsWhereKeyword,
     parseWhereToCommandObject,
 } = require('../commands/whereCommand')
-
 const WhereSchema = require('../models/WhereSchema')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe.each([
     'WHERE price=7;',
@@ -17,12 +17,7 @@ describe.each([
     "WHERE name='test' ORDER BY",
 ])('Valid WHERE-part of a query', (validCommand) => {
     describe(validCommand, () => {
-        const command = validCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(validCommand)
 
         test('is recognised as a Where-command', () => {
             expect(queryContainsWhereKeyword(command)).toBeTruthy()
@@ -55,12 +50,7 @@ describe.each([
     'WHERE name=test',
 ])('Invalid WHERE-part of a query', (invalidCommand) => {
     describe(invalidCommand, () => {
-        const command = invalidCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(invalidCommand)
 
         test('is recognised as a Where-command', () => {
             expect(queryContainsWhereKeyword(command)).toBeTruthy()
@@ -80,12 +70,7 @@ describe.each(['WHEE price=7;', 'price=7;'])(
     'Query part with misspelled or missing WHERE',
     (validCommand) => {
         describe(validCommand, () => {
-            const command = validCommand
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .replace(/\s+,/g, ',')
-                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-                .filter(Boolean)
+            const command = cleanCommand(validCommand)
 
             test('is not recognised as a Where-command', () => {
                 expect(queryContainsWhereKeyword(command)).toBeFalsy()

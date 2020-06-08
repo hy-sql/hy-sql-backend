@@ -36,7 +36,15 @@ const parseSelectColumns = (fullCommandAsStringList) => {
     }
 
     // SARAKKEIDEN OSIO - (*AS -- TODO*)
-    parsedCommand = parseColumnNames(fullCommandAsStringList, parsedCommand)
+    //return { pccolumns: laskuri, columns: namify(cleanStringArray(columns)) }
+    const { pccolumns, columns } = parseColumnNames(
+        fullCommandAsStringList,
+        parsedCommand.parserCounter
+    )
+    if (columns) {
+        parsedCommand.parserCounter = pccolumns
+        parsedCommand.columns = columns
+    }
 
     //FROM  (* etsiminen muualtakin -- TODO*)
     if (
@@ -49,8 +57,15 @@ const parseSelectColumns = (fullCommandAsStringList) => {
     }
 
     //TAULUJEN OSIO
-    parsedCommand = parseTableNames(fullCommandAsStringList, parsedCommand)
+    const { pctable, tableName } = parseTableNames(
+        fullCommandAsStringList,
+        parsedCommand.parserCounter
+    )
 
+    if (tableName) {
+        parsedCommand.parserCounter = pctable
+        parsedCommand.tableName = tableName
+    }
     // WHERE OSIO - specifies which rows to retrieve.
 
     // GROUP BY - groups rows sharing a property so that an aggregate function can be applied to each group.
@@ -83,17 +98,18 @@ const parseSelectColumns = (fullCommandAsStringList) => {
     return validationResult
 }
 
-const parseTableNames = (stringArray, parsedCommand) => {
+const parseTableNames = (stringArray, parserCounter) => {
     //näitä lisää, mieluiten johonkin ReservedWords-listaan joka importataan, *TODO: RESERVED WORDS LIST*
     if (
-        !['WHERE', 'JOIN', '(', ')', ';', 'VALUES'].includes(
-            stringArray[parsedCommand.parserCounter].toUpperCase()
+        !['WHERE', 'JOIN', '(', ')', ';', 'VALUES', 'ORDER', 'GROUP'].includes(
+            stringArray[parserCounter].toUpperCase()
         )
     ) {
-        parsedCommand.tableName = stringArray[parsedCommand.parserCounter]
-        parsedCommand.parserCounter++
+        const tableName = stringArray[parserCounter]
+        parserCounter++
+        return { pctable: parserCounter, tableName: tableName }
     }
-    return parsedCommand
+    return { pctable: parserCounter }
 }
 
 const parseSelectColumnsWhere = (fullCommandAsStringArray) => {

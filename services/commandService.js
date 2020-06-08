@@ -2,6 +2,7 @@ const createTableCommand = require('../commands/createTableCommand')
 const insertIntoCommand = require('../commands/insertIntoCommand')
 const selectWithOperatorsCommand = require('../commands/selectAdvancedCommand')
 const updateCommand = require('../commands/updateCommand')
+const deleteCommand = require('../commands/deleteCommand')
 
 const parseCommand = (fullCommandAsStringArray) => {
     //tämä pitää siistiä käyttämään yksi- ja kaksisanaisia komentoja
@@ -20,6 +21,8 @@ const parseCommand = (fullCommandAsStringArray) => {
             )
         case 'UPDATE':
             return updateCommand.parseCommand(fullCommandAsStringArray)
+        case 'DELETE':
+            return deleteCommand.parseCommand(fullCommandAsStringArray)
         default:
             console.log('sth went wrong')
             return null

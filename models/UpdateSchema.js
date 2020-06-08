@@ -1,4 +1,5 @@
 const Joi = require('@hapi/joi')
+const WhereSchema = require('./WhereSchema')
 
 const ColumnsSchema = Joi.object({
     columnName: Joi.string()
@@ -74,12 +75,14 @@ const UpdateSchema = Joi.object({
 
     columns: Joi.array().min(1).items(ColumnsSchema).required().messages({}),
 
-    //WHERE-parsiminen tähän TODO
-
     finalSemicolon: Joi.string().required().valid(';').messages({
         'any.only': 'Query must end with ;',
         'any.required': 'Query must end with ;',
     }),
 })
 
-module.exports = { UpdateSchema }
+const UpdateColumnsWhereSchema = UpdateSchema.keys({
+    where: WhereSchema,
+})
+
+module.exports = { UpdateSchema, UpdateColumnsWhereSchema }

@@ -1,4 +1,5 @@
 const selectAllCommand = require('../commands/selectAllCommand')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe.each([
     'SELEC * FROM Taulu;',
@@ -7,10 +8,7 @@ describe.each([
     'SELECT FROM Taulu BY ORDER;',
 ])('SELECT * query not containing ORDER BY', (wrongCommand) => {
     describe(wrongCommand, () => {
-        const command = wrongCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const command = cleanCommand(wrongCommand)
 
         test('does not contain orderBy field', () => {
             expect(selectAllCommand.parseCommand(command).value).toBeDefined()
@@ -30,10 +28,7 @@ describe.each([
     'SELECT * FROM Tuotteet ORDER BY hinta   dESc  ;',
 ])('Valid SELECT * ORDER BY -query', (validCommand) => {
     describe(validCommand, () => {
-        const command = validCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const command = cleanCommand(validCommand)
 
         test('is recognised as a command', () => {
             expect(selectAllCommand.parseCommand(command)).toBeTruthy()
@@ -65,10 +60,7 @@ describe.each([
     'SELECT nimi, hinta FROM Tuotteet ORDER BY ASC;',
 ])('Invalid SELECT * -query', (invalidCommand) => {
     describe(invalidCommand, () => {
-        const command = invalidCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const command = cleanCommand(invalidCommand)
 
         test('is recognised as a command', () => {
             expect(selectAllCommand.parseCommand(command)).toBeTruthy()

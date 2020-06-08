@@ -1,9 +1,22 @@
 /* eslint-disable no-unused-vars */
-const { UpdateSchema } = require('../models/UpdateSchema')
+const {
+    UpdateSchema,
+    UpdateColumnsWhereSchema,
+} = require('../models/UpdateSchema')
+const {
+    parseWhereToCommandObject,
+    queryContainsWhereKeyword,
+} = require('./whereCommand')
 
 const parseCommand = (fullCommandAsStringList) => {
-    const containsWhere = fullCommandAsStringList.indexOf('WHERE')
+    if (queryContainsWhereKeyword(fullCommandAsStringList)) {
+        return parseUpdateWithWhere(fullCommandAsStringList)
+    } else {
+        return parseUpdateWithoutWhere(fullCommandAsStringList)
+    }
+}
 
+const parseBaseCommand = (fullCommandAsStringList) => {
     let tableName = fullCommandAsStringList[1]
         ? fullCommandAsStringList[1]
         : undefined
@@ -16,29 +29,54 @@ const parseCommand = (fullCommandAsStringList) => {
             ? ';'
             : undefined
 
-    const columnsAndValuesAsStringList =
-        containsWhere === -1 && set !== undefined
-            ? fullCommandAsStringList.slice(
-                  3,
-                  fullCommandAsStringList.indexOf(';')
-              )
-            : fullCommandAsStringList.slice(
-                  3,
-                  fullCommandAsStringList.indexOf('WHERE')
-              )
-
     const parsedCommand = {
         name: fullCommandAsStringList[0],
         tableName,
         set,
-        columns:
-            set !== undefined
-                ? parseUpdatedColumns(columnsAndValuesAsStringList)
-                : undefined,
         finalSemicolon,
     }
 
-    return UpdateSchema.validate(parsedCommand)
+    return parsedCommand
+}
+
+const parseUpdateWithoutWhere = (fullCommandAsStringList) => {
+    const updateCommand = parseBaseCommand(fullCommandAsStringList)
+
+    const columnsAndValuesAsStringList =
+        updateCommand.set !== undefined
+            ? fullCommandAsStringList.slice(
+                  3,
+                  fullCommandAsStringList.indexOf(';')
+              )
+            : undefined
+
+    updateCommand.columns = parseUpdatedColumns(columnsAndValuesAsStringList)
+
+    return UpdateSchema.validate(updateCommand)
+}
+
+const parseUpdateWithWhere = (fullCommandAsStringList) => {
+    const updateCommand = parseBaseCommand(fullCommandAsStringList)
+
+    const whereIndex = fullCommandAsStringList.findIndex(
+        (string) => string.toUpperCase() === 'WHERE'
+    )
+
+    const columnsAndValuesAsStringList =
+        updateCommand.set !== undefined
+            ? fullCommandAsStringList.slice(3, whereIndex)
+            : undefined
+
+    const wherePartAsArray = fullCommandAsStringList.slice(
+        whereIndex,
+        fullCommandAsStringList.indexOf(';')
+    )
+
+    updateCommand.columns = parseUpdatedColumns(columnsAndValuesAsStringList)
+
+    updateCommand.where = parseWhereToCommandObject(wherePartAsArray)
+
+    return UpdateColumnsWhereSchema.validate(updateCommand)
 }
 
 const parseUpdatedColumns = (columnsAndValuesAsStringList) => {

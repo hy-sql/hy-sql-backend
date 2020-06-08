@@ -2,6 +2,7 @@ const State = require('../models/State')
 const StateService = require('../services/StateService')
 const commandService = require('../services/commandService')
 const selectAllCommand = require('../commands/selectAllCommand')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe('selectAllFromTable()', () => {
     test('returns error when table does not exist', () => {
@@ -36,12 +37,7 @@ describe('selectAllFromTable()', () => {
 
         const insertCommand =
             'INSERT INTO Tuotteet (nimi, hinta) VALUES (tuote, 10);'
-        const splitCommand = insertCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const splitCommand = cleanCommand(insertCommand)
         const parsedCommand = commandService.parseCommand(splitCommand)
 
         stateService.insertIntoTable(parsedCommand.value)
@@ -97,14 +93,7 @@ describe('selectAllFromTable() with ORDER BY -command', () => {
             "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
         ]
 
-        const splitCommandArray = commands.map((input) =>
-            input
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .replace(/\s+,/g, ',')
-                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-                .filter(Boolean)
-        )
+        const splitCommandArray = commands.map((input) => cleanCommand(input))
 
         const parsedCommands = splitCommandArray.map((c) =>
             commandService.parseCommand(c)
@@ -114,12 +103,9 @@ describe('selectAllFromTable() with ORDER BY -command', () => {
 
         const selectAllOrderByCommand = 'SELECT * FROM Tuotteet ORDER BY hinta;'
 
-        const splitSelectAllOrderByCommand = selectAllOrderByCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const splitSelectAllOrderByCommand = cleanCommand(
+            selectAllOrderByCommand
+        )
 
         const parsedSelectAllOrderByCommand = selectAllCommand.parseCommand(
             splitSelectAllOrderByCommand
@@ -147,14 +133,7 @@ describe('selectAllFromTable() with command.where', () => {
             'INSERT INTO Tuotteet (nimi, hinta) VALUES (testituote, 20);',
         ]
 
-        const splitCommandArray = commands.map((input) =>
-            input
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .replace(/\s+,/g, ',')
-                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-                .filter(Boolean)
-        )
+        const splitCommandArray = commands.map((input) => cleanCommand(input))
 
         const parsedCommands = splitCommandArray.map((c) =>
             commandService.parseCommand(c)
@@ -165,12 +144,7 @@ describe('selectAllFromTable() with command.where', () => {
 
     test('returns filtered rows when where is defined', () => {
         const selectCommand = 'SELECT * from Tuotteet WHERE hinta=10;'
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
         const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.selectAllFromTable(parsedCommand.value)
@@ -183,12 +157,7 @@ describe('selectAllFromTable() with command.where', () => {
 
     test('returns filtered rows when where-command contains >', () => {
         const selectCommand = 'SELECT * from Tuotteet WHERE hinta>10;'
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
         const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.selectAllFromTable(parsedCommand.value)
@@ -201,12 +170,7 @@ describe('selectAllFromTable() with command.where', () => {
 
     test('returns filtered rows when where-command contains >=', () => {
         const selectCommand = 'SELECT * from Tuotteet WHERE hinta>=20;'
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
         const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.selectAllFromTable(parsedCommand.value)
@@ -219,12 +183,7 @@ describe('selectAllFromTable() with command.where', () => {
 
     test('returns filtered rows when where-command contains <', () => {
         const selectCommand = 'SELECT * from Tuotteet WHERE hinta<20;'
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
         const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.selectAllFromTable(parsedCommand.value)
@@ -237,12 +196,7 @@ describe('selectAllFromTable() with command.where', () => {
 
     test('returns filtered rows when where-command contains <=', () => {
         const selectCommand = 'SELECT * from Tuotteet WHERE hinta<=10;'
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
         const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.selectAllFromTable(parsedCommand.value)
@@ -276,14 +230,7 @@ describe('selectAllFromTable() with command.where and command.orderBy', () => {
             "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',5);",
         ]
 
-        const splitCommandArray = commands.map((input) =>
-            input
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .replace(/\s+,/g, ',')
-                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-                .filter(Boolean)
-        )
+        const splitCommandArray = commands.map((input) => cleanCommand(input))
 
         const parsedCommands = splitCommandArray.map((c) =>
             commandService.parseCommand(c)
@@ -318,12 +265,7 @@ describe('selectAllFromTable() with command.where and command.orderBy', () => {
 
         const selectCommand =
             "SELECT * from Tuotteet WHERE nimi='olut' ORDER BY ASC;"
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
         const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand.value)
@@ -352,12 +294,7 @@ describe('selectAllFromTable() with command.where and command.orderBy', () => {
         const selectCommand =
             'SELECT * FROM Tuotteet WHERE hinta>5 ORDER BY ASC;'
 
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
         const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand.value)
@@ -397,12 +334,7 @@ describe('selectAllFromTable() with command.where and command.orderBy', () => {
         const selectCommand =
             'SELECT * FROM Tuotteet WHERE hinta>=5 ORDER BY ASC;'
 
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
         const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand.value)
@@ -442,12 +374,7 @@ describe('selectAllFromTable() with command.where and command.orderBy', () => {
         const selectCommand =
             'SELECT * FROM Tuotteet WHERE hinta<5 ORDER BY hinta DESC;'
 
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
         const parsedCommand = selectAllCommand.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand.value)
@@ -471,12 +398,7 @@ describe('selectAllFromTable() with command.where and command.orderBy', () => {
         const selectCommand =
             'SELECT * FROM Tuotteet WHERE hinta<=3 ORDER BY hinta DESC;'
 
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
 
         const parsedCommand = selectAllCommand.parseCommand(commandArray)
 

@@ -1,4 +1,5 @@
 const selectAllCommand = require('../commands/selectAllCommand')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe.each([
     'SELECT * FROM Taulu ;',
@@ -7,10 +8,7 @@ describe.each([
     'SELECT * FROM Taulu ORDER BY that;',
 ])('SELECT * query not containing WHERE keyword', (wrongCommand) => {
     describe(wrongCommand, () => {
-        const command = wrongCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const command = cleanCommand(wrongCommand)
 
         test('does not contain where field', () => {
             const parsedCommand = selectAllCommand.parseCommand(command)
@@ -28,10 +26,7 @@ describe.each([
     'SELECT * query not containing ORDER BY keywords or format invalid',
     (wrongCommand) => {
         describe(wrongCommand, () => {
-            const command = wrongCommand
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+            const command = cleanCommand(wrongCommand)
 
             test('does not contain orderBy field or format invalid', () => {
                 const parsedCommand = selectAllCommand.parseCommand(command)
@@ -51,10 +46,7 @@ describe.each([
     "SELECT * FROM Taulu76 where name='test' ' order by column;",
 ])('Invalid SELECT * -query', (invalidCommand) => {
     describe(invalidCommand, () => {
-        const command = invalidCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const command = cleanCommand(invalidCommand)
 
         test('is recognised as a command', () => {
             expect(selectAllCommand.parseCommand(command)).toBeTruthy()
@@ -78,10 +70,7 @@ describe.each([
     "SELECT * FROM Tuotteet where column='table' ORDER BY table   dESc  ;",
 ])('Valid SELECT * ORDER BY -query', (validCommand) => {
     describe(validCommand, () => {
-        const command = validCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const command = cleanCommand(validCommand)
 
         test('is recognised as a command', () => {
             expect(selectAllCommand.parseCommand(command)).toBeTruthy()

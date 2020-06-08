@@ -21,14 +21,7 @@ describe('selectAdvanced()', () => {
             "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('null', 6, 70);",
         ]
 
-        const splitCommandArray = commands.map((input) =>
-            input
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .replace(/\s+,/g, ',')
-                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-                .filter(Boolean)
-        )
+        const splitCommandArray = commands.map((input) => cleanCommand(input))
 
         const parsedCommands = splitCommandArray.map((c) =>
             commandService.parseCommand(c)
@@ -64,12 +57,7 @@ describe('selectAdvanced()', () => {
 
         const selectCommand = 'SELECT 5*hinta-3 FROM Tuotteet;'
 
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
@@ -104,12 +92,7 @@ describe('selectAdvanced()', () => {
 
         const selectCommand = 'SELECT LENGTH(nimi) FROM Tuotteet;'
 
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
@@ -151,12 +134,7 @@ describe('selectAdvanced()', () => {
 
         const selectCommand = 'SELECT 5+hinta*4, LENGTH(nimi) FROM Tuotteet;'
 
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
@@ -198,12 +176,7 @@ describe('selectAdvanced()', () => {
 
         const selectCommand = 'SELECT LENGTH(nimi), 5+hinta*4 FROM Tuotteet;'
 
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
@@ -253,12 +226,7 @@ describe('selectAdvanced()', () => {
         const selectCommand =
             'SELECT length(nimi), 5+hinta*4, lkm FROM Tuotteet;'
 
-        const commandArray = selectCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const commandArray = cleanCommand(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 

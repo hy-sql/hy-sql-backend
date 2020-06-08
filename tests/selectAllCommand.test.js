@@ -1,16 +1,12 @@
 const selectAllCommand = require('../commands/selectAllCommand')
 const commandService = require('../services/commandService')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe.each(['SELEC * FROM Taulu;', 'SELECT FROM Taulu;'])(
-    'Query not beginning with SELECT *',
+    'Query beginning with misspelled SELECT *',
     (wrongCommand) => {
         describe(wrongCommand, () => {
-            const command = wrongCommand
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .replace(/\s+,/g, ',')
-                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-                .filter(Boolean)
+            const command = cleanCommand(wrongCommand)
 
             test('does not pass validation', () => {
                 expect(
@@ -28,12 +24,7 @@ describe.each([
     'SELECT * FROM Taulun_nimi;',
 ])('Valid SELECT * -query', (validCommand) => {
     describe(validCommand, () => {
-        const command = validCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(validCommand)
 
         test('is recognised as a command', () => {
             expect(commandService.parseCommand(command)).toBeTruthy()
@@ -60,16 +51,10 @@ describe.each([
     'SELECT * FROM Taulu',
     'SELECT * FROM',
     'SELECT * FROM Taulu)a;',
-    'SELECT * FRM Taulu;',
-    'SELECT * FRM Taulu additonal ;',
+    'SELECT * FROM Taulu additonal ;',
 ])('Invalid SELECT * -query', (invalidCommand) => {
     describe(invalidCommand, () => {
-        const command = invalidCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(invalidCommand)
 
         test('is recognised as a command', () => {
             expect(commandService.parseCommand(command)).toBeTruthy()
@@ -92,12 +77,7 @@ describe.each([
     "SELECT * FROM Tuotteet WHERE name='test';",
 ])('Valid SELECT * FROM ... WHERE ...-query', (validCommand) => {
     describe(validCommand, () => {
-        const command = validCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(validCommand)
 
         test('is recognised as a command', () => {
             expect(commandService.parseCommand(command)).toBeTruthy()
@@ -124,12 +104,7 @@ describe.each([
     "SELECT * FROM Tuotteet WHERE name='test' ';",
 ])('Invalid SELECT * FROM ... WHERE ...-query', (invalidCommand) => {
     describe(invalidCommand, () => {
-        const command = invalidCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const command = cleanCommand(invalidCommand)
 
         test('is recognised as a command', () => {
             expect(commandService.parseCommand(command)).toBeTruthy()
@@ -152,12 +127,7 @@ describe.each([
     'SELECT * FROM ... WHERE ...-query with misspelled or missing WHERE',
     (validCommand) => {
         describe(validCommand, () => {
-            const command = validCommand
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .replace(/\s+,/g, ',')
-                .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-                .filter(Boolean)
+            const command = cleanCommand(validCommand)
 
             test('is recognised as a command', () => {
                 expect(commandService.parseCommand(command)).toBeTruthy()

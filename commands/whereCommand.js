@@ -126,6 +126,8 @@ const findSign = (string) => {
         return '<='
     } else if (string.includes('>=')) {
         return '>='
+    } else if (string.includes('<>')) {
+        return '<>'
     } else if (string.includes('=')) {
         return '='
     } else if (string.includes('<')) {

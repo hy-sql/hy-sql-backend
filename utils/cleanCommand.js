@@ -3,7 +3,7 @@ const cleanCommand = (commandString) => {
         .trim()
         .replace(/\s\s+/g, ' ')
         .replace(/\s+,/g, ',')
-        .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
+        .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(?<=\)|(?=\())|(;$)/)
         .filter(Boolean)
 }
 

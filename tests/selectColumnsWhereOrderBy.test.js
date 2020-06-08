@@ -1,4 +1,5 @@
 const selectCommand = require('../commands/selectCommand')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe.each([
     'SELECT nimi, hinta FROM Taulu ;',
@@ -7,10 +8,7 @@ describe.each([
     'SELECT nimi, hinta FROM Taulu ORDER BY that;',
 ])('SELECT nimi, hinta query not containing WHERE keyword', (wrongCommand) => {
     describe(wrongCommand, () => {
-        const command = wrongCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const command = cleanCommand(wrongCommand)
 
         test('does not contain where field', () => {
             const parsedCommand = selectCommand.parseCommand(command)
@@ -28,10 +26,7 @@ describe.each([
     'SELECT nimi, hinta query not containing ORDER BY keywords or format invalid',
     (wrongCommand) => {
         describe(wrongCommand, () => {
-            const command = wrongCommand
-                .trim()
-                .replace(/\s\s+/g, ' ')
-                .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+            const command = cleanCommand(wrongCommand)
 
             test('does not contain orderBy field or format invalid', () => {
                 const parsedCommand = selectCommand.parseCommand(command)
@@ -51,10 +46,7 @@ describe.each([
     "SELECT nimi, hinta FROM Taulu76 where name='test' ' order by column;",
 ])('Invalid SELECT nimi, hinta -query', (invalidCommand) => {
     describe(invalidCommand, () => {
-        const command = invalidCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const command = cleanCommand(invalidCommand)
 
         test('is recognised as a command', () => {
             expect(selectCommand.parseCommand(command)).toBeTruthy()
@@ -78,10 +70,7 @@ describe.each([
     "SELECT nimi, hinta FROM Tuotteet where column='table' ORDER BY table   dESc  ;",
 ])('Valid SELECT nimi, hinta ORDER BY -query', (validCommand) => {
     describe(validCommand, () => {
-        const command = validCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .split(/[\s]|(?<=\()|(?=\))|(?=;)/)
+        const command = cleanCommand(validCommand)
 
         test('is recognised as a command', () => {
             expect(selectCommand.parseCommand(command)).toBeTruthy()

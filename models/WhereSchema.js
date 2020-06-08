@@ -36,12 +36,15 @@ const WhereSchema = Joi.object({
             'string.max': 'Column name is too long',
         }),
 
-    sign: Joi.string().required().valid('=', '<=', '>=', '>', '<').messages({
-        'any.only':
-            'After WHERE, column name and the value must be separated by: =, <=, >=, > or <',
-        'any.required':
-            'After WHERE, column name and the value must be separated by: =, <=, >=, > or <',
-    }),
+    sign: Joi.string()
+        .required()
+        .valid('=', '<=', '>=', '<>', '>', '<')
+        .messages({
+            'any.only':
+                'After WHERE, column name and the value must be separated by: =, <=, <>, >=, > or <',
+            'any.required':
+                'After WHERE, column name and the value must be separated by: =, <=, <>, >=, > or <',
+        }),
 
     valueType: Joi.string().valid('INTEGER', 'TEXT').insensitive().required(),
 

@@ -1,6 +1,7 @@
 const State = require('../models/State')
 const StateService = require('../services/StateService')
 const commandService = require('../services/commandService')
+const cleanCommand = require('../utils/cleanCommand')
 
 describe('createTable()', () => {
     test('creates new table to list', () => {
@@ -172,12 +173,7 @@ describe('insertIntoTable()', () => {
 
         const insertCommand =
             "INSERT INTO Tuotteet (nimi, hinta) VALUES (10, 'tuote' );"
-        const splitCommand = insertCommand
-            .trim()
-            .replace(/\s\s+/g, ' ')
-            .replace(/\s+,/g, ',')
-            .split(/[\s]|(?<=,)|(?<=\()|(?=\))|(;$)/)
-            .filter(Boolean)
+        const splitCommand = cleanCommand(insertCommand)
         const parsedCommand = commandService.parseCommand(splitCommand)
 
         const result = stateService.insertIntoTable(parsedCommand.value)
