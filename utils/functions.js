@@ -3,7 +3,9 @@ const _ = require('lodash')
 const executeStringFunction = (functionDetails, row) => {
     switch (functionDetails.name) {
         case 'LENGTH':
-            return row[functionDetails.column].length
+            return functionDetails.param.type === 'column'
+                ? row[functionDetails.param.value].length
+                : functionDetails.param.value.length
         case 'CONCAT':
             return 'function not implemented yet'
         case 'SUBSTRING':
@@ -16,7 +18,7 @@ const executeAggregateFunction = (functionDetails, rows) => {
         case 'AVG':
             return 'function not implemented yet'
         case 'COUNT':
-            return functionDetails.column === '*'
+            return functionDetails.param === '*'
                 ? rows.length
                 : _.filter(rows, functionDetails.column).filter(Boolean).length
         case 'MAX':

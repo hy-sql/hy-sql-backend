@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const {
     SelectAdvancedSchema,
     SelectAdvancedWhereSchema,
@@ -16,11 +17,12 @@ const {
     arithmeticExpressionPattern,
     stringFunctionPattern,
     aggregateFunctionPattern,
+    containsFunctionPattern,
 } = require('../utils/regex')
 const {
-    parseColumnFromStringFunction,
-    parseColumnFromAggregateFunction,
-} = require('../utils/parseColumnFromFunction')
+    parseParameterFromStringFunction,
+    parseParameterFromAggregateFunction,
+} = require('../utils/parseParameterFromFunction')
 
 const parseCommand = (fullCommandAsStringArray) => {
     if (hasWhereOrderByKeywords(fullCommandAsStringArray)) {
@@ -144,14 +146,14 @@ const parseQueryField = (parsedField) => {
                 type: 'stringFunction',
                 name: parsedField.split('(')[0].toUpperCase(),
                 value: parsedField,
-                column: parseColumnFromStringFunction(parsedField),
+                param: parseParameterFromStringFunction(parsedField),
             }
         case aggregateFunctionPattern.test(parsedField):
             return {
                 type: 'aggregateFunction',
                 name: parsedField.split('(')[0].toUpperCase(),
                 value: parsedField,
-                column: parseColumnFromAggregateFunction(parsedField),
+                param: parseParameterFromAggregateFunction(parsedField),
             }
         case /^\*$/.test(parsedField):
             return {
@@ -185,7 +187,18 @@ const parseQueryField = (parsedField) => {
 }
 
 const parseExpression = (expression) => {
-    const splitExpression = expression.split(arithmeticOperatorPattern)
+    const splitExpression = _.flatten(
+        expression
+            .replace(containsFunctionPattern, ' $1 ')
+            .split(' ')
+            .filter(Boolean)
+            .map((e) =>
+                containsFunctionPattern.test(e)
+                    ? e
+                    : e.split(arithmeticOperatorPattern).filter(Boolean)
+            )
+            .filter(Boolean)
+    )
 
     return splitExpression.map((e) => parseExpressionFields(e))
 }
@@ -197,14 +210,14 @@ const parseExpressionFields = (expressionElement) => {
                 type: 'stringFunction',
                 name: expressionElement.split('(')[0].toUpperCase(),
                 value: expressionElement,
-                column: parseColumnFromStringFunction(expressionElement),
+                param: parseParameterFromStringFunction(expressionElement),
             }
         case aggregateFunctionPattern.test(expressionElement):
             return {
                 type: 'aggregateFunction',
                 name: expressionElement.split('(')[0].toUpperCase(),
                 value: expressionElement,
-                column: parseColumnFromAggregateFunction(expressionElement),
+                param: parseParameterFromAggregateFunction(expressionElement),
             }
         case /^'\w+'/.test(expressionElement):
             return {

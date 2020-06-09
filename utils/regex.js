@@ -28,10 +28,12 @@ const logicalOperatorsNamePattern = RegExp(
 
 const stringFunctions = ['LENGTH', 'CONCAT', 'SUBSTRING']
 
+const aggregateFunctions = ['AVG', 'COUNT', 'MAX', 'MIN', 'SUM']
+
 const stringFunctionsNamePattern = new RegExp(stringFunctions.join('|'), 'i')
 
 const stringFunctionPattern = new RegExp(
-    `^(${stringFunctions.join('|')})\\((\\w+|\\*)\\)$`,
+    `^(${stringFunctions.join('|')})\\(('?\\w+'?|\\*)\\)$`,
     'i'
 )
 
@@ -39,8 +41,6 @@ const containsStringFunctionPattern = new RegExp(
     `((${stringFunctions.join('|')})\\((\\w+|\\*)\\))`,
     'i'
 )
-
-const aggregateFunctions = ['AVG', 'COUNT', 'MAX', 'MIN', 'SUM']
 
 const aggregateFunctionsNamePattern = new RegExp(
     aggregateFunctions.join('|'),
@@ -57,11 +57,11 @@ const containsAggregateFunctionPattern = new RegExp(
     'i'
 )
 
-const isFunctionPattern = new RegExp(
+const containsFunctionPattern = new RegExp(
     `((${stringFunctions.join('|')}|${aggregateFunctions.join(
         '|'
     )})\\((\\w+|\\*)\\))`,
-    'i'
+    'gi'
 )
 
 module.exports = {
@@ -77,5 +77,5 @@ module.exports = {
     logicalOperatorsNamePattern,
     containsStringFunctionPattern,
     containsAggregateFunctionPattern,
-    isFunctionPattern,
+    containsFunctionPattern,
 }

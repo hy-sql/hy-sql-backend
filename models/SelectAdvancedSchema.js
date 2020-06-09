@@ -37,7 +37,7 @@ const SelectAdvancedSchema = Joi.object({
                     .pattern(stringFunctionPattern)
                     .insensitive()
                     .required(),
-                column: Joi.string().pattern(/^\w+$/).required(),
+                param: Joi.object().required(),
             }),
             Joi.object({
                 type: Joi.string().valid('aggregateFunction').required(),
@@ -48,8 +48,8 @@ const SelectAdvancedSchema = Joi.object({
                     .pattern(aggregateFunctionPattern)
                     .insensitive()
                     .required(),
-                column: Joi.string()
-                    .pattern(/^(\w+|\*)$/)
+                param: Joi.string()
+                    .pattern(/^('?\w+'?|\*)$/)
                     .required(),
             })
         )

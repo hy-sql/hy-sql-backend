@@ -7,8 +7,8 @@ const {
     endsWithStringFunctionExpressionPattern,
 } = require('../utils/regex')
 const {
-    parseColumnFromStringFunction,
-} = require('../utils/parseColumnFromFunction')
+    parseParameterFromStringFunction,
+} = require('../utils/parseParameterFromFunction')
 
 const parseWhereAdvanced = (slicedCommandAsStringArray) => {
     const indexOfOrderBy = slicedCommandAsStringArray.find(
@@ -152,7 +152,7 @@ const parseConditionPart = (parsedField) => {
                 type: 'stringFunction',
                 name: parsedField.split('(')[0].toUpperCase(),
                 value: parsedField,
-                column: parseColumnFromStringFunction(parsedField),
+                param: parseParameterFromStringFunction(parsedField),
             }
         case /^'\w+'/.test(parsedField):
             return {
@@ -185,7 +185,7 @@ const parseExpressionFields = (expressionElement) => {
                 type: 'stringFunction',
                 name: expressionElement.split('(')[0].toUpperCase(),
                 value: expressionElement,
-                column: parseColumnFromStringFunction(expressionElement),
+                param: parseParameterFromStringFunction(expressionElement),
             }
         case /^'\w+'/.test(expressionElement):
             return {

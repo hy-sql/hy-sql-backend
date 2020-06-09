@@ -54,7 +54,7 @@ class StateService {
 
         /*
          * If command object has property 'where' it's filtered in order
-         * to update only the rows that are spesified in query
+         * to update only the rows that are spesified in queries[i]
          */
         if (command.where) {
             const filter = this.createFilter(command.where)
@@ -162,7 +162,9 @@ class StateService {
 
         const result = `SELECT ${command.fields
             .map((c) => c.value)
-            .join(', ')} FROM ${command.tableName} -query executed successfully`
+            .join(', ')} FROM ${
+            command.tableName
+        } -queries[i] executed successfully`
 
         return {
             result,
@@ -225,31 +227,55 @@ class StateService {
         return existingRows.reduce((rowsToReturn, row) => {
             const newRow = {}
 
-            queries.forEach((query) => {
-                query
-                if (query.type === 'column') {
-                    newRow[query.value] = row[query.value]
-                } else if (query.type === 'expression') {
+            for (let i = 0; i < queries.length; i++) {
+                if (queries[i].type === 'column') {
+                    newRow[queries[i].value] = row[queries[i].value]
+                } else if (
+                    queries[i].type === 'expression' &&
+                    this.containsAggregateFunction(queries[i].value)
+                ) {
+                    const evaluated = this.evaluateAggregateExpression(
+                        queries[i].value,
+                        existingRows
+                    )
+                    newRow[queries[i].stringValue] = evaluated
+                    return [{ [queries[i].stringValue]: evaluated }]
+                } else if (queries[i].type === 'expression') {
                     const expressionResult = this.evaluateExpression(
-                        query.value,
+                        queries[i].value,
                         row,
                         existingRows
                     )
 
-                    newRow[query.stringValue] = expressionResult
-                } else if (query.type === 'stringFunction') {
-                    newRow[query.value] = executeStringFunction(query, row)
+                    newRow[queries[i].stringValue] = expressionResult
+                } else if (queries[i].type === 'stringFunction') {
+                    newRow[queries[i].value] = executeStringFunction(
+                        queries[i],
+                        row
+                    )
                 }
-            })
+            }
             rowsToReturn.push(newRow)
 
             return rowsToReturn
         }, [])
     }
 
-    evaluateExpression(expressionArray, row) {
+    containsAggregateFunction(expression) {
+        return expression.some((e) => e.type === 'aggregateFunction')
+    }
+
+    evaluateAggregateExpression(expressionArray, rows) {
+        const evaluatedExpression = expressionArray.map((e) =>
+            this.evaluateAggregateExpressionPart(e, rows)
+        )
+
+        return calculateExpression(evaluatedExpression)
+    }
+
+    evaluateExpression(expressionArray, row, rows) {
         const mappedExpression = expressionArray
-            .map((e) => this.evaluateExpressionPart(e, row))
+            .map((e) => this.evaluateExpressionPart(e, row, rows))
             .join('')
 
         return calculateExpression(mappedExpression)
@@ -300,6 +326,19 @@ class StateService {
                     this.evaluateExpressionPart(condition.left, row) !=
                     this.evaluateExpressionPart(condition.right, row)
                 )
+        }
+    }
+
+    evaluateAggregateExpressionPart(expressionPart, rows) {
+        switch (expressionPart.type) {
+            case 'stringFunction':
+                return executeStringFunction(expressionPart, rows[0])
+            case 'aggregateFunction':
+                return executeAggregateFunction(expressionPart, rows)
+            case 'column':
+                return rows[0].column
+            default:
+                return expressionPart.value
         }
     }
 
@@ -373,7 +412,7 @@ class StateService {
         this.state.insertIntoTable(tableIndex, newRow)
 
         return {
-            result: `INSERT INTO ${command.tableName} -query was executed succesfully`,
+            result: `INSERT INTO ${command.tableName} -queries[i] was executed succesfully`,
         }
     }
 
@@ -405,8 +444,8 @@ class StateService {
         }
 
         const result = command.where
-            ? `SELECT * FROM ${command.tableName} WHERE ${command.where.columnName}${command.where.sign}${command.where.value} -query executed succesfully`
-            : `SELECT * FROM ${command.tableName} -query was executed succesfully`
+            ? `SELECT * FROM ${command.tableName} WHERE ${command.where.columnName}${command.where.sign}${command.where.value} -queries[i] executed succesfully`
+            : `SELECT * FROM ${command.tableName} -queries[i] was executed succesfully`
 
         return {
             result,
@@ -523,8 +562,8 @@ class StateService {
 
         const columnsStr = command.columns.map((e) => e.name).join(', ')
         const result = command.where
-            ? `${command.name} ${columnsStr} FROM ${command.tableName} WHERE ${command.where.columnName}${command.where.sign}${command.where.value} -query executed succesfully`
-            : `${command.name} ${columnsStr} FROM ${command.tableName} -query was executed successfully`
+            ? `${command.name} ${columnsStr} FROM ${command.tableName} WHERE ${command.where.columnName}${command.where.sign}${command.where.value} -queries[i] executed succesfully`
+            : `${command.name} ${columnsStr} FROM ${command.tableName} -queries[i] was executed successfully`
         return {
             result,
             rows: rowsToReturn,
