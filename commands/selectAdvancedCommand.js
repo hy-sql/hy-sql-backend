@@ -15,7 +15,6 @@ const {
 const {
     arithmeticOperatorPattern,
     arithmeticExpressionPattern,
-    isArithmeticOperator,
     stringFunctionPattern,
     aggregateFunctionPattern,
     containsFunctionPattern,
@@ -230,7 +229,7 @@ const parseExpressionFields = (expressionElement) => {
                 type: 'integer',
                 value: Number(expressionElement),
             }
-        case isArithmeticOperator.test(expressionElement):
+        case arithmeticOperatorPattern.test(expressionElement):
             return {
                 type: 'operator',
                 value: expressionElement,
