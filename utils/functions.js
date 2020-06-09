@@ -14,13 +14,15 @@ const executeStringFunction = (functionDetails, row) => {
 }
 
 const executeAggregateFunction = (functionDetails, rows) => {
+    console.log('My Function', functionDetails)
     switch (functionDetails.name) {
         case 'AVG':
             return 'function not implemented yet'
         case 'COUNT':
-            return functionDetails.param === '*'
+            return functionDetails.param.type === 'all'
                 ? rows.length
-                : _.filter(rows, functionDetails.column).filter(Boolean).length
+                : _.filter(rows, functionDetails.param.value).filter(Boolean)
+                      .length
         case 'MAX':
             return 'function not implemented yet'
         case 'MIN':
