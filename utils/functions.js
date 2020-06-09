@@ -4,8 +4,8 @@ const executeStringFunction = (functionDetails, row) => {
     switch (functionDetails.name) {
         case 'LENGTH':
             return functionDetails.param.type === 'column'
-                ? row[functionDetails.param.value].length
-                : functionDetails.param.value.length
+                ? row[functionDetails.param.value].toString().length
+                : functionDetails.param.value.toString().length
         case 'CONCAT':
             return 'function not implemented yet'
         case 'SUBSTRING':
