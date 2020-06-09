@@ -1,4 +1,3 @@
-const util = require('util')
 const _ = require('lodash')
 const {
     SelectAdvancedSchema,
@@ -52,10 +51,6 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
         finalSemicolon:
             fullCommandAsStringArray[fullCommandAsStringArray.length - 1],
     }
-
-    console.log(
-        util.inspect(parsedCommand, false, null, true /* enable colors */)
-    )
 
     return parsedCommand
 }
