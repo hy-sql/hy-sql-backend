@@ -1,3 +1,4 @@
+const util = require('util')
 const _ = require('lodash')
 const {
     SelectAdvancedSchema,
@@ -13,6 +14,7 @@ const {
     hasWhereOrderByKeywords,
 } = require('./orderByCommand')
 const {
+    isArithmeticOperator,
     arithmeticOperatorPattern,
     arithmeticExpressionPattern,
     stringFunctionPattern,
@@ -50,6 +52,10 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
         finalSemicolon:
             fullCommandAsStringArray[fullCommandAsStringArray.length - 1],
     }
+
+    console.log(
+        util.inspect(parsedCommand, false, null, true /* enable colors */)
+    )
 
     return parsedCommand
 }
@@ -176,7 +182,7 @@ const parseQueryField = (parsedField) => {
                 type: 'integer',
                 value: Number(parsedField),
             }
-        case /^[+\-*%]$/.test(parsedField):
+        case isArithmeticOperator.test(parsedField):
             return parsedField
         default:
             return {
@@ -229,7 +235,7 @@ const parseExpressionFields = (expressionElement) => {
                 type: 'integer',
                 value: Number(expressionElement),
             }
-        case arithmeticOperatorPattern.test(expressionElement):
+        case isArithmeticOperator.test(expressionElement):
             return {
                 type: 'operator',
                 value: expressionElement,

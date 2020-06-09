@@ -15,7 +15,9 @@ const constraintsNamePattern = new RegExp(
     )
 )
 
-const arithmeticOperatorPattern = new RegExp('([+|\\-|*|/|%])', 'g')
+const isArithmeticOperator = new RegExp('^([+-/*%])$')
+
+const arithmeticOperatorPattern = new RegExp('([\\+|\\-|*|/|%])', 'g')
 
 const arithmeticExpressionPattern = new RegExp('.+([+|\\-|*|/|%]).+')
 
@@ -79,6 +81,7 @@ const containsFunctionPattern = new RegExp(
 module.exports = {
     constraintsNamePatternForSplit,
     constraintsNamePattern,
+    isArithmeticOperator,
     arithmeticOperatorPattern,
     arithmeticExpressionPattern,
     stringFunctionsNamePattern,
