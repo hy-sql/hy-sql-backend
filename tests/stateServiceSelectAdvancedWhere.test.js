@@ -299,8 +299,6 @@ describe('selectAdvanced()', () => {
         expect(result.rows).toEqual(expectedRows)
     })
 
-    /*
-    //''SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)=5 OR (hinta=4 AND LENGTH(nimi)<7);''
     test(`returns expected rows for: ${queries[15]}`, () => {
         const commandArray = cleanCommand(queries[15])
         const parsedCommand = commandService.parseCommand(commandArray)
@@ -317,8 +315,7 @@ describe('selectAdvanced()', () => {
         })
     })
 
-
-
+    /*
     //'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)>=6 AND (hinta=5 OR lkm>60);'
     test(`returns expected rows for: ${queries[16]}`, () => {
         const commandArray = cleanCommand(queries[16])
@@ -335,8 +332,8 @@ describe('selectAdvanced()', () => {
             nimi: 'selleri',
         })
     })
+    */
 
-    //'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)=5 OR LENGTH(nimi)>7;'
     test(`returns expected rows for: ${queries[17]}`, () => {
         const commandArray = cleanCommand(queries[17])
         const parsedCommand = commandService.parseCommand(commandArray)
@@ -352,7 +349,6 @@ describe('selectAdvanced()', () => {
             nimi: 'porkkana',
         })
     })
-    */
 
     test(`returns expected rows for: ${queries[18]}`, () => {
         const commandArray = cleanCommand(queries[18])
@@ -362,8 +358,6 @@ describe('selectAdvanced()', () => {
         expect(result.rows).toEqual([])
     })
 
-    /*
-    //SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)=5 OR (LENGTH(nimi)<7 AND hinta=4);
     test(`returns expected rows for: ${queries[19]}`, () => {
         const commandArray = cleanCommand(queries[19])
         const parsedCommand = commandService.parseCommand(commandArray)
@@ -379,9 +373,7 @@ describe('selectAdvanced()', () => {
             nimi: 'nauris',
         })
     })
-    */
 
-    //'SELECT COUNT(nimi) FROM Tuotteet WHERE hinta<=5;'
     test(`returns expected rows for: ${queries[20]}`, () => {
         const expectedRows = [
             {
