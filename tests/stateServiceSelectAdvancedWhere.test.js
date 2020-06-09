@@ -47,6 +47,7 @@ describe('selectAdvanced()', () => {
         'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)>=6 AND (hinta=5 OR lkm>60);',
         'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)=5 OR LENGTH(nimi)>7;',
         'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)<=5 AND LENGTH(nimi)>=7;',
+        'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)=5 OR (LENGTH(nimi)<7 AND hinta=4);',
     ]
 
     test(`returns expected rows for: ${queries[0]}`, () => {
@@ -359,4 +360,23 @@ describe('selectAdvanced()', () => {
 
         expect(result.rows).toEqual([])
     })
+
+    /*
+    //SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)=5 OR (LENGTH(nimi)<7 AND hinta=4);
+    test(`returns expected rows for: ${queries[19]}`, () => {
+        const commandArray = cleanCommand(queries[19])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand.value)
+
+        expect(result.rows).toHaveLength(2)
+        expect(result.rows).toContainEqual({
+            hinta: 6,
+            nimi: 'maito',
+        })
+        expect(result.rows).toContainEqual({
+            hinta: 4,
+            nimi: 'nauris',
+        })
+    })
+    */
 })
