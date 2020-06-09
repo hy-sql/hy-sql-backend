@@ -23,6 +23,11 @@ const parseParameterFromAggregateFunction = (functionAsString) => {
 
 const parseExpressionFields = (expressionElement) => {
     switch (true) {
+        case /^\*$/.test(expressionElement):
+            return {
+                type: 'all',
+                value: expressionElement,
+            }
         case /^'\w+'/.test(expressionElement):
             return {
                 type: 'string',
