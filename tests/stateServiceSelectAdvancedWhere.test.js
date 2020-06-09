@@ -46,6 +46,7 @@ describe('selectAdvanced()', () => {
         'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)=5 OR (hinta=4 AND LENGTH(nimi)<7);',
         'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)>=6 AND (hinta=5 OR lkm>60);',
         'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)=5 OR LENGTH(nimi)>7;',
+        'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)<=5 AND LENGTH(nimi)>=7;',
     ]
 
     test(`returns expected rows for: ${queries[0]}`, () => {
@@ -350,4 +351,12 @@ describe('selectAdvanced()', () => {
         })
     })
     */
+
+    test(`returns expected rows for: ${queries[18]}`, () => {
+        const commandArray = cleanCommand(queries[18])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand.value)
+
+        expect(result.rows).toEqual([])
+    })
 })

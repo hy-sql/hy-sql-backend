@@ -201,8 +201,6 @@ const parseExpression = (expression) => {
             .filter(Boolean)
     )
 
-    console.log(splitExpression)
-
     return splitExpression.map((e) => parseExpressionFields(e))
 }
 
