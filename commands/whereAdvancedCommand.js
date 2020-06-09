@@ -2,6 +2,7 @@ const _ = require('lodash')
 const {
     arithmeticOperatorPattern,
     arithmeticExpressionPattern,
+    isArithmeticOperator,
     comparisonOperatorPattern,
     stringFunctionPattern,
     endsWithStringFunctionExpressionPattern,
@@ -197,7 +198,7 @@ const parseExpressionFields = (expressionElement) => {
                 type: 'integer',
                 value: Number(expressionElement),
             }
-        case /^[+\-*%]$/.test(expressionElement):
+        case isArithmeticOperator.test(expressionElement):
             return {
                 type: 'operator',
                 value: expressionElement,
