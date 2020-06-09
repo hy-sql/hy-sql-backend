@@ -14,7 +14,6 @@ const executeStringFunction = (functionDetails, row) => {
 }
 
 const executeAggregateFunction = (functionDetails, rows) => {
-    console.log('My Function', functionDetails)
     switch (functionDetails.name) {
         case 'AVG':
             return 'function not implemented yet'
