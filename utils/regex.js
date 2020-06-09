@@ -19,6 +19,8 @@ const arithmeticOperatorPattern = new RegExp('([+|\\-|*|/|%])', 'g')
 
 const arithmeticExpressionPattern = new RegExp('.+([+|\\-|*|/|%]).+')
 
+const isArithmeticOperator = new RegExp('^[+-/*%]$')
+
 const comparisonOperatorPattern = RegExp('(>=|<=|<>|=|>|<)')
 
 const logicalOperatorsNamePattern = RegExp(
@@ -69,6 +71,7 @@ module.exports = {
     constraintsNamePattern,
     arithmeticOperatorPattern,
     arithmeticExpressionPattern,
+    isArithmeticOperator,
     stringFunctionsNamePattern,
     stringFunctionPattern,
     aggregateFunctionsNamePattern,
