@@ -13,9 +13,9 @@ const {
     hasWhereOrderByKeywords,
 } = require('./orderByCommand')
 const {
+    isArithmeticOperator,
     arithmeticOperatorPattern,
     arithmeticExpressionPattern,
-    isArithmeticOperator,
     stringFunctionPattern,
     aggregateFunctionPattern,
     containsFunctionPattern,
@@ -177,7 +177,7 @@ const parseQueryField = (parsedField) => {
                 type: 'integer',
                 value: Number(parsedField),
             }
-        case /^[+\-*%]$/.test(parsedField):
+        case isArithmeticOperator.test(parsedField):
             return parsedField
         default:
             return {
@@ -200,8 +200,6 @@ const parseExpression = (expression) => {
             )
             .filter(Boolean)
     )
-
-    console.log(splitExpression)
 
     return splitExpression.map((e) => parseExpressionFields(e))
 }

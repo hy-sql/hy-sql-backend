@@ -267,8 +267,6 @@ describe('selectAdvanced()', () => {
         expect(result.rows).toEqual(expectedRows)
     })
 
-    // Should these or some of them work in the future? (Maybe in next sprint?)
-
     test('returns row asked by select function expression with arithmetic expression', () => {
         const expectedRows = [
             {
