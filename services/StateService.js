@@ -1,4 +1,3 @@
-const util = require('util')
 const _ = require('lodash')
 const { calculateExpression } = require('../utils/calculateExpression')
 const {
@@ -132,43 +131,15 @@ class StateService {
         let rows = table.rows
 
         if (command.where) {
-            console.log(
-                util.inspect(
-                    command.where,
-                    false,
-                    null,
-                    true /* enable colors */
-                )
-            )
             const filteredAndRows =
                 command.where.conditions.AND.length > 0
                     ? this.filterAndRows(command.where.conditions.AND, rows)
                     : rows
 
-            console.log(
-                'filteredAndRows',
-                util.inspect(
-                    filteredAndRows,
-                    false,
-                    null,
-                    true /* enable colors */
-                )
-            )
-
             const filteredOrRows =
                 command.where.conditions.OR.length > 0
                     ? this.filterOrRows(command.where.conditions.OR, rows)
                     : rows
-
-            console.log(
-                'filteredOrRows',
-                util.inspect(
-                    filteredOrRows,
-                    false,
-                    null,
-                    true /* enable colors */
-                )
-            )
 
             const andRows = _.chain(filteredAndRows)
                 .flattenDeep()
