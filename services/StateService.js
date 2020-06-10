@@ -333,7 +333,6 @@ class StateService {
 
     checkCreateTableErrors(command) {
         if (this.state.tableExists(command.tableName)) {
-            console.log('HELLO')
             return `Table ${command.tableName} already exists`
         }
 
