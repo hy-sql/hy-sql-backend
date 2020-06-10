@@ -4,57 +4,60 @@ const commandService = require('../services/commandService')
 const cleanCommand = require('../utils/cleanCommand')
 
 const initialiseState = () => {
-    const initArray = [
-        {
-            name: 'Products',
-            columns: [
-                {
-                    name: 'id',
-                    type: 'INTEGER',
-                    constraints: ['PRIMARY KEY'],
-                },
-                {
-                    name: 'name',
-                    type: 'TEXT',
-                    constraints: [],
-                },
-                {
-                    name: 'price',
-                    type: 'INTEGER',
-                    constraints: [],
-                },
-            ],
-            rows: [
-                {
-                    id: 1,
-                    name: 'apple',
-                    price: 7,
-                },
-                {
-                    id: 2,
-                    name: 'orange',
-                    price: 5,
-                },
-                {
-                    id: 3,
-                    name: 'banana',
-                    price: 1,
-                },
-                {
-                    id: 4,
-                    name: 'milk',
-                    price: 4,
-                },
-                {
-                    id: 4,
-                    name: 'carrot',
-                    price: 4,
-                },
-            ],
-        },
-    ]
+    const initTable = new Map([
+        [
+            'Products',
+            {
+                name: 'Products',
+                columns: [
+                    {
+                        name: 'id',
+                        type: 'INTEGER',
+                        constraints: ['PRIMARY KEY'],
+                    },
+                    {
+                        name: 'name',
+                        type: 'TEXT',
+                        constraints: [],
+                    },
+                    {
+                        name: 'price',
+                        type: 'INTEGER',
+                        constraints: [],
+                    },
+                ],
+                rows: [
+                    {
+                        id: 1,
+                        name: 'apple',
+                        price: 7,
+                    },
+                    {
+                        id: 2,
+                        name: 'orange',
+                        price: 5,
+                    },
+                    {
+                        id: 3,
+                        name: 'banana',
+                        price: 1,
+                    },
+                    {
+                        id: 4,
+                        name: 'milk',
+                        price: 4,
+                    },
+                    {
+                        id: 4,
+                        name: 'carrot',
+                        price: 4,
+                    },
+                ],
+            },
+        ],
+    ])
 
-    const state = new State(initArray)
+    const state = new State(initTable)
     const stateService = new StateService(state)
 
     return {
@@ -99,7 +102,7 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.tables[0].rows
+        const rows = state.getTableByName('Products').rows
 
         expect(rows).toHaveLength(0)
     })
@@ -110,7 +113,7 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.tables[0].rows
+        const rows = state.getTableByName('Products').rows
 
         expect(rows).toHaveLength(4)
         expect(rows.filter((r) => r.name === 'milk')).toHaveLength(0)
@@ -122,7 +125,7 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.tables[0].rows
+        const rows = state.getTableByName('Products').rows
 
         expect(rows).toHaveLength(4)
         expect(rows.filter((r) => r.price === 1)).toHaveLength(0)
@@ -134,7 +137,7 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.tables[0].rows
+        const rows = state.getTableByName('Products').rows
 
         expect(rows).toHaveLength(2)
         expect(rows.filter((r) => r.price < 5)).toHaveLength(0)
@@ -146,7 +149,7 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.tables[0].rows
+        const rows = state.getTableByName('Products').rows
 
         expect(rows).toHaveLength(1)
         expect(rows.filter((r) => r.price > 3)).toHaveLength(0)
@@ -158,7 +161,7 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.tables[0].rows
+        const rows = state.getTableByName('Products').rows
 
         expect(rows).toHaveLength(4)
         expect(rows.filter((r) => r.price < 4)).toHaveLength(0)
@@ -170,7 +173,7 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.tables[0].rows
+        const rows = state.getTableByName('Products').rows
 
         expect(rows).toHaveLength(3)
         expect(rows.filter((r) => r.price > 4)).toHaveLength(0)
@@ -179,7 +182,7 @@ describe('Valid DELETE-command', () => {
 
 describe('If referenced table does not exist ', () => {
     test('returns result message and no error from stateService', () => {
-        const state = new State([])
+        const state = new State(new Map())
         const stateService = new StateService(state)
         const parsedCommand = parseCommand('DELETE FROM Products;')
         expect(parsedCommand.error).toBeUndefined()

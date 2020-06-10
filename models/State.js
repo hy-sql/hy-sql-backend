@@ -1,10 +1,14 @@
 class State {
     constructor(tables) {
-        this.tablelist = tables
+        this._tables = tables
+    }
+
+    set tables(tables) {
+        this._tables = tables
     }
 
     get tables() {
-        return this.tablelist
+        return this._tables
     }
 
     /**
@@ -12,22 +16,30 @@ class State {
      * @param {*} newTable Table object
      */
     createTable(newTable) {
-        this.tablelist.push(newTable)
+        this._tables.set(newTable.name, newTable)
+    }
+
+    getTableByName(tableName) {
+        return this._tables.get(tableName)
+    }
+
+    tableExists(tableName) {
+        return this._tables.has(tableName)
     }
 
     /*
      * Inserts new row in given table.
      */
-    insertIntoTable(tableIndex, newRow) {
-        this.tablelist[tableIndex].rows.push(newRow)
+    insertIntoTable(tableName, newRow) {
+        this._tables.get(tableName).rows.push(newRow)
     }
 
     /*
      * Updates rows in given table. Input is table's
      * index and object that contains new rows for the table.
      */
-    updateRows(tableIndex, newRows) {
-        this.tablelist[tableIndex].rows = newRows
+    updateRows(tableName, newRows) {
+        this._tables.get(tableName).rows = newRows
     }
 
     /*
@@ -35,8 +47,8 @@ class State {
      * after deletion. Input is table's
      * index and object that contains new rows for the table.
      */
-    deleteFromTable(tableIndex, remainingRows) {
-        this.tablelist[tableIndex].rows = remainingRows
+    deleteFromTable(tableName, remainingRows) {
+        this._tables.get(tableName).rows = remainingRows
     }
 }
 

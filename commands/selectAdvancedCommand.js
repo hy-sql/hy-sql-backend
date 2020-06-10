@@ -44,7 +44,7 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
     )
 
     const parsedCommand = {
-        name: 'SELECT ADVANCED',
+        name: 'SELECT',
         fields: parseFields(fullCommandAsStringArray.slice(1, indexOfFrom)),
         from: fullCommandAsStringArray[indexOfFrom],
         tableName: fullCommandAsStringArray[indexOfFrom + 1],

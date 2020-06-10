@@ -6,7 +6,7 @@ const cleanCommand = require('../utils/cleanCommand')
 describe('selectAdvanced()', () => {
     let stateService
     beforeEach(() => {
-        const state = new State([])
+        const state = new State(new Map())
         stateService = new StateService(state)
 
         const commands = [
