@@ -48,9 +48,7 @@ const SelectAdvancedSchema = Joi.object({
                     .pattern(aggregateFunctionPattern)
                     .insensitive()
                     .required(),
-                param: Joi.string()
-                    .pattern(/^('?\w+'?|\*)$/)
-                    .required(),
+                param: Joi.object(),
             })
         )
         .required()

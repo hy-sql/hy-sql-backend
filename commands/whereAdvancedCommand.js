@@ -4,7 +4,8 @@ const {
     arithmeticExpressionPattern,
     comparisonOperatorPattern,
     stringFunctionPattern,
-    endsWithStringFunctionExpressionPattern,
+    containsFunctionPattern,
+    functionExpressionPattern,
 } = require('../utils/regex')
 const {
     parseParameterFromStringFunction,
@@ -71,6 +72,7 @@ const parseConditions = (slicedCommandArray) => {
             const splitExpression = conditionArray[i].split(
                 comparisonOperatorPattern
             )
+
             const condition = {
                 left: parseConditionPart(splitExpression[0]),
                 operator: splitExpression[1],
@@ -92,7 +94,7 @@ const prepareConditionsForParsing = (slicedCommandArray) => {
         .filter(Boolean)
 
     const newArray = conditionsArray.reduce((newArray, c) => {
-        if (!c.match(endsWithStringFunctionExpressionPattern)) {
+        if (!c.match(containsFunctionPattern)) {
             newArray.push(c.replace('(', ' ( ').replace(')', ' ) ').split(' '))
         } else {
             const splitArray = splitBracketsFromFunctionExpressionArray(c)
@@ -124,13 +126,12 @@ const findIndexOfClosingBracket = (conditionsArray, IndexOfOpeningBracket) => {
 const splitBracketsFromFunctionExpressionArray = (
     functionConditionSurroundedWithBrackets
 ) => {
-    let regex = new RegExp(/(LENGTH\(\w+\)=\w+)|(\w+=LENGTH\(\w+\))/gi)
     const arr = functionConditionSurroundedWithBrackets
-        .split(regex)
-        .filter(Boolean)
+        .replace(functionExpressionPattern, ' $1 ')
+        .split(' ')
 
     const newArr = arr.map((e) => {
-        if (!regex.test(e)) {
+        if (!containsFunctionPattern.test(e)) {
             return e.split(/(\()|(\))/).filter(Boolean)
         }
         return e

@@ -4,8 +4,8 @@ const executeStringFunction = (functionDetails, row) => {
     switch (functionDetails.name) {
         case 'LENGTH':
             return functionDetails.param.type === 'column'
-                ? row[functionDetails.param.value].length
-                : functionDetails.param.value.length
+                ? row[functionDetails.param.value].toString().length
+                : functionDetails.param.value.toString().length
         case 'CONCAT':
             return 'function not implemented yet'
         case 'SUBSTRING':
@@ -18,9 +18,10 @@ const executeAggregateFunction = (functionDetails, rows) => {
         case 'AVG':
             return 'function not implemented yet'
         case 'COUNT':
-            return functionDetails.param === '*'
+            return functionDetails.param.type === 'all'
                 ? rows.length
-                : _.filter(rows, functionDetails.column).filter(Boolean).length
+                : _.filter(rows, functionDetails.param.value).filter(Boolean)
+                      .length
         case 'MAX':
             return 'function not implemented yet'
         case 'MIN':
