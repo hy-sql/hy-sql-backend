@@ -12,16 +12,18 @@ describe.each([
     '   selecT     id       , NIMI, hintA FRoM tuoTTeet   WHERE    hinta>=5;',
     'select id, NIMI, hinta fROM                    Tuotteet;',
 ])('valid command SELECT ... FROM WHERE testing', (command) => {
-    const fullCommandAsStringList = splitCommandIntoArray(command)
+    const fullCommandAsStringArray = splitCommandIntoArray(command)
 
     test('valid command is recognized and true returned', () => {
-        const result = commandService.parseCommand(fullCommandAsStringList)
+        const result = commandService.parseCommand(fullCommandAsStringArray)
 
         expect(result).toBeTruthy()
     })
 
     test('valid command is parsed and validated successfully', () => {
-        const parsedCommand = selectParser.parseCommand(fullCommandAsStringList)
+        const parsedCommand = selectParser.parseCommand(
+            fullCommandAsStringArray
+        )
 
         expect(parsedCommand.error).not.toBeDefined()
     })
@@ -37,11 +39,11 @@ describe.each([
 ])(
     'invalid command with the right name (SELECT) and WHERE keyword testing',
     (command) => {
-        const fullCommandAsStringList = splitCommandIntoArray(command)
+        const fullCommandAsStringArray = splitCommandIntoArray(command)
 
         test('invalid command is parsed but validation fails', () => {
             const parsedCommand = selectParser.parseCommand(
-                fullCommandAsStringList
+                fullCommandAsStringArray
             )
 
             const result = SelectColumnsOrderBySchema.validate(parsedCommand)

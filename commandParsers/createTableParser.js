@@ -1,20 +1,21 @@
 /* eslint-disable no-unused-vars */
 const { CreateTableSchema } = require('../schemas/CreateTableSchema')
 
-const parseCommand = (fullCommandAsStringList) => {
+const parseCommand = (fullCommandAsStringArray) => {
     const parsedCommand = {
-        name: fullCommandAsStringList.slice(0, 2).join(' '),
-        tableName: fullCommandAsStringList[2],
-        openingBracket: fullCommandAsStringList[3],
+        name: fullCommandAsStringArray.slice(0, 2).join(' '),
+        tableName: fullCommandAsStringArray[2],
+        openingBracket: fullCommandAsStringArray[3],
         columns: parseColumns(
-            fullCommandAsStringList.slice(
-                fullCommandAsStringList.indexOf('(') + 1,
-                fullCommandAsStringList.indexOf(')')
+            fullCommandAsStringArray.slice(
+                fullCommandAsStringArray.indexOf('(') + 1,
+                fullCommandAsStringArray.indexOf(')')
             )
         ),
-        closingBracket: fullCommandAsStringList.join(' ').indexOf(')') > 0,
+        closingBracket: fullCommandAsStringArray.join(' ').indexOf(')') > 0,
         finalSemicolon:
-            fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
+            fullCommandAsStringArray[fullCommandAsStringArray.length - 1] ===
+            ';'
                 ? ';'
                 : undefined,
     }

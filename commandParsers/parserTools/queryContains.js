@@ -1,5 +1,5 @@
-const queryContainsWhereKeyword = (fullCommandAsStringList) => {
-    const where = fullCommandAsStringList.findIndex(
+const queryContainsWhereKeyword = (fullCommandAsStringArray) => {
+    const where = fullCommandAsStringArray.findIndex(
         (string) => string.toUpperCase() === 'WHERE'
     )
     return where !== -1

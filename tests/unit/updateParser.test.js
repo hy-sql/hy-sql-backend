@@ -9,17 +9,17 @@ describe.each([
     "uPdAtE Tuotteet sEt nimi='nauris';",
 ])('Valid UPDATE command testing', (command) => {
     describe(command, () => {
-        const fullCommandAsStringList = splitCommandIntoArray(command)
+        const fullCommandAsStringArray = splitCommandIntoArray(command)
 
         test('is recognized as UPDATE command', () => {
-            const result = commandService.parseCommand(fullCommandAsStringList)
+            const result = commandService.parseCommand(fullCommandAsStringArray)
 
             expect(result).toBeTruthy()
         })
 
         test('is parsed and validated successfully', () => {
             const parsedCommand = updateParser.parseCommand(
-                fullCommandAsStringList
+                fullCommandAsStringArray
             )
 
             expect(parsedCommand.value).toBeDefined()
@@ -43,17 +43,17 @@ describe.each([
     "update tuotteet set nimi: 'nauris';",
 ])('Invalid UPDATE command testing', (command) => {
     describe(command, () => {
-        const fullCommandAsStringList = splitCommandIntoArray(command)
+        const fullCommandAsStringArray = splitCommandIntoArray(command)
 
         test('is recognized as UPDATE command', () => {
-            const result = commandService.parseCommand(fullCommandAsStringList)
+            const result = commandService.parseCommand(fullCommandAsStringArray)
 
             expect(result).toBeTruthy()
         })
 
         test('fails validation after parsed to command object', () => {
             const parsedCommand = commandService.parseCommand(
-                fullCommandAsStringList
+                fullCommandAsStringArray
             )
 
             expect(parsedCommand.error).toBeDefined()

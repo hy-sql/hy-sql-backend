@@ -1,8 +1,8 @@
 const { InsertIntoSchema } = require('../schemas/InsertIntoSchema')
 const { parseColumnNames } = require('./parserTools/parseColumnNames')
 
-const parseCommand = (fullCommandAsStringList) => {
-    let anchorLocation = fullCommandAsStringList
+const parseCommand = (fullCommandAsStringArray) => {
+    let anchorLocation = fullCommandAsStringArray
         .join(' ')
         .toUpperCase()
         .split(' ')
@@ -10,7 +10,7 @@ const parseCommand = (fullCommandAsStringList) => {
 
     if (anchorLocation === -1) {
         return {
-            value: { name: fullCommandAsStringList.slice(0, 2).join(' ') },
+            value: { name: fullCommandAsStringArray.slice(0, 2).join(' ') },
             error: {
                 details: [
                     {
@@ -23,20 +23,20 @@ const parseCommand = (fullCommandAsStringList) => {
     }
 
     let parsedCommand = {
-        name: fullCommandAsStringList.slice(0, 2).join(' '),
-        size: fullCommandAsStringList.length,
+        name: fullCommandAsStringArray.slice(0, 2).join(' '),
+        size: fullCommandAsStringArray.length,
         parserCounter: 3,
-        tableName: fullCommandAsStringList[2],
-        anchorKeyword: fullCommandAsStringList[anchorLocation],
+        tableName: fullCommandAsStringArray[2],
+        anchorKeyword: fullCommandAsStringArray[anchorLocation],
     }
 
-    if (fullCommandAsStringList[parsedCommand.parserCounter] === '(') {
+    if (fullCommandAsStringArray[parsedCommand.parserCounter] === '(') {
         parsedCommand.columnsOpeningBracket = '('
         parsedCommand.parserCounter++
     }
 
     const { pccolumns, columns } = parseColumnNames(
-        fullCommandAsStringList,
+        fullCommandAsStringArray,
         parsedCommand.parserCounter
     )
     if (columns) {
@@ -44,7 +44,7 @@ const parseCommand = (fullCommandAsStringList) => {
         parsedCommand.columns = columns
     }
 
-    if (fullCommandAsStringList[parsedCommand.parserCounter] === ')') {
+    if (fullCommandAsStringArray[parsedCommand.parserCounter] === ')') {
         parsedCommand.columnsClosingBracket = ')'
     }
 
@@ -53,13 +53,13 @@ const parseCommand = (fullCommandAsStringList) => {
     let lohko = []
     loop1: for (
         let index = anchorLocation + 1;
-        index < fullCommandAsStringList.length;
+        index < fullCommandAsStringArray.length;
         index++
     ) {
-        switch (fullCommandAsStringList[index]) {
+        switch (fullCommandAsStringArray[index]) {
             case ';':
                 parsedCommand.finalSemicolon = ';'
-                if (index < fullCommandAsStringList.length - 1)
+                if (index < fullCommandAsStringArray.length - 1)
                     parseErrors.push({
                         message: 'There is unparsed text after semicolon',
                     })
@@ -108,7 +108,7 @@ const parseCommand = (fullCommandAsStringList) => {
                     continue loop1
                 }
             default:
-                lohko.push(fullCommandAsStringList[index])
+                lohko.push(fullCommandAsStringArray[index])
         }
     }
     if (lohko.length !== 0) {

@@ -11,16 +11,18 @@ describe.each([
     '   selecT     id       , NIMI, hintA FRoM tuoTTeet;',
     'select id, NIMI, hinta fROM                    Tuotteet;',
 ])('valid command SELECT ... FROM testing', (command) => {
-    const fullCommandAsStringList = splitCommandIntoArray(command)
+    const fullCommandAsStringArray = splitCommandIntoArray(command)
 
     test('valid command is recognized and true returned', () => {
-        const result = commandService.parseCommand(fullCommandAsStringList)
+        const result = commandService.parseCommand(fullCommandAsStringArray)
 
         expect(result).toBeTruthy()
     })
 
     test('valid command is parsed and validated successfully', () => {
-        const parsedCommand = selectParser.parseCommand(fullCommandAsStringList)
+        const parsedCommand = selectParser.parseCommand(
+            fullCommandAsStringArray
+        )
 
         expect(parsedCommand.error).toBeUndefined()
     })
@@ -34,10 +36,12 @@ describe.each([
     '   selecT id nimi hinta FROM tuoTTeeT;', //sarakkeiden kaikki pilkut puuttuu
     'SeleCT id,nimi,hinta   Tuotteet;', //FROM puuttuu
 ])('invalid command with the right name (SELECT) testing', (command) => {
-    const fullCommandAsStringList = splitCommandIntoArray(command)
+    const fullCommandAsStringArray = splitCommandIntoArray(command)
 
     test('valid command is parsed but validation fails', () => {
-        const parsedCommand = selectParser.parseCommand(fullCommandAsStringList)
+        const parsedCommand = selectParser.parseCommand(
+            fullCommandAsStringArray
+        )
 
         const result = SelectSchema.validate(parsedCommand)
 
@@ -52,10 +56,10 @@ describe.each([
     'seleeect id,nimi,hinta from TUOTTEET;',
     'ELECT id,nimi,hinta FroM Tuotteet;',
 ])('invalid command name(SELECT) testing', (command) => {
-    const fullCommandAsStringList = splitCommandIntoArray(command)
+    const fullCommandAsStringArray = splitCommandIntoArray(command)
 
     test('invalid command is NOT recognized and false returned', () => {
-        const result = commandService.parseCommand(fullCommandAsStringList)
+        const result = commandService.parseCommand(fullCommandAsStringArray)
 
         expect(result).toBeFalsy()
     })

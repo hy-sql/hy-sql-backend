@@ -10,17 +10,17 @@ describe.each([
     '   create taBle    tuoTTeet (id inTEger    primary KEY, NIMI    text, hintA    inTEger);',
     'crEAte        TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
 ])('valid command testing', (command) => {
-    const fullCommandAsStringList = splitCommandIntoArray(command)
+    const fullCommandAsStringArray = splitCommandIntoArray(command)
 
     test('valid command is recognized and true returned', () => {
-        const result = commandService.parseCommand(fullCommandAsStringList)
+        const result = commandService.parseCommand(fullCommandAsStringArray)
 
         expect(result).toBeTruthy()
     })
 
     test('valid command is parsed and validated successfully', () => {
         const parsedCommand = createTableParser.parseCommand(
-            fullCommandAsStringList
+            fullCommandAsStringArray
         )
 
         expect(parsedCommand.value).toBeDefined()
@@ -42,11 +42,11 @@ describe.each([
     '   create taBle    tuoTTeet ',
     '   create      ',
 ])('invalid command with the right name (CREATE TABLE) testing', (command) => {
-    const fullCommandAsStringList = splitCommandIntoArray(command)
+    const fullCommandAsStringArray = splitCommandIntoArray(command)
 
     test('valid command is parsed but validation fails', () => {
         const parsedCommand = createTableParser.parseCommand(
-            fullCommandAsStringList
+            fullCommandAsStringArray
         )
 
         expect(parsedCommand.error).toBeDefined()
@@ -59,10 +59,10 @@ describe.each([
     'create taBle! tuoTTeet id inTEger primary KEY, NIMI text, hintA inTEger);',
     '   create taBle_    tuoTTeet (id     primary KEY, NIMI    text, hintA    inTEger);',
 ])('invalid command name testing', (command) => {
-    const fullCommandAsStringList = splitCommandIntoArray(command)
+    const fullCommandAsStringArray = splitCommandIntoArray(command)
 
     test('invalid command is not recognized and false returned', () => {
-        const result = commandService.parseCommand(fullCommandAsStringList)
+        const result = commandService.parseCommand(fullCommandAsStringArray)
 
         expect(result).toBeFalsy()
     })

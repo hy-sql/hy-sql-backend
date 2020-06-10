@@ -67,8 +67,8 @@ const initialiseState = () => {
 }
 
 const parseCommand = (command) => {
-    const fullCommandAsStringList = splitCommandIntoArray(command)
-    return commandService.parseCommand(fullCommandAsStringList)
+    const fullCommandAsStringArray = splitCommandIntoArray(command)
+    return commandService.parseCommand(fullCommandAsStringArray)
 }
 
 describe('Valid DELETE-command', () => {

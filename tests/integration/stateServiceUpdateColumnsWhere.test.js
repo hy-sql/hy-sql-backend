@@ -49,9 +49,9 @@ describe.each([
         const state = new State(tables)
         const stateService = new StateService(state)
 
-        const fullCommandAsStringList = splitCommandIntoArray(command)
+        const fullCommandAsStringArray = splitCommandIntoArray(command)
         const parsedCommand = commandService.parseCommand(
-            fullCommandAsStringList
+            fullCommandAsStringArray
         )
 
         test('returns correct result message from stateService', () => {
@@ -81,9 +81,9 @@ describe.each([
         const state = new State(new Map())
         const stateService = new StateService(state)
 
-        const fullCommandAsStringList = splitCommandIntoArray(command)
+        const fullCommandAsStringArray = splitCommandIntoArray(command)
         const parsedCommand = commandService.parseCommand(
-            fullCommandAsStringList
+            fullCommandAsStringArray
         )
 
         test('returns error message from stateService', () => {
@@ -139,9 +139,9 @@ describe.each(["UPDATE Tuotteet SET nimi=6 where nimi='nauris';"])(
             const state = new State(tables)
             const stateService = new StateService(state)
 
-            const fullCommandAsStringList = splitCommandIntoArray(command)
+            const fullCommandAsStringArray = splitCommandIntoArray(command)
             const parsedCommand = commandService.parseCommand(
-                fullCommandAsStringList
+                fullCommandAsStringArray
             )
 
             test('returns error message from stateService', () => {

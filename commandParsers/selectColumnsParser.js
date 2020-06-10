@@ -27,18 +27,18 @@ const parseCommand = (fullCommandAsStringArray) => {
     return parseSelectColumns(fullCommandAsStringArray)
 }
 
-const parseSelectColumns = (fullCommandAsStringList) => {
+const parseSelectColumns = (fullCommandAsStringArray) => {
     //KOMENTO
     let parsedCommand = {
-        name: fullCommandAsStringList[0],
-        size: fullCommandAsStringList.length,
+        name: fullCommandAsStringArray[0],
+        size: fullCommandAsStringArray.length,
         parserCounter: 1,
     }
 
     // SARAKKEIDEN OSIO - (*AS -- TODO*)
     //return { pccolumns: laskuri, columns: namify(cleanStringArray(columns)) }
     const { pccolumns, columns } = parseColumnNames(
-        fullCommandAsStringList,
+        fullCommandAsStringArray,
         parsedCommand.parserCounter
     )
     if (columns) {
@@ -48,17 +48,17 @@ const parseSelectColumns = (fullCommandAsStringList) => {
 
     //FROM  (* etsiminen muualtakin -- TODO*)
     if (
-        fullCommandAsStringList[parsedCommand.parserCounter].toUpperCase() ===
+        fullCommandAsStringArray[parsedCommand.parserCounter].toUpperCase() ===
         'FROM'
     ) {
         parsedCommand.from =
-            fullCommandAsStringList[parsedCommand.parserCounter]
+            fullCommandAsStringArray[parsedCommand.parserCounter]
         parsedCommand.parserCounter++
     }
 
     //TAULUJEN OSIO
     const { pctable, tableName } = parseTableNames(
-        fullCommandAsStringList,
+        fullCommandAsStringArray,
         parsedCommand.parserCounter
     )
 
@@ -75,21 +75,21 @@ const parseSelectColumns = (fullCommandAsStringList) => {
     // ORDER BY -- tehdään controllerissa -- specifies an order in which to return the rows.
 
     // finalSemicolon ---- NÄMÄ PITÄÄ SIISTIÄ, HOLY SPAGHETTI BATMAN
-    if (fullCommandAsStringList[parsedCommand.parserCounter] === ';') {
+    if (fullCommandAsStringArray[parsedCommand.parserCounter] === ';') {
         parsedCommand.finalSemicolon = ';'
         parsedCommand.parserCounter++
     } else if (
-        fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
+        fullCommandAsStringArray[fullCommandAsStringArray.length - 1] === ';'
     ) {
         parsedCommand.finalSemicolon = ';'
-        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList.slice(
+        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringArray.slice(
             parsedCommand.parserCounter,
-            fullCommandAsStringList.length - 1
+            fullCommandAsStringArray.length - 1
         )
     } else {
-        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringList.slice(
+        parsedCommand.unparsedBeforeFinalSemicolon = fullCommandAsStringArray.slice(
             parsedCommand.parserCounter,
-            fullCommandAsStringList.length
+            fullCommandAsStringArray.length
         )
     }
 
