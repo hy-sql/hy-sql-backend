@@ -1,9 +1,18 @@
 const _ = require('lodash')
-const { calculateExpression } = require('../utils/calculateExpression')
 const {
     executeStringFunction,
     executeAggregateFunction,
-} = require('../utils/functions')
+} = require('./components/functions')
+const {
+    evaluateExpression,
+    evaluateAggregateExpression,
+    containsAggregateFunction,
+} = require('./components/expressionTools')
+const {
+    createAdvancedFilter,
+    createFilter,
+    createOppositeFilter,
+} = require('./components/filterTools')
 
 class StateService {
     constructor(state) {
@@ -151,7 +160,7 @@ class StateService {
          * to update only the rows that are spesified in queries[i]
          */
         if (command.where) {
-            const filter = this.createFilter(command.where)
+            const filter = createFilter(command.where)
             rowsToUpdate = _.filter(rowsToUpdate, filter)
             let notChangedRows = _.difference(table.rows, rowsToUpdate)
             notChangedRows.forEach((row) => newRows.push(row))
@@ -197,7 +206,7 @@ class StateService {
         let rows = table.rows
 
         if (command.where) {
-            const filter = this.createOppositeFilter(command.where)
+            const filter = createOppositeFilter(command.where)
             rows = _.filter(rows, filter)
         } else {
             rows = []
@@ -241,7 +250,7 @@ class StateService {
                     return _.intersection(existingRows, filteredOr)
                 }
                 return _.filter(rowsToReturn, (row) =>
-                    this.createAdvancedFilter(row, condition)
+                    createAdvancedFilter(row, condition)
                 )
             },
             existingRows
@@ -261,7 +270,7 @@ class StateService {
                     filtered = this.filterOrRows(condition.OR, existingRows)
                 } else {
                     filtered = _.filter(existingRows, (row) =>
-                        this.createAdvancedFilter(row, condition)
+                        createAdvancedFilter(row, condition)
                     )
                 }
 
@@ -282,16 +291,16 @@ class StateService {
                     newRow[queries[i].value] = row[queries[i].value]
                 } else if (
                     queries[i].type === 'expression' &&
-                    this.containsAggregateFunction(queries[i].value)
+                    containsAggregateFunction(queries[i].value)
                 ) {
-                    const evaluated = this.evaluateAggregateExpression(
+                    const evaluated = evaluateAggregateExpression(
                         queries[i].value,
                         existingRows
                     )
                     newRow[queries[i].stringValue] = evaluated
                     return [{ [queries[i].stringValue]: evaluated }]
                 } else if (queries[i].type === 'expression') {
-                    const expressionResult = this.evaluateExpression(
+                    const expressionResult = evaluateExpression(
                         queries[i].value,
                         row,
                         existingRows
@@ -311,26 +320,6 @@ class StateService {
         }, [])
     }
 
-    containsAggregateFunction(expression) {
-        return expression.some((e) => e.type === 'aggregateFunction')
-    }
-
-    evaluateAggregateExpression(expressionArray, rows) {
-        const evaluatedExpression = expressionArray.map((e) =>
-            this.evaluateAggregateExpressionPart(e, rows)
-        )
-
-        return calculateExpression(evaluatedExpression)
-    }
-
-    evaluateExpression(expressionArray, row, rows) {
-        const mappedExpression = expressionArray
-            .map((e) => this.evaluateExpressionPart(e, row, rows))
-            .join('')
-
-        return calculateExpression(mappedExpression)
-    }
-
     createAggregateFunctionRow(functionField, existingRows) {
         return [
             {
@@ -342,153 +331,7 @@ class StateService {
         ]
     }
 
-    createAdvancedFilter(row, condition) {
-        switch (condition.operator) {
-            case '=':
-                return (
-                    // eslint-disable-next-line
-                    this.evaluateExpressionPart(condition.left, row) ==
-                    this.evaluateExpressionPart(condition.right, row)
-                )
-            case '>':
-                return (
-                    this.evaluateExpressionPart(condition.left, row) >
-                    this.evaluateExpressionPart(condition.right, row)
-                )
-            case '<':
-                return (
-                    this.evaluateExpressionPart(condition.left, row) <
-                    this.evaluateExpressionPart(condition.right, row)
-                )
-            case '>=':
-                return (
-                    this.evaluateExpressionPart(condition.left, row) >=
-                    this.evaluateExpressionPart(condition.right, row)
-                )
-            case '<=':
-                return (
-                    this.evaluateExpressionPart(condition.left, row) <=
-                    this.evaluateExpressionPart(condition.right, row)
-                )
-            case '<>':
-                return (
-                    // eslint-disable-next-line
-                    this.evaluateExpressionPart(condition.left, row) !=
-                    this.evaluateExpressionPart(condition.right, row)
-                )
-        }
-    }
-
-    evaluateAggregateExpressionPart(expressionPart, rows) {
-        switch (expressionPart.type) {
-            case 'stringFunction':
-                return executeStringFunction(expressionPart, rows[0])
-            case 'aggregateFunction':
-                return executeAggregateFunction(expressionPart, rows)
-            case 'column':
-                return rows[0].column
-            default:
-                return expressionPart.value
-        }
-    }
-
-    evaluateExpressionPart(expressionPart, row) {
-        switch (expressionPart.type) {
-            case 'expression': {
-                const expressionResult = this.evaluateExpression(
-                    expressionPart.value,
-                    row
-                )
-                return expressionResult
-            }
-            case 'stringFunction':
-                return executeStringFunction(expressionPart, row)
-            case 'aggregateFunction':
-                return executeAggregateFunction(expressionPart)
-            case 'string':
-                return expressionPart.value
-            case 'integer':
-                return expressionPart.value
-            case 'column':
-                return row[expressionPart.value]
-            case 'operator':
-                return expressionPart.value
-        }
-    }
-
-    createFilter(whereObject) {
-        const column = whereObject.columnName
-        const value = whereObject.value
-        const sign = whereObject.sign
-
-        switch (sign) {
-            case '>':
-                return (item) => {
-                    return item[column] > value
-                }
-            case '<':
-                return (item) => {
-                    return item[column] < value
-                }
-            case '>=':
-                return (item) => {
-                    return item[column] >= value
-                }
-            case '<=':
-                return (item) => {
-                    return item[column] <= value
-                }
-            case '<>':
-                return (item) => {
-                    // eslint-disable-next-line eqeqeq
-                    return item[column] != value
-                }
-            default:
-                return (item) => {
-                    // eslint-disable-next-line eqeqeq
-                    return item[column] == value
-                }
-        }
-    }
-
-    /*Creates filter that gives the opposite results than filter created with createFilter()*/
-    createOppositeFilter(whereObject) {
-        const column = whereObject.columnName
-        const value = whereObject.value
-        const sign = whereObject.sign
-
-        switch (sign) {
-            case '<>':
-                return (item) => {
-                    // eslint-disable-next-line
-                    return item[column] == value
-                }
-            case '>':
-                return (item) => {
-                    return item[column] <= value
-                }
-            case '<':
-                return (item) => {
-                    return item[column] >= value
-                }
-            case '>=':
-                return (item) => {
-                    return item[column] < value
-                }
-            case '<=':
-                return (item) => {
-                    return item[column] > value
-                }
-            default:
-                return (item) => {
-                    // eslint-disable-next-line
-                    return item[column] != value
-                }
-        }
-    }
-
     checkCreateTableErrors(command) {
-        console.log(command)
         if (this.state.tableExists(command.tableName)) {
             console.log('HELLO')
             return `Table ${command.tableName} already exists`

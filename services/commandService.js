@@ -1,28 +1,26 @@
-const createTableCommand = require('../commands/createTableCommand')
-const insertIntoCommand = require('../commands/insertIntoCommand')
-const selectWithOperatorsCommand = require('../commands/selectAdvancedCommand')
-const updateCommand = require('../commands/updateCommand')
-const deleteCommand = require('../commands/deleteCommand')
+const createTableParser = require('../commandParsers/createTableParser')
+const insertIntoParser = require('../commandParsers/insertIntoParser')
+const selectParser = require('../commandParsers/selectParser')
+const updateParser = require('../commandParsers/updateParser')
+const deleteParser = require('../commandParsers/deleteParser')
 
 const parseCommand = (fullCommandAsStringArray) => {
     //tämä pitää siistiä käyttämään yksi- ja kaksisanaisia komentoja
     switch (fullCommandAsStringArray[0].toUpperCase()) {
         case 'CREATE':
             if (fullCommandAsStringArray[1].trim().toUpperCase() === 'TABLE')
-                return createTableCommand.parseCommand(fullCommandAsStringArray)
+                return createTableParser.parseCommand(fullCommandAsStringArray)
             return null
         case 'INSERT':
             if (fullCommandAsStringArray[1].trim().toUpperCase() === 'INTO')
-                return insertIntoCommand.parseCommand(fullCommandAsStringArray)
+                return insertIntoParser.parseCommand(fullCommandAsStringArray)
             return null
         case 'SELECT':
-            return selectWithOperatorsCommand.parseCommand(
-                fullCommandAsStringArray
-            )
+            return selectParser.parseCommand(fullCommandAsStringArray)
         case 'UPDATE':
-            return updateCommand.parseCommand(fullCommandAsStringArray)
+            return updateParser.parseCommand(fullCommandAsStringArray)
         case 'DELETE':
-            return deleteCommand.parseCommand(fullCommandAsStringArray)
+            return deleteParser.parseCommand(fullCommandAsStringArray)
         default:
             console.log('sth went wrong')
             return null
