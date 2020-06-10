@@ -1,6 +1,6 @@
 const commandService = require('../services/commandService')
-const CommandArraySchema = require('../models/CommandArraySchema')
-const cleanCommand = require('../utils/cleanCommand')
+const CommandArraySchema = require('../schemas/CommandArraySchema')
+const splitCommandIntoArray = require('../commandParsers/parserTools/splitCommandIntoArray')
 
 const parser = (request, response, next) => {
     const commandArray = request.body.commandArray
@@ -19,7 +19,9 @@ const parser = (request, response, next) => {
         })
     }
 
-    const splitCommandArray = commandArray.map((input) => cleanCommand(input))
+    const splitCommandArray = commandArray.map((input) =>
+        splitCommandIntoArray(input)
+    )
 
     const parsedCommands = splitCommandArray.map((c) =>
         commandService.parseCommand(c)
