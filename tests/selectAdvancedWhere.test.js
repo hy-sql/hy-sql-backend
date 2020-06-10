@@ -2,6 +2,9 @@
 const selectAdvancedCommand = require('../commands/selectAdvancedCommand')
 const cleanCommand = require('../utils/cleanCommand')
 
+/**
+ * SELECT ... WHERE ... with aritmetic expression
+ */
 describe.each([
     'SELECT nimi, hinta FROM Taulu WHERE hinta+1=5;',
     'SELECT nimi, hinta FROM Taulu WHERE hinta*2=20;',
@@ -27,7 +30,10 @@ describe.each([
     }
 )
 
-//TODO
+//ei mene läpi vielä
+/**
+ * Invalid SELECT ... WHERE ... with aritmetic expression
+ */
 describe.each([
     'SELECT nimi, hinta FROM Taulu WHERE hinta+1=!5;',
     'SELECT nimi, hinta FROM Taulu WHERE hinta**2=20;',
@@ -51,6 +57,9 @@ describe.each([
     }
 )
 
+/**
+ * SELECT ... WHERE ... AND ... OR ... with aritmetic expression
+ */
 describe.each([
     'SELECT nimi, hinta FROM Taulu WHERE hinta+1=5 AND 2*hinta<10;',
     'SELECT nimi, hinta FROM Taulu WHERE hinta*2=20 OR hinta*2=10;',
@@ -76,13 +85,16 @@ describe.each([
     }
 )
 
-//TODO
+//ei mene läpi vielä
+/**
+ * Invalid SELECT ... WHERE ... AND ... OR ... with aritmetic expression
+ */
 describe.each([
-    'SELECT nimi, hinta FROM Taulu WHERE hinta+1=5 AND 2*hinta<10;',
-    'SELECT nimi, hinta FROM Taulu WHERE hinta*2=20 OR hinta*2=10;',
-    'SELECT nimi, hinta FROM Taulu WHERE (hinta*hinta>=20 AND hinta < 15) OR hinta+1=6;',
-    'SELECT nimi, hinta FROM Taulu WHERE hinta*h<=20 OR LENGTH(nimi)=8;',
-    'SELECT nimi, hinta FROM Taulu WHERE hinta/2=10 AND LENGTH(nimi)=8;',
+    'SELECT nimi, hinta FROM Taulu WHERE hinta+1=5 AND 123, 2*hinta<10;',
+    'SELECT nimi, hinta FROM Taulu WHERE hinta*2=20 OR 123, hinta*2=10;',
+    'SELECT nimi, hinta FROM Taulu WHERE (hinta*hinta>=20 AND hinta < 15) 123abc OR hinta+1=6;',
+    'SELECT nimi, hinta FROM Taulu WHERE hinta*h<=20 OR nimi: nauris;',
+    'SELECT nimi, hinta FROM Taulu WHERE hinta/2=10 AND nimi: nauris;',
 ])(
     'Invalid SELECT with WHERE condition containing AND and OR operators',
     (invalidCommand) => {
