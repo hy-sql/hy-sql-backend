@@ -190,6 +190,14 @@ class StateService {
     filterAndRows(conditions, existingRows) {
         const filteredRows = Object.values(conditions).reduce(
             (rowsToReturn, condition) => {
+                if (condition.OR) {
+                    const filteredOr = this.filterOrRows(
+                        condition.OR,
+                        rowsToReturn
+                    )
+
+                    return _.intersection(existingRows, filteredOr)
+                }
                 return _.filter(rowsToReturn, (row) =>
                     this.createAdvancedFilter(row, condition)
                 )
