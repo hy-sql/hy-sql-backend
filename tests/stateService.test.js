@@ -5,8 +5,7 @@ const cleanCommand = require('../utils/cleanCommand')
 
 describe('createTable()', () => {
     test('creates new table to list', () => {
-        const initArray = []
-        const state = new State(initArray)
+        const state = new State(new Map())
         const stateService = new StateService(state)
         const command = {
             name: 'CREATE TABLE',
@@ -21,19 +20,24 @@ describe('createTable()', () => {
             finalSemicolon: ';',
         }
         stateService.createTable(command)
-        expect(state.tables[0].name).toBe('Tuotteet')
+
+        const table = state.getTableByName(command.tableName)
+        expect(table.name).toBe('Tuotteet')
+        expect(table.columns).toBe(command.columns)
     })
 
     test('returns error when table already exists', () => {
-        const initTables = [
-            {
-                name: 'Tuotteet',
-                columns: [],
-                rows: [],
-            },
-        ]
-        const state = new State(initTables)
+        const existingTable = {
+            name: 'Tuotteet',
+            columns: [],
+            rows: [],
+        }
+
+        const state = new State(new Map())
         const stateService = new StateService(state)
+
+        state.createTable(existingTable)
+
         const command = {
             name: 'CREATE TABLE',
             tableName: 'Tuotteet',
@@ -46,13 +50,13 @@ describe('createTable()', () => {
             closingBracket: ')',
             finalSemicolon: ';',
         }
+
         const result = stateService.createTable(command)
         expect(result.error).toBe('Table Tuotteet already exists')
     })
 
     test('returns error when trying to create duplicate columns', () => {
-        const initTables = []
-        const state = new State(initTables)
+        const state = new State(new Map())
         const stateService = new StateService(state)
         const command = {
             name: 'CREATE TABLE',
@@ -74,8 +78,7 @@ describe('createTable()', () => {
 
 describe('insertIntoTable()', () => {
     test('returns error if table does not exist', () => {
-        const initTables = []
-        const state = new State(initTables)
+        const state = new State(new Map())
         const stateService = new StateService(state)
         const insertCommand = {
             name: 'INSERT INTO',
@@ -106,8 +109,7 @@ describe('insertIntoTable()', () => {
     })
 
     test('creates new row succesfully', () => {
-        const initArray = []
-        const state = new State(initArray)
+        const state = new State(new Map())
         const stateService = new StateService(state)
         const createCommand = {
             name: 'CREATE TABLE',
@@ -147,15 +149,14 @@ describe('insertIntoTable()', () => {
             ],
         }
         stateService.insertIntoTable(insertCommand)
-        const rows = state.tables[0].rows
+        const rows = state.getTableByName(insertCommand.tableName).rows
         expect(rows[0].id).toBe(1)
         expect(rows[0].nimi).toBe('tuote')
         expect(rows[0].hinta).toBe(10)
     })
 
     test('returns error when trying to insert wrong datatype to column', () => {
-        const initArray = []
-        const state = new State(initArray)
+        const state = new State(new Map())
         const stateService = new StateService(state)
         const createCommand = {
             name: 'CREATE TABLE',

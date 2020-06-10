@@ -5,8 +5,7 @@ const cleanCommand = require('../utils/cleanCommand')
 
 describe('selectFromTable()', () => {
     test('returns error when table does not exist', () => {
-        const initArray = []
-        const state = new State(initArray)
+        const state = new State(new Map())
         const stateService = new StateService(state)
 
         const command = {
@@ -14,13 +13,12 @@ describe('selectFromTable()', () => {
             tableName: 'products',
         }
 
-        const result = stateService.selectAdvanced(command)
+        const result = stateService.selectFrom(command)
         expect(result.error).toBe('No such table products')
     })
 
     test('returns column nimi for SELECT nimi FROM Tuotteet;', () => {
-        const initArray = []
-        const state = new State(initArray)
+        const state = new State(new Map())
         const stateService = new StateService(state)
 
         const commands = [
@@ -40,7 +38,7 @@ describe('selectFromTable()', () => {
         const commandArray = cleanCommand(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectAdvanced(parsedCommand.value)
+        const result = stateService.selectFrom(parsedCommand.value)
         // expect(result.result).toBe(
         //     'SELECT nimi FROM Tuotteet -query executed successfully'
         // )
@@ -49,12 +47,11 @@ describe('selectFromTable()', () => {
     })
 })
 
-describe('selectAdvanced() with command.where', () => {
+describe('selectFrom() with command.where', () => {
     let stateService
 
     beforeEach(() => {
-        const initArray = []
-        const state = new State(initArray)
+        const state = new State(new Map())
         stateService = new StateService(state)
 
         const commands = [
@@ -77,7 +74,7 @@ describe('selectAdvanced() with command.where', () => {
         const commandArray = cleanCommand(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectAdvanced(parsedCommand.value)
+        const result = stateService.selectFrom(parsedCommand.value)
         // expect(result.result).toBe(
         //     'SELECT nimi FROM Tuotteet WHERE hinta=10 -query executed successfully'
         // )
@@ -91,7 +88,7 @@ describe('selectAdvanced() with command.where', () => {
         const commandArray = cleanCommand(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectAdvanced(parsedCommand.value)
+        const result = stateService.selectFrom(parsedCommand.value)
         // expect(result.result).toBe(
         //     'SELECT nimi FROM Tuotteet WHERE hinta>5 -query executed successfully'
         // )
@@ -105,7 +102,7 @@ describe('selectAdvanced() with command.where', () => {
         const commandArray = cleanCommand(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectAdvanced(parsedCommand.value)
+        const result = stateService.selectFrom(parsedCommand.value)
         // expect(result.result).toBe(
         //     'SELECT nimi FROM Tuotteet WHERE hinta>=20 -query executed successfully'
         // )
@@ -119,7 +116,7 @@ describe('selectAdvanced() with command.where', () => {
         const commandArray = cleanCommand(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectAdvanced(parsedCommand.value)
+        const result = stateService.selectFrom(parsedCommand.value)
         // expect(result.result).toBe(
         //     'SELECT nimi FROM Tuotteet WHERE hinta<20 -query executed successfully'
         // )
@@ -133,7 +130,7 @@ describe('selectAdvanced() with command.where', () => {
         const commandArray = cleanCommand(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectAdvanced(parsedCommand.value)
+        const result = stateService.selectFrom(parsedCommand.value)
         // expect(result.result).toBe(
         //     'SELECT nimi FROM Tuotteet WHERE hinta<=10 -query executed successfully'
         // )
@@ -143,10 +140,9 @@ describe('selectAdvanced() with command.where', () => {
     })
 })
 
-describe('selectAdvanced() with ORDER BY -command', () => {
+describe('selectFrom() with ORDER BY -command', () => {
     test('returns rows from table in ascending order', () => {
-        const initArray = []
-        const state = new State(initArray)
+        const state = new State(new Map())
         const stateService = new StateService(state)
 
         const expectedRows = [
@@ -218,10 +214,9 @@ describe('selectAdvanced() with ORDER BY -command', () => {
     })
 })
 
-describe('selectAdvanced() with ORDER BY DESC -command (numbers)', () => {
+describe('selectFrom() with ORDER BY DESC -command (numbers)', () => {
     test('returns rows from table in ascending order', () => {
-        const initArray = []
-        const state = new State(initArray)
+        const state = new State(new Map())
         const stateService = new StateService(state)
 
         const expectedRows = [
@@ -293,10 +288,9 @@ describe('selectAdvanced() with ORDER BY DESC -command (numbers)', () => {
     })
 })
 
-describe('selectAdvanced() with ORDER BY ASC -command', () => {
+describe('selectFrom() with ORDER BY ASC -command', () => {
     test('returns rows from table in ascending order', () => {
-        const initArray = []
-        const state = new State(initArray)
+        const state = new State(new Map())
         const stateService = new StateService(state)
 
         const expectedRows = [
@@ -368,10 +362,9 @@ describe('selectAdvanced() with ORDER BY ASC -command', () => {
     })
 })
 
-describe('selectAdvanced() with ORDER BY DESC -command (text)', () => {
+describe('selectFrom() with ORDER BY DESC -command (text)', () => {
     test('returns rows from table in ascending order', () => {
-        const initArray = []
-        const state = new State(initArray)
+        const state = new State(new Map())
         const stateService = new StateService(state)
 
         const expectedRows = [
@@ -443,12 +436,11 @@ describe('selectAdvanced() with ORDER BY DESC -command (text)', () => {
     })
 })
 
-describe('selectAdvanced() with command.where and command.orderBy', () => {
+describe('selectFrom() with command.where and command.orderBy', () => {
     let stateService
 
     beforeEach(() => {
-        const initArray = []
-        const state = new State(initArray)
+        const state = new State(new Map())
         stateService = new StateService(state)
 
         const commands = [

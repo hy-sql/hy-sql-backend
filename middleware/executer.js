@@ -2,7 +2,7 @@ const State = require('../models/State')
 const StateService = require('../services/StateService')
 
 const executer = (request, response, next) => {
-    const state = new State([])
+    const state = new State(new Map())
     const stateService = new StateService(state)
 
     const parsedCommands = request.parsedCommands

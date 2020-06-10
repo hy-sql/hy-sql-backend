@@ -11,7 +11,7 @@ const {
 } = require('../utils/regex')
 
 const SelectAdvancedSchema = Joi.object({
-    name: Joi.string().valid('SELECT ADVANCED'),
+    name: Joi.string().valid('SELECT'),
 
     fields: Joi.array()
         .items(
