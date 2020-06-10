@@ -315,7 +315,6 @@ describe('selectAdvanced()', () => {
         })
     })
 
-    /*
     //'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)>=6 AND (hinta=5 OR lkm>60);'
     test(`returns expected rows for: ${queries[16]}`, () => {
         const commandArray = cleanCommand(queries[16])
@@ -332,7 +331,6 @@ describe('selectAdvanced()', () => {
             nimi: 'selleri',
         })
     })
-    */
 
     test(`returns expected rows for: ${queries[17]}`, () => {
         const commandArray = cleanCommand(queries[17])
