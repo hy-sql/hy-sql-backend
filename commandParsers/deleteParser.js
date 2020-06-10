@@ -1,8 +1,6 @@
 const { DeleteSchema, DeleteWhereSchema } = require('../schemas/DeleteSchema')
-const {
-    queryContainsWhereKeyword,
-    parseWhereToCommandObject,
-} = require('./whereCommand')
+const { parseWhereToCommandObject } = require('./whereCommand')
+const { queryContainsWhereKeyword } = require('./parserTools/queryContains')
 const checkForAdditionalAtEnd = require('./parserTools/checkForAdditional')
 
 const parseCommand = (fullCommandAsStringArray) => {

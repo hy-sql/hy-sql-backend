@@ -1,41 +1,29 @@
-const _ = require('lodash')
 const {
     SelectAdvancedSchema,
     SelectAdvancedWhereSchema,
     SelectAdvancedOrderBySchema,
     SelectAdvancedWhereOrderBySchema,
 } = require('../schemas/SelectAdvancedSchema')
-const { parseWhereAdvanced } = require('./whereParser')
-const { queryContainsWhereKeyword } = require('./whereCommand')
+const { parseWhere } = require('./whereParser')
 const {
-    parseOrderBy,
-    hasOrderByKeywords,
-    hasWhereOrderByKeywords,
-} = require('./orderByParser')
-const {
-    isArithmeticOperator,
-    arithmeticOperatorPattern,
-    arithmeticExpressionPattern,
-    stringFunctionPattern,
-    aggregateFunctionPattern,
-    containsFunctionPattern,
-} = require('../helpers/regex')
-const {
-    parseParameterFromStringFunction,
-    parseParameterFromAggregateFunction,
-} = require('./parserTools/parseParameterFromFunction')
+    queryContainsWhereKeyword,
+    queryContainsOrderByKeywords,
+    queryContainsWhereOrderByKeywords,
+} = require('./parserTools/queryContains')
+const { parseOrderBy } = require('./orderByParser')
+const { parseFields } = require('./fieldParser')
 
 const parseCommand = (fullCommandAsStringArray) => {
-    if (hasWhereOrderByKeywords(fullCommandAsStringArray)) {
-        return parseWhereOrderBy(fullCommandAsStringArray)
-    } else if (hasOrderByKeywords(fullCommandAsStringArray)) {
-        return parseSelectOrderBy(fullCommandAsStringArray)
+    switch (true) {
+        case queryContainsWhereOrderByKeywords(fullCommandAsStringArray):
+            return parseSelectWhereOrderBy(fullCommandAsStringArray)
+        case queryContainsOrderByKeywords(fullCommandAsStringArray):
+            return parseSelectOrderBy(fullCommandAsStringArray)
+        case queryContainsWhereKeyword(fullCommandAsStringArray):
+            return parseSelectWhere(fullCommandAsStringArray)
+        default:
+            return parseSelect(fullCommandAsStringArray)
     }
-    if (queryContainsWhereKeyword(fullCommandAsStringArray)) {
-        return parseWhere(fullCommandAsStringArray)
-    }
-
-    return parseselectParser(fullCommandAsStringArray)
 }
 
 const parseBaseCommand = (fullCommandAsStringArray) => {
@@ -55,7 +43,7 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
     return parsedCommand
 }
 
-const parseselectParser = (fullCommandAsStringArray) => {
+const parseSelect = (fullCommandAsStringArray) => {
     const parsedBaseCommand = parseBaseCommand(fullCommandAsStringArray)
 
     const validatedParsedCommand = SelectAdvancedSchema.validate(
@@ -65,14 +53,14 @@ const parseselectParser = (fullCommandAsStringArray) => {
     return validatedParsedCommand
 }
 
-const parseWhere = (fullCommandAsStringArray) => {
+const parseSelectWhere = (fullCommandAsStringArray) => {
     const indexOfWhere = fullCommandAsStringArray.findIndex(
         (k) => k.toUpperCase() === 'WHERE'
     )
 
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
 
-    parsedCommand.where = parseWhereAdvanced(
+    parsedCommand.where = parseWhere(
         fullCommandAsStringArray.slice(indexOfWhere)
     )
 
@@ -99,7 +87,7 @@ const parseSelectOrderBy = (fullCommandAsStringArray) => {
     return validationResult
 }
 
-const parseWhereOrderBy = (fullCommandAsStringArray) => {
+const parseSelectWhereOrderBy = (fullCommandAsStringArray) => {
     const indexOfWhere = fullCommandAsStringArray.findIndex(
         (k) => k.toUpperCase() === 'WHERE'
     )
@@ -110,7 +98,7 @@ const parseWhereOrderBy = (fullCommandAsStringArray) => {
 
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
 
-    parsedCommand.where = parseWhereAdvanced(
+    parsedCommand.where = parseWhere(
         fullCommandAsStringArray.slice(indexOfWhere)
     )
 
@@ -126,121 +114,6 @@ const parseWhereOrderBy = (fullCommandAsStringArray) => {
     )
 
     return validationResult
-}
-
-const parseFields = (fieldArray) => {
-    const fieldObjects = fieldArray
-        .join('')
-        .split(',')
-        .filter(Boolean)
-        .map((f) => {
-            return parseQueryField(f)
-        })
-
-    return fieldObjects
-}
-
-const parseQueryField = (parsedField) => {
-    switch (true) {
-        case stringFunctionPattern.test(parsedField):
-            return {
-                type: 'stringFunction',
-                name: parsedField.split('(')[0].toUpperCase(),
-                value: parsedField,
-                param: parseParameterFromStringFunction(parsedField),
-            }
-        case aggregateFunctionPattern.test(parsedField):
-            return {
-                type: 'aggregateFunction',
-                name: parsedField.split('(')[0].toUpperCase(),
-                value: parsedField,
-                param: parseParameterFromAggregateFunction(parsedField),
-            }
-        case /^\*$/.test(parsedField):
-            return {
-                type: 'all',
-                value: parsedField,
-            }
-        case arithmeticExpressionPattern.test(parsedField):
-            return {
-                type: 'expression',
-                value: parseExpression(parsedField),
-                stringValue: parsedField,
-            }
-        case /^'\w+'/.test(parsedField):
-            return {
-                type: 'string',
-                value: parsedField.replace(/'/g, ''),
-            }
-        case !isNaN(parsedField):
-            return {
-                type: 'integer',
-                value: Number(parsedField),
-            }
-        case isArithmeticOperator.test(parsedField):
-            return parsedField
-        default:
-            return {
-                type: 'column',
-                value: parsedField,
-            }
-    }
-}
-
-const parseExpression = (expression) => {
-    const splitExpression = _.flatten(
-        expression
-            .replace(containsFunctionPattern, ' $1 ')
-            .split(' ')
-            .filter(Boolean)
-            .map((e) =>
-                containsFunctionPattern.test(e)
-                    ? e
-                    : e.split(arithmeticOperatorPattern).filter(Boolean)
-            )
-            .filter(Boolean)
-    )
-
-    return splitExpression.map((e) => parseExpressionFields(e))
-}
-
-const parseExpressionFields = (expressionElement) => {
-    switch (true) {
-        case stringFunctionPattern.test(expressionElement):
-            return {
-                type: 'stringFunction',
-                name: expressionElement.split('(')[0].toUpperCase(),
-                value: expressionElement,
-                param: parseParameterFromStringFunction(expressionElement),
-            }
-        case aggregateFunctionPattern.test(expressionElement):
-            return {
-                type: 'aggregateFunction',
-                name: expressionElement.split('(')[0].toUpperCase(),
-                value: expressionElement,
-                param: parseParameterFromAggregateFunction(expressionElement),
-            }
-        case /^'\w+'/.test(expressionElement):
-            return {
-                type: 'string',
-                value: expressionElement.replace(/'/g, ''),
-            }
-        case !isNaN(expressionElement):
-            return {
-                type: 'integer',
-                value: Number(expressionElement),
-            }
-        case isArithmeticOperator.test(expressionElement):
-            return {
-                type: 'operator',
-                value: expressionElement,
-            }
-        default:
-            return {
-                type: 'column',
-                value: expressionElement,
-            }
-    }
 }
 
 module.exports = { parseCommand }

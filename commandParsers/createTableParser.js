@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 const { CreateTableSchema } = require('../schemas/CreateTableSchema')
+const { constraintsNamePatternForSplit } = require('../helpers/regex')
 
 const parseCommand = (fullCommandAsStringArray) => {
     const parsedCommand = {
@@ -44,8 +45,6 @@ const parseColumns = (columnsAsStringList) => {
 }
 
 const parseColumnConstraints = (constraintsAsStringArray) => {
-    const { constraintsNamePatternForSplit } = require('../helpers/regex')
-
     const separatedConstraintsAsStringList = constraintsAsStringArray
         .join(' ')
         .toUpperCase()

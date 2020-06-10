@@ -1,3 +1,4 @@
+// const util = require('util')
 const _ = require('lodash')
 const {
     executeStringFunction,
@@ -93,23 +94,10 @@ class StateService {
         let rows = table.rows
 
         if (command.where) {
-            const filteredAndRows =
-                command.where.conditions.AND.length > 0
-                    ? this.filterAndRows(command.where.conditions.AND, rows)
-                    : rows
-
-            const filteredOrRows =
-                command.where.conditions.OR.length > 0
-                    ? this.filterOrRows(command.where.conditions.OR, rows)
-                    : rows
-
-            const andRows = _.chain(filteredAndRows)
-                .flattenDeep()
-                .uniq()
-                .value()
-            const orRows = _.chain(filteredOrRows).flattenDeep().uniq().value()
-
-            rows = _.intersection(andRows, orRows)
+            // console.log(
+            //     util.inspect(command, false, null, true /* enable colors */)
+            // )
+            rows = this.filterRows(command.where.conditions, rows)
         }
 
         rows = this.createAdvancedRows(command, rows)
@@ -221,6 +209,27 @@ class StateService {
         return {
             result,
         }
+    }
+
+    filterRows(conditions, rows) {
+        const filteredAndRows =
+            conditions.AND.length > 0
+                ? this.filterAndRows(conditions.AND, rows)
+                : rows
+
+        const filteredOrRows =
+            conditions.OR.length > 0
+                ? this.filterOrRows(conditions.OR, rows)
+                : rows
+
+        const andRows = _.chain(filteredAndRows).flattenDeep().uniq().value()
+        const orRows = _.chain(filteredOrRows).flattenDeep().uniq().value()
+
+        return _.intersection(andRows, orRows)
+    }
+
+    orderRowsBy() {
+        //TODO
     }
 
     createAdvancedRows(command, existingRows) {
