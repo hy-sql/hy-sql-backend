@@ -4,21 +4,19 @@ const {
     SelectAllWhereSchema,
     SelectAllWhereOrderBySchema,
 } = require('../schemas/SelectAllSchema')
+const { parseWhereToCommandObject } = require('./whereCommand')
+const { parseOrderBy } = require('./orderByParser')
 const {
     queryContainsWhereKeyword,
-    parseWhereToCommandObject,
-} = require('./whereCommand')
-const {
-    parseOrderBy,
-    hasOrderByKeywords,
-    hasWhereOrderByKeywords,
-} = require('./orderByParser')
+    queryContainsOrderByKeywords,
+    queryContainsWhereOrderByKeywords,
+} = require('./parserTools/queryContains')
 const checkForAdditionalAtEnd = require('./parserTools/checkForAdditional')
 
 const parseCommand = (fullCommandAsStringArray) => {
-    if (hasWhereOrderByKeywords(fullCommandAsStringArray)) {
+    if (queryContainsWhereOrderByKeywords(fullCommandAsStringArray)) {
         return parseSelectWhereOrderBy(fullCommandAsStringArray)
-    } else if (hasOrderByKeywords(fullCommandAsStringArray)) {
+    } else if (queryContainsOrderByKeywords(fullCommandAsStringArray)) {
         return parseSelectAllOrderBy(fullCommandAsStringArray)
     } else if (queryContainsWhereKeyword(fullCommandAsStringArray)) {
         return parseSelectAllWhere(fullCommandAsStringArray)

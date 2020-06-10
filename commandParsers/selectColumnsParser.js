@@ -1,13 +1,11 @@
 const { parseColumnNames } = require('./parserTools/parseColumnNames')
+const { parseWhereToCommandObject } = require('./whereCommand')
+const { parseOrderBy } = require('./orderByParser')
 const {
-    parseWhereToCommandObject,
     queryContainsWhereKeyword,
-} = require('./whereCommand')
-const {
-    parseOrderBy,
-    hasOrderByKeywords,
-    hasWhereOrderByKeywords,
-} = require('./orderByParser')
+    queryContainsOrderByKeywords,
+    queryContainsWhereOrderByKeywords,
+} = require('./parserTools/queryContains')
 const {
     SelectSchema,
     SelectColumnsWhereSchema,
@@ -16,9 +14,9 @@ const {
 } = require('../schemas/SelectSchema')
 
 const parseCommand = (fullCommandAsStringArray) => {
-    if (hasWhereOrderByKeywords(fullCommandAsStringArray)) {
+    if (queryContainsWhereOrderByKeywords(fullCommandAsStringArray)) {
         return parseSelectColumnsWhereOrderBy(fullCommandAsStringArray)
-    } else if (hasOrderByKeywords(fullCommandAsStringArray)) {
+    } else if (queryContainsOrderByKeywords(fullCommandAsStringArray)) {
         return parseSelectColumnsOrderBy(fullCommandAsStringArray)
     } else if (queryContainsWhereKeyword(fullCommandAsStringArray)) {
         return parseSelectColumnsWhere(fullCommandAsStringArray)
