@@ -1,15 +1,9 @@
-/* eslint-disable no-unused-vars */
 const {
     UpdateSchema,
     UpdateColumnsWhereSchema,
 } = require('../schemas/UpdateSchema')
 const { parseWhere } = require('./whereParser')
 const { queryContainsWhereKeyword } = require('./parserTools/queryContains')
-
-// const {
-//     parseWhereToCommandObject,
-//     queryContainsWhereKeyword,
-// } = require('./whereCommand')
 
 const parseCommand = (fullCommandAsStringList) => {
     if (queryContainsWhereKeyword(fullCommandAsStringList)) {
@@ -86,14 +80,10 @@ const parseUpdatedColumns = (columnsAndValuesAsStringList) => {
     if (!columnsAndValuesAsStringList) return undefined
 
     const parsedUpdatedColumns = []
-    // console.log('ORIGINAL', columnsAndValuesAsStringList)
-
-    // console.log('join:', columnsAndValuesAsStringList.join(''))
     /*first change array to string and then remove unnecessary commas (,) and change back to array*/
     const separatedColumnsAsList = columnsAndValuesAsStringList
         .join('')
         .split(',')
-    // console.log('FIRST SEPARATED ', separatedColumnsAsList)
 
     /*every item of the array is {column=value}, this loop parses them into pairs and removes singlequotes*/
     separatedColumnsAsList.forEach((element) => {
