@@ -94,6 +94,7 @@ class StateService {
         let rows = table.rows
 
         if (command.where) {
+            console.log(command.where)
             // console.log(
             //     util.inspect(command, false, null, true /* enable colors */)
             // )
@@ -148,14 +149,10 @@ class StateService {
          * to update only the rows that are spesified in queries[i]
          */
         if (command.where) {
-            console.log(command.where)
             rowsToUpdate = this.filterRows(
                 command.where.conditions,
                 rowsToUpdate
             )
-            console.log(rowsToUpdate)
-            // const filter = createFilter(command.where)
-            // rowsToUpdate = _.filter(rowsToUpdate, filter)
             let notChangedRows = _.difference(table.rows, rowsToUpdate) //fix this!!
             notChangedRows.forEach((row) => newRows.push(row))
         }
