@@ -152,7 +152,7 @@ class StateService {
                 command.where.conditions,
                 rowsToUpdate
             )
-            let notChangedRows = _.difference(table.rows, rowsToUpdate) //fix this!!
+            let notChangedRows = _.difference(table.rows, rowsToUpdate)
             notChangedRows.forEach((row) => newRows.push(row))
         }
 
