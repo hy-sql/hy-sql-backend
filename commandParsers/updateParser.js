@@ -1,36 +1,33 @@
-/* eslint-disable no-unused-vars */
 const {
     UpdateSchema,
     UpdateColumnsWhereSchema,
 } = require('../schemas/UpdateSchema')
-const {
-    parseWhereToCommandObject,
-    queryContainsWhereKeyword,
-} = require('./whereCommand')
+const { parseWhere } = require('./whereParser')
+const { queryContainsWhereKeyword } = require('./parserTools/queryContains')
 
-const parseCommand = (fullCommandAsStringArray) => {
-    if (queryContainsWhereKeyword(fullCommandAsStringArray)) {
-        return parseUpdateWithWhere(fullCommandAsStringArray)
+const parseCommand = (fullCommandAsStringList) => {
+    if (queryContainsWhereKeyword(fullCommandAsStringList)) {
+        return parseUpdateWithWhere(fullCommandAsStringList)
     } else {
-        return parseUpdateWithoutWhere(fullCommandAsStringArray)
+        return parseUpdateWithoutWhere(fullCommandAsStringList)
     }
 }
 
-const parseBaseCommand = (fullCommandAsStringArray) => {
-    let tableName = fullCommandAsStringArray[1]
-        ? fullCommandAsStringArray[1]
+const parseBaseCommand = (fullCommandAsStringList) => {
+    let tableName = fullCommandAsStringList[1]
+        ? fullCommandAsStringList[1]
         : undefined
     let set =
-        fullCommandAsStringArray[2].toUpperCase() === 'SET'
-            ? fullCommandAsStringArray[2]
+        fullCommandAsStringList[2].toUpperCase() === 'SET'
+            ? fullCommandAsStringList[2]
             : undefined
     let finalSemicolon =
-        fullCommandAsStringArray[fullCommandAsStringArray.length - 1] === ';'
+        fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
             ? ';'
             : undefined
 
     const parsedCommand = {
-        name: fullCommandAsStringArray[0],
+        name: fullCommandAsStringList[0],
         tableName,
         set,
         finalSemicolon,
@@ -39,58 +36,54 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
     return parsedCommand
 }
 
-const parseUpdateWithoutWhere = (fullCommandAsStringArray) => {
-    const updateParser = parseBaseCommand(fullCommandAsStringArray)
+const parseUpdateWithoutWhere = (fullCommandAsStringList) => {
+    const updateCommand = parseBaseCommand(fullCommandAsStringList)
 
     const columnsAndValuesAsStringList =
-        updateParser.set !== undefined
-            ? fullCommandAsStringArray.slice(
+        updateCommand.set !== undefined
+            ? fullCommandAsStringList.slice(
                   3,
-                  fullCommandAsStringArray.indexOf(';')
+                  fullCommandAsStringList.indexOf(';')
               )
             : undefined
 
-    updateParser.columns = parseUpdatedColumns(columnsAndValuesAsStringList)
+    updateCommand.columns = parseUpdatedColumns(columnsAndValuesAsStringList)
 
-    return UpdateSchema.validate(updateParser)
+    return UpdateSchema.validate(updateCommand)
 }
 
-const parseUpdateWithWhere = (fullCommandAsStringArray) => {
-    const updateParser = parseBaseCommand(fullCommandAsStringArray)
+const parseUpdateWithWhere = (fullCommandAsStringList) => {
+    const updateCommand = parseBaseCommand(fullCommandAsStringList)
 
-    const whereIndex = fullCommandAsStringArray.findIndex(
+    const whereIndex = fullCommandAsStringList.findIndex(
         (string) => string.toUpperCase() === 'WHERE'
     )
 
     const columnsAndValuesAsStringList =
-        updateParser.set !== undefined
-            ? fullCommandAsStringArray.slice(3, whereIndex)
+        updateCommand.set !== undefined
+            ? fullCommandAsStringList.slice(3, whereIndex)
             : undefined
 
-    const wherePartAsArray = fullCommandAsStringArray.slice(
-        whereIndex,
-        fullCommandAsStringArray.indexOf(';')
+    const wherePartAsArray = fullCommandAsStringList.slice(
+        whereIndex
+        //fullCommandAsStringList.indexOf(';') //this is commented out because of a bug in whereParser
     )
 
-    updateParser.columns = parseUpdatedColumns(columnsAndValuesAsStringList)
+    updateCommand.columns = parseUpdatedColumns(columnsAndValuesAsStringList)
 
-    updateParser.where = parseWhereToCommandObject(wherePartAsArray)
+    updateCommand.where = parseWhere(wherePartAsArray)
 
-    return UpdateColumnsWhereSchema.validate(updateParser)
+    return UpdateColumnsWhereSchema.validate(updateCommand)
 }
 
 const parseUpdatedColumns = (columnsAndValuesAsStringList) => {
     if (!columnsAndValuesAsStringList) return undefined
 
     const parsedUpdatedColumns = []
-    // console.log('ORIGINAL', columnsAndValuesAsStringList)
-
-    // console.log('join:', columnsAndValuesAsStringList.join(''))
     /*first change array to string and then remove unnecessary commas (,) and change back to array*/
     const separatedColumnsAsList = columnsAndValuesAsStringList
         .join('')
         .split(',')
-    // console.log('FIRST SEPARATED ', separatedColumnsAsList)
 
     /*every item of the array is {column=value}, this loop parses them into pairs and removes singlequotes*/
     separatedColumnsAsList.forEach((element) => {

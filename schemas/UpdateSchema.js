@@ -1,5 +1,5 @@
 const Joi = require('@hapi/joi')
-const WhereSchema = require('./WhereSchema')
+const WhereAdvancedSchema = require('./WhereAdvancedSchema')
 
 const ColumnsSchema = Joi.object({
     columnName: Joi.string()
@@ -82,7 +82,7 @@ const UpdateSchema = Joi.object({
 })
 
 const UpdateColumnsWhereSchema = UpdateSchema.keys({
-    where: WhereSchema,
+    where: WhereAdvancedSchema,
 })
 
 module.exports = { UpdateSchema, UpdateColumnsWhereSchema }

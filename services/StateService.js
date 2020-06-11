@@ -10,7 +10,6 @@ const {
     containsAggregateFunction,
 } = require('./components/expressionTools')
 const {
-    createAdvancedFilter,
     createFilter,
     createOppositeFilter,
 } = require('./components/filterTools')
@@ -94,6 +93,7 @@ class StateService {
         let rows = table.rows
 
         if (command.where) {
+            console.log(command.where)
             // console.log(
             //     util.inspect(command.where, false, null, true)
             // )
@@ -145,8 +145,10 @@ class StateService {
          * to update only the rows that are spesified in queries[i]
          */
         if (command.where) {
-            const filter = createFilter(command.where)
-            rowsToUpdate = _.filter(rowsToUpdate, filter)
+            rowsToUpdate = this.filterRows(
+                command.where.conditions,
+                rowsToUpdate
+            )
             let notChangedRows = _.difference(table.rows, rowsToUpdate)
             notChangedRows.forEach((row) => newRows.push(row))
         }
@@ -270,7 +272,7 @@ class StateService {
                     return _.intersection(existingRows, filteredOr)
                 }
                 return _.filter(rowsToReturn, (row) =>
-                    createAdvancedFilter(row, condition)
+                    createFilter(row, condition)
                 )
             },
             existingRows
@@ -290,7 +292,7 @@ class StateService {
                     filtered = this.filterOrRows(condition.OR, existingRows)
                 } else {
                     filtered = _.filter(existingRows, (row) =>
-                        createAdvancedFilter(row, condition)
+                        createFilter(row, condition)
                     )
                 }
 

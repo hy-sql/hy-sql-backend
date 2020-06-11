@@ -1,6 +1,6 @@
 const { evaluateExpressionPart } = require('./expressionTools')
 
-const createAdvancedFilter = (row, condition) => {
+const createFilter = (row, condition) => {
     switch (condition.operator) {
         case '=':
             return (
@@ -34,41 +34,6 @@ const createAdvancedFilter = (row, condition) => {
                 evaluateExpressionPart(condition.left, row) !=
                 evaluateExpressionPart(condition.right, row)
             )
-    }
-}
-
-const createFilter = (whereObject) => {
-    const column = whereObject.columnName
-    const value = whereObject.value
-    const sign = whereObject.sign
-
-    switch (sign) {
-        case '>':
-            return (item) => {
-                return item[column] > value
-            }
-        case '<':
-            return (item) => {
-                return item[column] < value
-            }
-        case '>=':
-            return (item) => {
-                return item[column] >= value
-            }
-        case '<=':
-            return (item) => {
-                return item[column] <= value
-            }
-        case '<>':
-            return (item) => {
-                // eslint-disable-next-line eqeqeq
-                return item[column] != value
-            }
-        default:
-            return (item) => {
-                // eslint-disable-next-line eqeqeq
-                return item[column] == value
-            }
     }
 }
 
@@ -109,7 +74,6 @@ const createOppositeFilter = (whereObject) => {
 }
 
 module.exports = {
-    createAdvancedFilter,
     createFilter,
     createOppositeFilter,
 }

@@ -203,6 +203,36 @@ Content-Type: application/json
   ]
 }
 
+### UPDATE ... SET ... WHERE ... AND;
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": [
+    "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 5);",
+    "UPDATE Tuotteet SET nimi='ananas' WHERE nimi='retiisi' AND hinta=7;",
+    "SELECT * FROM Tuotteet;"
+  ]
+}
+
+### UPDATE ... SET ... WHERE ... OR;
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": [
+    "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 5);",
+    "UPDATE Tuotteet SET nimi='ananas' WHERE nimi='retiisi' OR hinta=5;",
+    "SELECT * FROM Tuotteet;"
+  ]
+}
+
 ### DELETE testing
 
 POST http://localhost:3001/api/query

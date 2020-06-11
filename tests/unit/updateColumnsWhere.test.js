@@ -7,6 +7,9 @@ describe.each([
     "update tuotteet SET hinta=6, nimi='nauris' WHERE nimi='retiisi';",
     "update tuotteet set hinta=6 where nimi='ananas';",
     "uPdAtE Tuotteet sEt nimi='nauris' WheRe hinta=6;",
+    "UPDATE Tuotteet SET hinta=6 WHERE nimi='nauris' AND hinta=6;",
+    "UPDATE Tuotteet SET hinta=6 WHERE nimi='nauris' OR hinta=6;",
+    "UPDATE Tuotteet SET hinta=6 WHERE nimi='nauris' OR (nimi='nauris' AND hinta=6);",
 ])('Valid UPDATE command testing', (command) => {
     describe(command, () => {
         const fullCommandAsStringArray = splitCommandIntoArray(command)
@@ -27,6 +30,7 @@ describe.each([
             expect(parsedCommand.value).toHaveProperty('tableName')
             expect(parsedCommand.value).toHaveProperty('set')
             expect(parsedCommand.value).toHaveProperty('finalSemicolon')
+            expect(parsedCommand.value).toHaveProperty('where')
 
             expect(parsedCommand.error).not.toBeDefined()
         })
