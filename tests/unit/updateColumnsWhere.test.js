@@ -1,5 +1,5 @@
 const commandService = require('../../services/commandService')
-const updateParser = require('../../commandParsers/updateAdvancedParser')
+const updateParser = require('../../commandParsers/updateParser')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
 
 describe.each([

@@ -1,7 +1,7 @@
 const createTableParser = require('../commandParsers/createTableParser')
 const insertIntoParser = require('../commandParsers/insertIntoParser')
 const selectParser = require('../commandParsers/selectParser')
-const updateParser = require('../commandParsers/updateAdvancedParser')
+const updateParser = require('../commandParsers/updateParser')
 const deleteParser = require('../commandParsers/deleteParser')
 
 const parseCommand = (fullCommandAsStringArray) => {

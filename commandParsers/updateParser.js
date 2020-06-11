@@ -2,7 +2,7 @@
 const {
     UpdateSchema,
     UpdateColumnsWhereSchema,
-} = require('../schemas/UpdateAdvancedSchema')
+} = require('../schemas/UpdateSchema')
 const { parseWhere } = require('./whereParser')
 const { queryContainsWhereKeyword } = require('./parserTools/queryContains')
 
