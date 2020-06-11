@@ -1,6 +1,6 @@
 const { evaluateExpressionPart } = require('./expressionTools')
 
-const createAdvancedFilter = (row, condition) => {
+const createFilter = (row, condition) => {
     switch (condition.operator) {
         case '=':
             return (
@@ -74,6 +74,6 @@ const createOppositeFilter = (whereObject) => {
 }
 
 module.exports = {
-    createAdvancedFilter,
+    createFilter,
     createOppositeFilter,
 }

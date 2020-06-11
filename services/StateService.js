@@ -10,7 +10,7 @@ const {
     containsAggregateFunction,
 } = require('./components/expressionTools')
 const {
-    createAdvancedFilter,
+    createFilter,
     createOppositeFilter,
 } = require('./components/filterTools')
 
@@ -261,7 +261,7 @@ class StateService {
                     return _.intersection(existingRows, filteredOr)
                 }
                 return _.filter(rowsToReturn, (row) =>
-                    createAdvancedFilter(row, condition)
+                    createFilter(row, condition)
                 )
             },
             existingRows
@@ -281,7 +281,7 @@ class StateService {
                     filtered = this.filterOrRows(condition.OR, existingRows)
                 } else {
                     filtered = _.filter(existingRows, (row) =>
-                        createAdvancedFilter(row, condition)
+                        createFilter(row, condition)
                     )
                 }
 
