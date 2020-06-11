@@ -1,5 +1,10 @@
+test.todo(
+    'temporary useless test so this file does not fail execution as empty'
+)
+
 /* Temporarily commented until validation of where is completed.
 When validation is ready, pick which tests are to be kept.
+Also remove the then redundant test above.
 
 const { parseWhere } = require('../../commandParsers/whereParser')
 const { queryContainsWhereKeyword } = require('./parserTools/queryContains')

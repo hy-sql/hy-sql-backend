@@ -57,8 +57,10 @@ class StateService {
 
         const table = this.findTable(command.tableName)
 
+        const highest_id =
+            table.rows.length === 0 ? 0 : _.maxBy(table.rows, 'id').id
         const newRow = {
-            id: table.rows.length + 1,
+            id: highest_id + 1,
         }
 
         for (let i = 0; i < command.columns.length; i++) {
@@ -93,7 +95,7 @@ class StateService {
         let rows = table.rows
 
         if (command.where) {
-            console.log(command.where)
+            //console.log(command.where)
             // console.log(
             //     util.inspect(command.where, false, null, true)
             // )
