@@ -11,7 +11,6 @@ const {
 } = require('./components/expressionTools')
 const {
     createAdvancedFilter,
-    // createFilter,
     createOppositeFilter,
 } = require('./components/filterTools')
 

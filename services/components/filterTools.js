@@ -37,41 +37,6 @@ const createAdvancedFilter = (row, condition) => {
     }
 }
 
-const createFilter = (whereObject) => {
-    const column = whereObject.columnName
-    const value = whereObject.value
-    const sign = whereObject.sign
-
-    switch (sign) {
-        case '>':
-            return (item) => {
-                return item[column] > value
-            }
-        case '<':
-            return (item) => {
-                return item[column] < value
-            }
-        case '>=':
-            return (item) => {
-                return item[column] >= value
-            }
-        case '<=':
-            return (item) => {
-                return item[column] <= value
-            }
-        case '<>':
-            return (item) => {
-                // eslint-disable-next-line eqeqeq
-                return item[column] != value
-            }
-        default:
-            return (item) => {
-                // eslint-disable-next-line eqeqeq
-                return item[column] == value
-            }
-    }
-}
-
 /*Creates filter that gives the opposite results than filter created with createFilter()*/
 const createOppositeFilter = (whereObject) => {
     const column = whereObject.columnName
@@ -110,6 +75,5 @@ const createOppositeFilter = (whereObject) => {
 
 module.exports = {
     createAdvancedFilter,
-    createFilter,
     createOppositeFilter,
 }
