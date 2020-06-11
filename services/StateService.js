@@ -11,7 +11,7 @@ const {
 } = require('./components/expressionTools')
 const {
     createAdvancedFilter,
-    createFilter,
+    // createFilter,
     createOppositeFilter,
 } = require('./components/filterTools')
 
@@ -148,9 +148,15 @@ class StateService {
          * to update only the rows that are spesified in queries[i]
          */
         if (command.where) {
-            const filter = createFilter(command.where)
-            rowsToUpdate = _.filter(rowsToUpdate, filter)
-            let notChangedRows = _.difference(table.rows, rowsToUpdate)
+            console.log(command.where)
+            rowsToUpdate = this.filterRows(
+                command.where.conditions,
+                rowsToUpdate
+            )
+            console.log(rowsToUpdate)
+            // const filter = createFilter(command.where)
+            // rowsToUpdate = _.filter(rowsToUpdate, filter)
+            let notChangedRows = _.difference(table.rows, rowsToUpdate) //fix this!!
             notChangedRows.forEach((row) => newRows.push(row))
         }
 
