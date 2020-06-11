@@ -9,10 +9,7 @@ const {
     evaluateAggregateExpression,
     containsAggregateFunction,
 } = require('./components/expressionTools')
-const {
-    createFilter,
-    createOppositeFilter,
-} = require('./components/filterTools')
+const { createFilter } = require('./components/filterTools')
 
 class StateService {
     constructor(state) {
@@ -195,8 +192,8 @@ class StateService {
         let rows = table.rows
 
         if (command.where) {
-            const filter = createOppositeFilter(command.where)
-            rows = _.filter(rows, filter)
+            const rowsToDelete = this.filterRows(command.where.conditions, rows)
+            rows = _.difference(rows, rowsToDelete)
         } else {
             rows = []
         }
