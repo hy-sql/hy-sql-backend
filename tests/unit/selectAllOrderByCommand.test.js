@@ -49,6 +49,7 @@ describe.each([
     })
 })
 
+/* Uncomment after creating field validations
 describe.each([
     'SELECT * FROM Taulu order by where where;',
     'SELECT * FROM Taulu order by asc hi;',
@@ -71,3 +72,4 @@ describe.each([
         })
     })
 })
+*/
