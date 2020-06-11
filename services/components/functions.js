@@ -16,18 +16,18 @@ const executeStringFunction = (functionDetails, row) => {
 const executeAggregateFunction = (functionDetails, rows) => {
     switch (functionDetails.name) {
         case 'AVG':
-            return 'function not implemented yet'
+            return _.meanBy(rows, functionDetails.param.value)
         case 'COUNT':
             return functionDetails.param.type === 'all'
                 ? rows.length
                 : _.filter(rows, functionDetails.param.value).filter(Boolean)
                       .length
         case 'MAX':
-            return 'function not implemented yet'
+            return _.maxBy(rows, functionDetails.param.value)
         case 'MIN':
-            return 'function not implemented yet'
+            return _.minBy(rows, functionDetails.param.value)
         case 'SUM':
-            return 'function not implemented yet'
+            return _.sumBy(rows, functionDetails.param.value)
     }
 }
 
