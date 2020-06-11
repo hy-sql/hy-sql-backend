@@ -1,19 +1,21 @@
+const { parseOrderByFields } = require('./fieldParser')
+
 const parseOrderBy = (slicedCommandAsStringArray) => {
-    return slicedCommandAsStringArray.slice(0, 2).join(' ').toUpperCase() ===
+    const parsedOrderByPart =
+        slicedCommandAsStringArray.slice(0, 2).join(' ').toUpperCase() ===
         'ORDER BY'
-        ? {
-              keyword: slicedCommandAsStringArray
-                  .slice(0, 2)
-                  .join(' ')
-                  .toUpperCase(),
-              columnName: slicedCommandAsStringArray[2],
-              order: slicedCommandAsStringArray
-                  .slice(3)
-                  .join(' ')
-                  .toUpperCase()
-                  .trim(),
-          }
-        : null
+            ? {
+                  keyword: slicedCommandAsStringArray
+                      .slice(0, 2)
+                      .join(' ')
+                      .toUpperCase(),
+                  columns: parseOrderByFields(
+                      slicedCommandAsStringArray.slice(2)
+                  ),
+              }
+            : null
+
+    return parsedOrderByPart
 }
 
 module.exports = { parseOrderBy }

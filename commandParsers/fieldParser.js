@@ -9,6 +9,7 @@ const {
     containsFunctionPattern,
     stringFunctionsNamePattern,
     aggregateFunctionsNamePattern,
+    sortOrderKeywordPattern,
 } = require('../helpers/regex')
 const prepareConditionsForParsing = require('./parserTools/prepareConditionsForParsing')
 const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBracket')
@@ -83,8 +84,8 @@ const parseExpression = (expression) => {
     )
 }
 
-const parseFields = (fieldArray) => {
-    const fieldObjects = fieldArray
+const parseSelectFields = (fieldArray) => {
+    const selectFields = fieldArray
         .join('')
         .split(',')
         .filter(Boolean)
@@ -92,7 +93,24 @@ const parseFields = (fieldArray) => {
             return parseField(f)
         })
 
-    return fieldObjects
+    return selectFields
+}
+
+const parseOrderByFields = (fieldArray) => {
+    const orderByFields = fieldArray
+        .join(' ')
+        .trim()
+        .split(',')
+        .map((f) => f.trim())
+        .map((f) => f.split(' '))
+        .map((f) => {
+            const column = parseField(f[0])
+            column.order = parseField(f[1])
+
+            return column
+        })
+
+    return orderByFields
 }
 
 const parseField = (field) => {
@@ -137,6 +155,11 @@ const parseField = (field) => {
                 type: 'operator',
                 value: field === '**' ? '*' : field,
             }
+        case sortOrderKeywordPattern.test(field):
+            return {
+                type: 'order',
+                value: field ? field.toLowerCase() : 'asc',
+            }
         default:
             return {
                 type: 'column',
@@ -163,4 +186,10 @@ const parseParameterFromAggregateFunction = (functionAsString) => {
     )
 }
 
-module.exports = { parseConditions, parseExpression, parseFields, parseField }
+module.exports = {
+    parseConditions,
+    parseExpression,
+    parseSelectFields,
+    parseOrderByFields,
+    parseField,
+}

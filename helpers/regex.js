@@ -79,6 +79,8 @@ const containsFunctionPattern = new RegExp(
     'gi'
 )
 
+const sortOrderKeywordPattern = new RegExp('^(ASC|DESC)$', 'i')
+
 module.exports = {
     constraintsNamePatternForSplit,
     constraintsNamePattern,
@@ -95,4 +97,5 @@ module.exports = {
     containsAggregateFunctionPattern,
     functionExpressionPattern,
     containsFunctionPattern,
+    sortOrderKeywordPattern,
 }

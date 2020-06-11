@@ -11,7 +11,7 @@ const {
     queryContainsWhereOrderByKeywords,
 } = require('./parserTools/queryContains')
 const { parseOrderBy } = require('./orderByParser')
-const { parseFields } = require('./fieldParser')
+const { parseSelectFields } = require('./fieldParser')
 
 const parseCommand = (fullCommandAsStringArray) => {
     switch (true) {
@@ -33,7 +33,9 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
 
     const parsedCommand = {
         name: 'SELECT',
-        fields: parseFields(fullCommandAsStringArray.slice(1, indexOfFrom)),
+        fields: parseSelectFields(
+            fullCommandAsStringArray.slice(1, indexOfFrom)
+        ),
         from: fullCommandAsStringArray[indexOfFrom],
         tableName: fullCommandAsStringArray[indexOfFrom + 1],
         finalSemicolon:

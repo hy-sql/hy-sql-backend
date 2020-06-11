@@ -1,4 +1,4 @@
-// const util = require('util')
+const util = require('util')
 const _ = require('lodash')
 const {
     executeStringFunction,
@@ -95,7 +95,7 @@ class StateService {
 
         if (command.where) {
             // console.log(
-            //     util.inspect(command, false, null, true /* enable colors */)
+            //     util.inspect(command.where, false, null, true)
             // )
             rows = this.filterRows(command.where.conditions, rows)
         }
@@ -103,11 +103,8 @@ class StateService {
         rows = this.createAdvancedRows(command, rows)
 
         if (command.orderBy) {
-            rows =
-                command.orderBy.order &&
-                command.orderBy.order.toUpperCase() === 'DESC'
-                    ? _.orderBy(rows, [command.orderBy.columnName], ['desc'])
-                    : _.orderBy(rows, [command.orderBy.columnName], ['asc'])
+            console.log(util.inspect(command.orderBy, false, null, true))
+            rows = this.orderRowsBy(command.orderBy.columns, rows)
         }
 
         const result = `SELECT ${command.fields
@@ -228,8 +225,22 @@ class StateService {
         return _.intersection(andRows, orRows)
     }
 
-    orderRowsBy() {
+    orderRowsBy(columns, rows) {
         //TODO
+        console.log('columns', columns)
+        const arrayOfColumnNames = columns.map((c) => c.value)
+        const arrayOfOrderingKeywords = columns.map((c) => c.order.value)
+
+        console.log(arrayOfColumnNames)
+        console.log(arrayOfOrderingKeywords)
+
+        const orderedRows = _.orderBy(
+            rows,
+            arrayOfColumnNames,
+            arrayOfOrderingKeywords
+        )
+
+        return orderedRows
     }
 
     createAdvancedRows(command, existingRows) {
