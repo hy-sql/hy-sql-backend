@@ -27,8 +27,6 @@ const arithmeticExpressionPattern = new RegExp(
     '^(?!\\+|-|\\/|\\*\\*|\\%)\\w+(([+|\\-|*|/|%])\\w+)+(?!\\+|-|\\/|\\*\\*|\\%)$'
 )
 
-console.log(arithmeticExpressionPattern.test('2+2+4'))
-
 const comparisonOperators = ['>=', '<=', '<>', '=', '>', '<']
 
 const comparisonOperatorPattern = RegExp('(>=|<=|<>|=|>|<)')

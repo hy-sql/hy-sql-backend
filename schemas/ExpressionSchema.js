@@ -10,9 +10,9 @@ const ExpressionSchema = Joi.object({
     type: Joi.string().valid('expression').required(),
     value: Joi.array()
         .items(
+            ArithmeticOperatorSchema.required(),
             ColumnSchema,
             IntegerSchema,
-            ArithmeticOperatorSchema,
             Joi.link('#function')
         )
         .required(),

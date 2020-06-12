@@ -7,8 +7,8 @@ const {
     TextSchema,
     IntegerSchema,
 } = require('./FieldSchemas')
-const FunctionSchema = require('./FunctionSchema')
 const ExpressionSchema = require('./ExpressionSchema')
+const FunctionSchema = require('./FunctionSchema')
 
 const SelectSchema = Joi.object({
     name: Joi.string().required().valid('SELECT').insensitive().messages({
@@ -17,7 +17,7 @@ const SelectSchema = Joi.object({
     }),
 
     fields: Joi.array()
-        .has(
+        .items(
             AllFieldsSchema,
             ColumnSchema,
             TextSchema,
@@ -25,6 +25,7 @@ const SelectSchema = Joi.object({
             ExpressionSchema.shared(FunctionSchema),
             FunctionSchema.shared(ExpressionSchema)
         )
+        .min(1)
         .required(),
 
     from: Joi.string()
