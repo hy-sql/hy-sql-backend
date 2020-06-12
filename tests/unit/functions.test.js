@@ -70,6 +70,7 @@ describe('executeStringFunction()', () => {
     })
 })
 
+// Now expected values for AVG are the expected return values of lodash _.meanBy
 describe('executeAggregateFunction()', () => {
     const functionDetailList = [
         {
@@ -168,6 +169,30 @@ describe('executeAggregateFunction()', () => {
             value: 'SUM(nonexistent)',
             param: { type: 'column', value: 'nonexistent' },
         },
+        {
+            type: 'aggregateFunction',
+            name: 'AVG',
+            value: 'AVG(hinta)',
+            param: { type: 'column', value: 'hinta' },
+        },
+        {
+            type: 'aggregateFunction',
+            name: 'AVG',
+            value: 'AVG(lkm)',
+            param: { type: 'column', value: 'lkm' },
+        },
+        {
+            type: 'aggregateFunction',
+            name: 'AVG',
+            value: 'AVG(nimi)',
+            param: { type: 'column', value: 'nimi' },
+        },
+        {
+            type: 'aggregateFunction',
+            name: 'AVG',
+            value: 'AVG(nonexistent)',
+            param: { type: 'column', value: 'nonexistent' },
+        },
     ]
 
     test(`returns the expected result with ${functionDetailList[0].value}`, () => {
@@ -243,14 +268,26 @@ describe('executeAggregateFunction()', () => {
             error: 'Parameter given to SUM does not match any existing column',
         })
     })
-})
 
-/*
-{ id: 1, nimi: 'retiisi', hinta: 7, lkm: 20 },
-{ id: 2, nimi: 'porkkana', hinta: 5, lkm: 40 },
-{ id: 3, nimi: 'nauris', hinta: 4, lkm: 40 },
-{ id: 4, nimi: 'lanttu', hinta: 8, lkm: 20 },
-{ id: 5, nimi: 'selleri', hinta: 4, lkm: 30 },
-{ id: 6, nimi: 'selleri', hinta: 6, lkm: 70 },
-{ id: 7, nimi: 'maito', hinta: 6, lkm: 70 },
-*/
+    test(`returns the expected result with ${functionDetailList[16].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[16], rows)).toBe(
+            5.714285714285714
+        )
+    })
+
+    test(`returns the expected result with ${functionDetailList[17].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[17], rows)).toBe(
+            41.42857142857143
+        )
+    })
+
+    test(`returns the expected result with ${functionDetailList[18].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[18], rows)).toBe(0)
+    })
+
+    test(`returns the expected error object with ${functionDetailList[19].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[19], rows)).toEqual({
+            error: 'Parameter given to AVG does not match any existing column',
+        })
+    })
+})
