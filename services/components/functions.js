@@ -39,6 +39,10 @@ const executeAggregateFunction = (functionDetails, rows) => {
                     'Parameter given to MIN does not match any existing column',
             })
         case 'SUM':
+            if (_.isString(_.sumBy(rows, paramValue))) {
+                return 0
+            }
+
             return _.sumBy(rows, paramValue)
                 ? _.sumBy(rows, paramValue)
                 : {
