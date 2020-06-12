@@ -96,6 +96,30 @@ describe('executeAggregateFunction()', () => {
             value: 'COUNT(hinta)',
             param: { type: 'column', value: 'hinta' },
         },
+        {
+            type: 'aggregateFunction',
+            name: 'MAX',
+            value: 'MAX(hinta)',
+            param: { type: 'column', value: 'hinta' },
+        },
+        {
+            type: 'aggregateFunction',
+            name: 'MAX',
+            value: 'MAX(lkm)',
+            param: { type: 'column', value: 'lkm' },
+        },
+        {
+            type: 'aggregateFunction',
+            name: 'MAX',
+            value: 'MAX(nimi)',
+            param: { type: 'column', value: 'nimi' },
+        },
+        {
+            type: 'aggregateFunction',
+            name: 'MAX',
+            value: 'MAX(nonexistent)',
+            param: { type: 'column', value: 'nonexistent' },
+        },
     ]
 
     test(`returns the expected result with ${functionDetailList[0].value}`, () => {
@@ -113,4 +137,33 @@ describe('executeAggregateFunction()', () => {
     test(`returns the expected result with ${functionDetailList[3].value}`, () => {
         expect(executeAggregateFunction(functionDetailList[3], rows)).toBe(7)
     })
+
+    test(`returns the expected result with ${functionDetailList[4].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[4], rows)).toBe(8)
+    })
+
+    test(`returns the expected result with ${functionDetailList[5].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[5], rows)).toBe(70)
+    })
+
+    test(`returns the expected result with ${functionDetailList[6].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[6], rows)).toBe(
+            'selleri'
+        )
+    })
+
+    test(`returns the expected result with ${functionDetailList[7].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[7], rows)).toEqual({
+            error: 'Parameter given to MAX does not match any existing column',
+        })
+    })
 })
+/*
+{ id: 1, nimi: 'retiisi', hinta: 7, lkm: 20 },
+{ id: 2, nimi: 'porkkana', hinta: 5, lkm: 40 },
+{ id: 3, nimi: 'nauris', hinta: 4, lkm: 40 },
+{ id: 4, nimi: 'lanttu', hinta: 8, lkm: 20 },
+{ id: 5, nimi: 'selleri', hinta: 4, lkm: 30 },
+{ id: 6, nimi: 'selleri', hinta: 6, lkm: 70 },
+{ id: 7, nimi: 'maito', hinta: 6, lkm: 70 },
+*/
