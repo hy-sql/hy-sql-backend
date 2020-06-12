@@ -144,6 +144,30 @@ describe('executeAggregateFunction()', () => {
             value: 'MIN(nonexistent)',
             param: { type: 'column', value: 'nonexistent' },
         },
+        {
+            type: 'aggregateFunction',
+            name: 'SUM',
+            value: 'SUM(hinta)',
+            param: { type: 'column', value: 'hinta' },
+        },
+        {
+            type: 'aggregateFunction',
+            name: 'SUM',
+            value: 'SUM(lkm)',
+            param: { type: 'column', value: 'lkm' },
+        },
+        {
+            type: 'aggregateFunction',
+            name: 'SUM',
+            value: 'SUM(nimi)',
+            param: { type: 'column', value: 'nimi' },
+        },
+        {
+            type: 'aggregateFunction',
+            name: 'SUM',
+            value: 'SUM(nonexistent)',
+            param: { type: 'column', value: 'nonexistent' },
+        },
     ]
 
     test(`returns the expected result with ${functionDetailList[0].value}`, () => {
@@ -201,7 +225,26 @@ describe('executeAggregateFunction()', () => {
             error: 'Parameter given to MIN does not match any existing column',
         })
     })
+
+    test(`returns the expected result with ${functionDetailList[12].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[12], rows)).toBe(40)
+    })
+
+    test(`returns the expected result with ${functionDetailList[13].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[13], rows)).toBe(290)
+    })
+
+    test(`returns the expected result with ${functionDetailList[14].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[14], rows)).toBe(0)
+    })
+
+    test(`returns the expected error object with ${functionDetailList[15].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[15], rows)).toEqual({
+            error: 'Parameter given to SUM does not match any existing column',
+        })
+    })
 })
+
 /*
 { id: 1, nimi: 'retiisi', hinta: 7, lkm: 20 },
 { id: 2, nimi: 'porkkana', hinta: 5, lkm: 40 },
