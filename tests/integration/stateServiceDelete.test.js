@@ -6,9 +6,9 @@ const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCom
 const initialiseState = () => {
     const initTable = new Map([
         [
-            'Products',
+            'Tuotteet',
             {
-                name: 'Products',
+                name: 'Tuotteet',
                 columns: [
                     {
                         name: 'id',
@@ -16,12 +16,12 @@ const initialiseState = () => {
                         constraints: ['PRIMARY KEY'],
                     },
                     {
-                        name: 'name',
+                        name: 'nimi',
                         type: 'TEXT',
                         constraints: [],
                     },
                     {
-                        name: 'price',
+                        name: 'hinta',
                         type: 'INTEGER',
                         constraints: [],
                     },
@@ -29,28 +29,28 @@ const initialiseState = () => {
                 rows: [
                     {
                         id: 1,
-                        name: 'apple',
-                        price: 7,
+                        nimi: 'omena',
+                        hinta: 7,
                     },
                     {
                         id: 2,
-                        name: 'orange',
-                        price: 5,
+                        nimi: 'appelsiini',
+                        hinta: 5,
                     },
                     {
                         id: 3,
-                        name: 'banana',
-                        price: 1,
+                        nimi: 'banaani',
+                        hinta: 1,
                     },
                     {
                         id: 4,
-                        name: 'milk',
-                        price: 4,
+                        nimi: 'maito',
+                        hinta: 4,
                     },
                     {
                         id: 4,
-                        name: 'carrot',
-                        price: 4,
+                        nimi: 'porkkana',
+                        hinta: 4,
                     },
                 ],
             },
@@ -73,13 +73,18 @@ const parseCommand = (command) => {
 
 describe('Valid DELETE-command', () => {
     const queries = [
-        'DELETE FROM Products;',
-        "DELETE FROM Products WHERE name='milk';",
-        'DELETE FROM Products WHERE price=1;',
-        'DELETE FROM Products WHERE price<=4;',
-        'DELETE FROM Products WHERE price>=4;',
-        'DELETE FROM Products WHERE price<4;',
-        'DELETE FROM Products WHERE price>4;',
+        'DELETE FROM Tuotteet;',
+        "DELETE FROM Tuotteet WHERE nimi='maito';",
+        'DELETE FROM Tuotteet WHERE hinta=1;',
+        'DELETE FROM Tuotteet WHERE hinta<=4;',
+        'DELETE FROM Tuotteet WHERE hinta>=4;',
+        'DELETE FROM Tuotteet WHERE hinta<4;',
+        'DELETE FROM Tuotteet WHERE hinta>4;',
+        'DELETE FROM Tuotteet WHERE hinta<5 OR hinta>5;',
+        "DELETE FROM Tuotteet WHERE hinta<>4 OR nimi<>'maito';",
+        'DELETE FROM Tuotteet WHERE hinta<4 AND hinta>4;',
+        'DELETE FROM Tuotteet WHERE hinta<LENGTH(nimi);',
+        'DELETE FROM Tuotteet WHERE hinta<4 OR hinta>=4;',
     ]
 
     test.each(queries)(
@@ -102,7 +107,7 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.getTableByName('Products').rows
+        const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(0)
     })
@@ -113,10 +118,10 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.getTableByName('Products').rows
+        const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(4)
-        expect(rows.filter((r) => r.name === 'milk')).toHaveLength(0)
+        expect(rows.filter((r) => r.nimi === 'maito')).toHaveLength(0)
     })
 
     test(`${queries[2]} deletes the correct rows from the table`, () => {
@@ -125,10 +130,10 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.getTableByName('Products').rows
+        const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(4)
-        expect(rows.filter((r) => r.price === 1)).toHaveLength(0)
+        expect(rows.filter((r) => r.hinta === 1)).toHaveLength(0)
     })
 
     test(`${queries[3]} deletes the correct rows from the table`, () => {
@@ -137,10 +142,10 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.getTableByName('Products').rows
+        const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(2)
-        expect(rows.filter((r) => r.price < 5)).toHaveLength(0)
+        expect(rows.filter((r) => r.hinta < 5)).toHaveLength(0)
     })
 
     test(`${queries[4]} deletes the correct rows from the table`, () => {
@@ -149,10 +154,10 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.getTableByName('Products').rows
+        const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(1)
-        expect(rows.filter((r) => r.price > 3)).toHaveLength(0)
+        expect(rows.filter((r) => r.hinta > 3)).toHaveLength(0)
     })
 
     test(`${queries[5]} deletes the correct rows from the table`, () => {
@@ -161,10 +166,10 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.getTableByName('Products').rows
+        const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(4)
-        expect(rows.filter((r) => r.price < 4)).toHaveLength(0)
+        expect(rows.filter((r) => r.hinta < 4)).toHaveLength(0)
     })
 
     test(`${queries[6]} deletes the correct rows from the table`, () => {
@@ -173,10 +178,68 @@ describe('Valid DELETE-command', () => {
         expect(parsedCommand.error).toBeUndefined()
 
         stateService.updateState(parsedCommand.value)
-        const rows = state.getTableByName('Products').rows
+        const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(3)
-        expect(rows.filter((r) => r.price > 4)).toHaveLength(0)
+        expect(rows.filter((r) => r.hinta > 4)).toHaveLength(0)
+    })
+
+    test(`${queries[7]} deletes the correct rows from the table`, () => {
+        const { state, stateService } = initialiseState()
+        const parsedCommand = parseCommand(queries[7])
+        expect(parsedCommand.error).toBeUndefined()
+
+        stateService.updateState(parsedCommand.value)
+        const rows = state.getTableByName('Tuotteet').rows
+
+        expect(rows).toHaveLength(1)
+        expect(rows).toContainEqual({ id: 2, nimi: 'appelsiini', hinta: 5 })
+    })
+
+    test(`${queries[8]} deletes the correct rows from the table`, () => {
+        const { state, stateService } = initialiseState()
+        const parsedCommand = parseCommand(queries[8])
+        expect(parsedCommand.error).toBeUndefined()
+
+        stateService.updateState(parsedCommand.value)
+        const rows = state.getTableByName('Tuotteet').rows
+
+        expect(rows).toHaveLength(1)
+        expect(rows).toContainEqual({ id: 4, nimi: 'maito', hinta: 4 })
+    })
+
+    test(`${queries[9]} deletes the correct rows from the table`, () => {
+        const { state, stateService } = initialiseState()
+        const parsedCommand = parseCommand(queries[9])
+        expect(parsedCommand.error).toBeUndefined()
+
+        const rowsBefore = state.getTableByName('Tuotteet').rows
+        stateService.updateState(parsedCommand.value)
+        const rows = state.getTableByName('Tuotteet').rows
+
+        expect(rows).toEqual(rowsBefore)
+    })
+
+    test(`${queries[10]} deletes the correct rows from the table`, () => {
+        const { state, stateService } = initialiseState()
+        const parsedCommand = parseCommand(queries[10])
+        expect(parsedCommand.error).toBeUndefined()
+
+        stateService.updateState(parsedCommand.value)
+        const rows = state.getTableByName('Tuotteet').rows
+
+        expect(rows).toContainEqual({ id: 1, nimi: 'omena', hinta: 7 })
+    })
+
+    test(`${queries[11]} deletes the correct rows from the table`, () => {
+        const { state, stateService } = initialiseState()
+        const parsedCommand = parseCommand(queries[11])
+        expect(parsedCommand.error).toBeUndefined()
+
+        stateService.updateState(parsedCommand.value)
+        const rows = state.getTableByName('Tuotteet').rows
+
+        expect(rows).toEqual([])
     })
 })
 
@@ -184,13 +247,13 @@ describe('If referenced table does not exist ', () => {
     test('returns result message and no error from stateService', () => {
         const state = new State(new Map())
         const stateService = new StateService(state)
-        const parsedCommand = parseCommand('DELETE FROM Products;')
+        const parsedCommand = parseCommand('DELETE FROM Tuotteet;')
         expect(parsedCommand.error).toBeUndefined()
 
         const result = stateService.updateState(parsedCommand.value)
 
         expect(result.error).toBeDefined()
-        expect(result.error).toBe('No such table Products')
+        expect(result.error).toBe('No such table Tuotteet')
         expect(result.result).toBeUndefined()
     })
 })

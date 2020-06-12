@@ -1,4 +1,4 @@
-const util = require('util')
+//const util = require('util')
 const _ = require('lodash')
 const {
     executeStringFunction,
@@ -9,10 +9,7 @@ const {
     evaluateAggregateExpression,
     containsAggregateFunction,
 } = require('./components/expressionTools')
-const {
-    createFilter,
-    createOppositeFilter,
-} = require('./components/filterTools')
+const { createFilter } = require('./components/filterTools')
 
 class StateService {
     constructor(state) {
@@ -57,8 +54,10 @@ class StateService {
 
         const table = this.findTable(command.tableName)
 
+        const highest_id =
+            table.rows.length === 0 ? 0 : _.maxBy(table.rows, 'id').id
         const newRow = {
-            id: table.rows.length + 1,
+            id: highest_id + 1,
         }
 
         for (let i = 0; i < command.columns.length; i++) {
@@ -93,7 +92,7 @@ class StateService {
         let rows = table.rows
 
         if (command.where) {
-            console.log(command.where)
+            //console.log(command.where)
             // console.log(
             //     util.inspect(command.where, false, null, true)
             // )
@@ -103,7 +102,7 @@ class StateService {
         rows = this.createAdvancedRows(command, rows)
 
         if (command.orderBy) {
-            console.log(util.inspect(command.orderBy, false, null, true))
+            //console.log(util.inspect(command.orderBy, false, null, true))
             rows = this.orderRowsBy(command.orderBy.columns, rows)
         }
 
@@ -193,8 +192,8 @@ class StateService {
         let rows = table.rows
 
         if (command.where) {
-            const filter = createOppositeFilter(command.where)
-            rows = _.filter(rows, filter)
+            const rowsToDelete = this.filterRows(command.where.conditions, rows)
+            rows = _.difference(rows, rowsToDelete)
         } else {
             rows = []
         }
@@ -229,12 +228,12 @@ class StateService {
 
     orderRowsBy(columns, rows) {
         //TODO
-        console.log('columns', columns)
+        //console.log('columns', columns)
         const arrayOfColumnNames = columns.map((c) => c.value)
         const arrayOfOrderingKeywords = columns.map((c) => c.order.value)
 
-        console.log(arrayOfColumnNames)
-        console.log(arrayOfOrderingKeywords)
+        //console.log(arrayOfColumnNames)
+        //console.log(arrayOfOrderingKeywords)
 
         const orderedRows = _.orderBy(
             rows,
