@@ -1,5 +1,5 @@
 const {
-    arithmeticOperatorPattern,
+    containsArithmeticOperatorPattern,
     comparisonOperatorPattern,
     logicalOperatorsNamePattern,
     stringFunctionsNamePattern,
@@ -7,7 +7,7 @@ const {
 } = require('../helpers/regex')
 
 const containsArithmeticOperator = (input) => {
-    return arithmeticOperatorPattern.test(input)
+    return containsArithmeticOperatorPattern.test(input)
 }
 
 const containsComparisonOperator = (input) => {
