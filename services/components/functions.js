@@ -18,6 +18,10 @@ const executeAggregateFunction = (functionDetails, rows) => {
 
     switch (functionDetails.name) {
         case 'AVG':
+            if (_.isString(_.get(rows[0], paramValue))) {
+                return 0
+            }
+
             return _.meanBy(rows, paramValue)
                 ? _.meanBy(rows, paramValue)
                 : {
