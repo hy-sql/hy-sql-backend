@@ -3,7 +3,7 @@ const StateService = require('../../services/StateService')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
 
-describe('selectAdvanced()', () => {
+describe('selectFrom()', () => {
     let stateService
     beforeEach(() => {
         const state = new State(new Map())

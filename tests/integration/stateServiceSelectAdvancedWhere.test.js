@@ -3,7 +3,7 @@ const StateService = require('../../services/StateService')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
 
-describe('selectAdvanced()', () => {
+describe('selectFrom()', () => {
     let stateService
     beforeEach(() => {
         const state = new State(new Map())
@@ -51,6 +51,14 @@ describe('selectAdvanced()', () => {
         'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)<=5 AND LENGTH(nimi)>=7;',
         'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)=5 OR (LENGTH(nimi)<7 AND hinta=4);',
         'SELECT COUNT(nimi) FROM Tuotteet WHERE hinta<=5;',
+        "SELECT MAX(hinta) FROM Tuotteet WHERE nimi<>'lanttu';",
+        'SELECT MAX(nimi) FROM Tuotteet WHERE hinta>6;',
+        'SELECT MIN(lkm) FROM Tuotteet WHERE hinta<=6;',
+        'SELECT MIN(nimi) FROM Tuotteet WHERE lkm<60 AND lkm>=30;',
+        'SELECT SUM(hinta) FROM Tuotteet WHERE lkm=70;',
+        'SELECT SUM(nimi) FROM Tuotteet WHERE lkm>40;',
+        "SELECT AVG(hinta) FROM Tuotteet WHERE nimi='selleri';",
+        'SELECT AVG(nimi) FROM Tuotteet WHERE hinta<6;',
     ]
 
     test(`returns expected rows for: ${queries[0]}`, () => {
@@ -101,31 +109,19 @@ describe('selectAdvanced()', () => {
     })
 
     test(`returns expected rows for: ${queries[3]}`, () => {
-        const expectedRows = [
-            {
-                'COUNT(*)': 2,
-            },
-        ]
-
         const commandArray = splitCommandIntoArray(queries[3])
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand.value)
 
-        expect(result.rows).toEqual(expectedRows)
+        expect(result.rows).toEqual([{ 'COUNT(*)': 2 }])
     })
 
     test(`returns expected rows for: ${queries[4]}`, () => {
-        const expectedRows = [
-            {
-                'COUNT(*)': 6,
-            },
-        ]
-
         const commandArray = splitCommandIntoArray(queries[4])
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand.value)
 
-        expect(result.rows).toEqual(expectedRows)
+        expect(result.rows).toEqual([{ 'COUNT(*)': 6 }])
     })
 
     test(`returns expected rows for: ${queries[5]}`, () => {
@@ -246,13 +242,11 @@ describe('selectAdvanced()', () => {
     })
 
     test(`returns expected rows for: ${queries[11]}`, () => {
-        const expectedRows = []
-
         const commandArray = splitCommandIntoArray(queries[11])
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand.value)
 
-        expect(result.rows).toEqual(expectedRows)
+        expect(result.rows).toEqual([])
     })
 
     test(`returns expected rows for: ${queries[12]}`, () => {
@@ -271,13 +265,11 @@ describe('selectAdvanced()', () => {
     })
 
     test(`returns expected rows for: ${queries[13]}`, () => {
-        const expectedRows = []
-
         const commandArray = splitCommandIntoArray(queries[13])
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand.value)
 
-        expect(result.rows).toEqual(expectedRows)
+        expect(result.rows).toEqual([])
     })
 
     test(`returns expected rows for: ${queries[14]}`, () => {
@@ -317,7 +309,6 @@ describe('selectAdvanced()', () => {
         })
     })
 
-    //'SELECT hinta, nimi FROM Tuotteet WHERE LENGTH(nimi)>=6 AND (hinta=5 OR lkm>60);'
     test(`returns expected rows for: ${queries[16]}`, () => {
         const commandArray = splitCommandIntoArray(queries[16])
         const parsedCommand = commandService.parseCommand(commandArray)
@@ -375,16 +366,66 @@ describe('selectAdvanced()', () => {
     })
 
     test(`returns expected rows for: ${queries[20]}`, () => {
-        const expectedRows = [
-            {
-                'COUNT(nimi)': 3,
-            },
-        ]
-
         const commandArray = splitCommandIntoArray(queries[20])
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand.value)
 
-        expect(result.rows).toEqual(expectedRows)
+        expect(result.rows).toEqual([{ 'COUNT(nimi)': 3 }])
+    })
+
+    test(`returns expected rows for: ${queries[21]}`, () => {
+        const commandArray = splitCommandIntoArray(queries[21])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual([{ 'MAX(hinta)': 7 }])
+    })
+
+    test(`returns expected rows for: ${queries[22]}`, () => {
+        const commandArray = splitCommandIntoArray(queries[22])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual([{ 'MAX(nimi)': 'retiisi' }])
+    })
+
+    test(`returns expected rows for: ${queries[23]}`, () => {
+        const commandArray = splitCommandIntoArray(queries[23])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual([{ 'MIN(lkm)': 30 }])
+    })
+
+    test(`returns expected rows for: ${queries[24]}`, () => {
+        const commandArray = splitCommandIntoArray(queries[24])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual([{ 'MIN(nimi)': 'nauris' }])
+    })
+
+    test(`returns expected rows for: ${queries[25]}`, () => {
+        const commandArray = splitCommandIntoArray(queries[25])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual([{ 'SUM(hinta)': 12 }])
+    })
+
+    test(`returns expected rows for: ${queries[26]}`, () => {
+        const commandArray = splitCommandIntoArray(queries[26])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual([{ 'SUM(nimi)': 0 }])
+    })
+
+    test(`returns expected rows for: ${queries[27]}`, () => {
+        const commandArray = splitCommandIntoArray(queries[27])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual([{ 'AVG(hinta)': 5 }])
+    })
+
+    test(`returns expected rows for: ${queries[28]}`, () => {
+        const commandArray = splitCommandIntoArray(queries[28])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual([{ 'AVG(nimi)': 0 }])
     })
 })
