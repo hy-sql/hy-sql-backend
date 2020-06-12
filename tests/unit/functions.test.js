@@ -120,6 +120,30 @@ describe('executeAggregateFunction()', () => {
             value: 'MAX(nonexistent)',
             param: { type: 'column', value: 'nonexistent' },
         },
+        {
+            type: 'aggregateFunction',
+            name: 'MIN',
+            value: 'MIN(hinta)',
+            param: { type: 'column', value: 'hinta' },
+        },
+        {
+            type: 'aggregateFunction',
+            name: 'MIN',
+            value: 'MIN(lkm)',
+            param: { type: 'column', value: 'lkm' },
+        },
+        {
+            type: 'aggregateFunction',
+            name: 'MIN',
+            value: 'MIN(nimi)',
+            param: { type: 'column', value: 'nimi' },
+        },
+        {
+            type: 'aggregateFunction',
+            name: 'MIN',
+            value: 'MIN(nonexistent)',
+            param: { type: 'column', value: 'nonexistent' },
+        },
     ]
 
     test(`returns the expected result with ${functionDetailList[0].value}`, () => {
@@ -152,9 +176,29 @@ describe('executeAggregateFunction()', () => {
         )
     })
 
-    test(`returns the expected result with ${functionDetailList[7].value}`, () => {
+    test(`returns the expected error object with ${functionDetailList[7].value}`, () => {
         expect(executeAggregateFunction(functionDetailList[7], rows)).toEqual({
             error: 'Parameter given to MAX does not match any existing column',
+        })
+    })
+
+    test(`returns the expected result with ${functionDetailList[8].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[8], rows)).toBe(4)
+    })
+
+    test(`returns the expected result with ${functionDetailList[9].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[9], rows)).toBe(20)
+    })
+
+    test(`returns the expected result with ${functionDetailList[10].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[10], rows)).toBe(
+            'lanttu'
+        )
+    })
+
+    test(`returns the expected error object with ${functionDetailList[11].value}`, () => {
+        expect(executeAggregateFunction(functionDetailList[11], rows)).toEqual({
+            error: 'Parameter given to MIN does not match any existing column',
         })
     })
 })
