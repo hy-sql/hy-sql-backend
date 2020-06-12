@@ -18,10 +18,12 @@ const executeAggregateFunction = (functionDetails, rows) => {
 
     switch (functionDetails.name) {
         case 'AVG':
-            return _.get(_.meanBy(rows, paramValue), paramValue, {
-                error:
-                    'Parameter given to AVG does not match any existing column',
-            })
+            return _.meanBy(rows, paramValue)
+                ? _.meanBy(rows, paramValue)
+                : {
+                      error:
+                          'Parameter given to AVG does not match any existing column',
+                  }
         case 'COUNT':
             return functionDetails.param.type === 'all'
                 ? rows.length
@@ -37,10 +39,12 @@ const executeAggregateFunction = (functionDetails, rows) => {
                     'Parameter given to MIN does not match any existing column',
             })
         case 'SUM':
-            return _.get(_.sumBy(rows, paramValue), paramValue, {
-                error:
-                    'Parameter given to SUM does not match any existing column',
-            })
+            return _.sumBy(rows, paramValue)
+                ? _.sumBy(rows, paramValue)
+                : {
+                      error:
+                          'Parameter given to SUM does not match any existing column',
+                  }
     }
 }
 
