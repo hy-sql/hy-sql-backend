@@ -16,6 +16,12 @@ class StateService {
         this.state = state
     }
 
+    /* Palauttaa tuloksen muodossa { result: result }
+      tai vastaavasti virheilmoituksen muodossa { error: error }. Lisäksi SELECT
+      palauttaa taulun rivit muodossa { result: result, rows: [] }.
+      Jos CREATE TABLE -lauseessa yritetään muodostaa duplikaattisarakkeita palautetaan lista
+      virheviestejä muodossa { error: [] }
+    */
     updateState(command) {
         switch (command.name) {
             case 'CREATE TABLE':
