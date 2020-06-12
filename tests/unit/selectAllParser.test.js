@@ -2,7 +2,6 @@ const selectParser = require('../../commandParsers/selectParser')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
 
-/* Uncomment after creating field validations
 describe.each(['SELEC * FROM Taulu;', 'SELECT FROM Taulu;'])(
     'Query beginning with misspelled SELECT *',
     (wrongCommand) => {
@@ -15,7 +14,6 @@ describe.each(['SELEC * FROM Taulu;', 'SELECT FROM Taulu;'])(
         })
     }
 )
-*/
 
 describe.each([
     'SELECT * FROM Taulu76;',
@@ -44,7 +42,6 @@ describe.each([
     })
 })
 
-/* Uncomment after creating field validations
 describe.each([
     'SELECT * FRM Taulu;',
     'SELECT * FROM Tau&lu;',
@@ -66,36 +63,34 @@ describe.each([
         })
     })
 })
-*/
 
-describe.each([
-    'SELECT * FROM Tuotteet WHERE price=7;',
-    'SELECT * FROM Tuotteet WhEre price=7;',
-    'SELECT * FROM Tuotteet WHERE price = 7;',
-    'SELECT * FROM Tuotteet WHERE price =7;',
-    "SELECT * FROM Tuotteet WHERE name = ' test ';",
-    "SELECT * FROM Tuotteet WHERE name=' test';",
-    "SELECT * FROM Tuotteet WHERE name='test ';",
-    "SELECT * FROM Tuotteet WHERE name='test';",
-])('Valid SELECT * FROM ... WHERE ...-query', (validCommand) => {
-    describe(validCommand, () => {
-        const command = splitCommandIntoArray(validCommand)
+// describe.each([
+//     'SELECT * FROM Tuotteet WHERE price=7;',
+//     'SELECT * FROM Tuotteet WhEre price=7;',
+//     'SELECT * FROM Tuotteet WHERE price = 7;',
+//     'SELECT * FROM Tuotteet WHERE price =7;',
+//     "SELECT * FROM Tuotteet WHERE name = ' test ';",
+//     "SELECT * FROM Tuotteet WHERE name=' test';",
+//     "SELECT * FROM Tuotteet WHERE name='test ';",
+//     "SELECT * FROM Tuotteet WHERE name='test';",
+// ])('Valid SELECT * FROM ... WHERE ...-query', (validCommand) => {
+//     describe(validCommand, () => {
+//         const command = splitCommandIntoArray(validCommand)
 
-        test('is recognised as a command', () => {
-            expect(commandService.parseCommand(command)).toBeTruthy()
-        })
+//         test('is recognised as a command', () => {
+//             expect(commandService.parseCommand(command)).toBeTruthy()
+//         })
 
-        test('is parsed and validated succesfully', () => {
-            const parsedCommand = selectParser.parseCommand(command)
+//         test('is parsed and validated succesfully', () => {
+//             const parsedCommand = selectParser.parseCommand(command)
 
-            expect(parsedCommand.value).toBeDefined()
-            expect(parsedCommand.value).toHaveProperty('where')
-            expect(parsedCommand.error).toBeUndefined()
-        })
-    })
-})
+//             expect(parsedCommand.value).toBeDefined()
+//             expect(parsedCommand.value).toHaveProperty('where')
+//             expect(parsedCommand.error).toBeUndefined()
+//         })
+//     })
+// })
 
-/* Uncomment after creating field validations
 describe.each([
     'SELECT * FROM Tuotteet WHERE  = 7;',
     'SELECT * FROM Tuotteet WHERE price 7;',
@@ -146,4 +141,3 @@ describe.each([
         })
     }
 )
-*/

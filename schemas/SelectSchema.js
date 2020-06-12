@@ -17,7 +17,7 @@ const SelectSchema = Joi.object({
     }),
 
     fields: Joi.array()
-        .items(
+        .has(
             AllFieldsSchema,
             ColumnSchema,
             TextSchema,
@@ -49,6 +49,8 @@ const SelectSchema = Joi.object({
         'any.only': 'Query must end with ;',
         'any.required': 'Query must end with ;',
     }),
+
+    additional: Joi.array().max(0),
 })
 
 const SelectWhereSchema = SelectSchema.keys({

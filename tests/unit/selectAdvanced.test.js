@@ -5,7 +5,7 @@ describe.each([
     'SELECT this+5* FROM Taulu;',
     'SELECT not * going + to -+ work FROM Taulu;',
     'SELECT "not * going + to - work" FROM Taulu;',
-    // 'SELECT this* FROM Taulu;',
+    'SELECT this* FROM Taulu;',
     'SELECT this*-that FROM Taulu;',
     'SELECT *this* that FROM Taulu;',
 ])('SELECT query with invalid arithmetic operation', (invalidCommand) => {
@@ -16,7 +16,7 @@ describe.each([
             expect(selectParser.parseCommand(command).value).toBeDefined()
             expect(
                 selectParser.parseCommand(command).value.fields[0].type
-            ).toEqual('expression')
+            ).not.toEqual('expression')
         })
     })
 })
