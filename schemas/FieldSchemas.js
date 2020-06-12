@@ -17,6 +17,7 @@ const ColumnSchema = Joi.object({
         .pattern(allFunctionsNamePattern, { invert: true })
         .invalid('FROM')
         .insensitive()
+        .max(64)
         .required(),
 })
 
@@ -27,7 +28,10 @@ const TextSchema = Joi.object({
 
 const IntegerSchema = Joi.object({
     type: Joi.string().valid('integer').required(),
-    value: Joi.number().required(),
+    value: Joi.number().required().messages({
+        'any.required':
+            'value type without singlequotes is expected to be number',
+    }),
 })
 
 const ArithmeticOperatorSchema = Joi.object({
