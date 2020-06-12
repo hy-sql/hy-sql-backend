@@ -181,9 +181,9 @@ class StateService {
     }
 
     /*
-     *For executing DELETE FROM Table_name; or DELETE FROM Table_name WHERE...; queries
-     *Expected input is a parsed DELETE-command object. Output is an object either containing
-     the key result or error and respectively the value result string or error string respectively.
+     * For executing DELETE FROM Table_name; or DELETE FROM Table_name WHERE...; queries
+     * Expected input is a parsed DELETE-command object. Output is an object either containing
+     * the key result or error and respectively the value result string or error string respectively.
      */
     deleteFromTable(command) {
         const error = this.checkIfTableExists(command.tableName)

@@ -70,7 +70,6 @@ describe('executeStringFunction()', () => {
     })
 })
 
-// Now expected values for AVG are the expected return values of lodash _.meanBy
 describe('executeAggregateFunction()', () => {
     const functionDetailList = [
         {

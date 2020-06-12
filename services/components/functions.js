@@ -1,5 +1,12 @@
 const _ = require('lodash')
 
+/* Handles string functions. Input is object containing function details and a table row.
+ * Expected input format of functionDetails: { type: type, name: name, value: value, param: { paramDetails } }
+ *
+ * Returns:
+ *    - functionDetails.name === 'LENGTH': length of param.value or
+ *      length of value in param.value column in input row.
+ */
 const executeStringFunction = (functionDetails, row) => {
     switch (functionDetails.name) {
         case 'LENGTH':
@@ -13,6 +20,22 @@ const executeStringFunction = (functionDetails, row) => {
     }
 }
 
+/* Handles sql aggregate functions. Takes as input an object containing function details and the table rows.
+ * Expected input format of functionDetails: { type: type, name: name, value: value, param: { paramDetails } }
+ *
+ * Return value depends on the fields of functionDetails:
+ *    - name === 'AVG': If param.value does not match any existing columns returns an error object.
+ *         If it matches a column of type TEXT, 0 is returned.
+ *         Otherwise average of the values in the matched column is returned.
+ *    - name === 'COUNT': returns rows.length.
+ *    - name === 'MAX': If param.value does not match any existing columns returns an error object.
+ *         Otherwise the highest of the values in the matched column is returned.
+ *    - name === 'MIN': If param.value does not match any existing columns returns an error object.
+ *         Otherwise the lowest of the values in the matched column is returned.
+ *    - name === 'SUM': If param.value does not match any existing columns returns an error object.
+ *         If it matches a column of type TEXT, 0 is returned.
+ *         Otherwise sum of the values in the matched column is returned.
+ */
 const executeAggregateFunction = (functionDetails, rows) => {
     const paramValue = functionDetails.param.value
 
