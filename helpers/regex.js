@@ -23,9 +23,11 @@ const modifiedArithmeticOperator = new RegExp('^(\\+|-|\\/|\\*\\*|\\%)$')
 const containsArithmeticOperatorPattern = new RegExp('([\\+|\\-|*|/|%])', 'g')
 
 // Have to think more about this one
-const arithmeticExpressionPattern = new RegExp('.+(([+|\\-|*|/|%]).+)+')
+const arithmeticExpressionPattern = new RegExp(
+    '^(?!\\+|-|\\/|\\*\\*|\\%)\\w+(([+|\\-|*|/|%])\\w+)+(?!\\+|-|\\/|\\*\\*|\\%)$'
+)
 
-console.log(arithmeticExpressionPattern.test('2+SUM(hinta)'))
+console.log(arithmeticExpressionPattern.test('2+2+4'))
 
 const comparisonOperators = ['>=', '<=', '<>', '=', '>', '<']
 
@@ -67,8 +69,6 @@ const aggregateFunctionPattern = new RegExp(
     )})\\((\\w+|\\*|\\w+(([+|\\-|*|/|%])\\w+)+)\\)$`,
     'i'
 )
-
-console.log(aggregateFunctionPattern.test('SUM(hinta)'))
 
 const containsAggregateFunctionPattern = new RegExp(
     `((${aggregateFunctions.join('|')})\\((\\w+|\\*)\\))`,

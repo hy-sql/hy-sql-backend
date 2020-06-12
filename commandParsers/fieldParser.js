@@ -1,15 +1,16 @@
 const _ = require('lodash')
 const {
-    isArithmeticOperator,
-    arithmeticExpressionPattern,
-    stringFunctionPattern,
     aggregateFunctionPattern,
-    comparisonOperatorPattern,
-    arithmeticOperatorPattern,
-    containsFunctionPattern,
-    stringFunctionsNamePattern,
     aggregateFunctionsNamePattern,
+    arithmeticExpressionPattern,
+    containsArithmeticOperatorPattern,
+    comparisonOperatorPattern,
+    containsFunctionPattern,
+    modifiedArithmeticOperator,
     sortOrderKeywordPattern,
+    stringFunctionPattern,
+    stringFunctionsNamePattern,
+    textInputPattern,
 } = require('../helpers/regex')
 const prepareConditionsForParsing = require('./parserTools/prepareConditionsForParsing')
 const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBracket')
@@ -72,7 +73,7 @@ const parseExpression = (expression) => {
             .map((e) =>
                 containsFunctionPattern.test(e)
                     ? e
-                    : e.split(arithmeticOperatorPattern).filter(Boolean)
+                    : e.split(containsArithmeticOperatorPattern).filter(Boolean)
             )
             .filter(Boolean)
     )
@@ -138,9 +139,9 @@ const parseField = (field) => {
                 value: parseExpression(field),
                 stringValue: field,
             }
-        case /^'\w+'/.test(field):
+        case textInputPattern.test(field):
             return {
-                type: 'string',
+                type: 'text',
                 value: field.replace(/'/g, ''),
             }
         case !isNaN(field):
@@ -148,7 +149,7 @@ const parseField = (field) => {
                 type: 'integer',
                 value: Number(field),
             }
-        case isArithmeticOperator.test(field):
+        case modifiedArithmeticOperator.test(field):
             return {
                 type: 'operator',
                 value: field === '**' ? '*' : field,

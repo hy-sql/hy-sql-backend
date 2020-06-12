@@ -15,6 +15,8 @@ const ColumnSchema = Joi.object({
     value: Joi.string()
         .pattern(/^\w+$/)
         .pattern(allFunctionsNamePattern, { invert: true })
+        .invalid('FROM')
+        .insensitive()
         .required(),
 })
 
