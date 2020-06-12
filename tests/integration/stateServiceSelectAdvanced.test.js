@@ -370,20 +370,16 @@ describe('selectFrom()', () => {
         expect(result.rows).toEqual([{ 'MAX(nimi)': 'selleri' }])
     })
 
-    test('returns row asked by MAX-function in select', () => {
+    test('returns expected error for MAX-function in select', () => {
         const selectParser = 'SELECT MAX(nonexistent) FROM Tuotteet;'
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand.value)
-        expect(result.rows).toEqual([
-            {
-                'MAX(nonexistent)': {
-                    error:
-                        'Parameter given to MAX does not match any existing column',
-                },
-            },
-        ])
+        expect(result.error).toBeDefined()
+        expect(result.error).toBe(
+            'Parameter given to MAX does not match any existing column'
+        )
     })
 
     test('returns row asked by MIN-function in select', () => {
@@ -404,20 +400,16 @@ describe('selectFrom()', () => {
         expect(result.rows).toEqual([{ 'MIN(nimi)': 'lanttu' }])
     })
 
-    test('returns row asked by MIN-function in select', () => {
+    test('returns expected error for MIN-function in select', () => {
         const selectParser = 'SELECT MIN(nonexistent) FROM Tuotteet;'
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand.value)
-        expect(result.rows).toEqual([
-            {
-                'MIN(nonexistent)': {
-                    error:
-                        'Parameter given to MIN does not match any existing column',
-                },
-            },
-        ])
+        expect(result.error).toBeDefined()
+        expect(result.error).toBe(
+            'Parameter given to MIN does not match any existing column'
+        )
     })
 
     test('returns row asked by SUM-function in select', () => {
@@ -438,20 +430,16 @@ describe('selectFrom()', () => {
         expect(result.rows).toEqual([{ 'SUM(nimi)': 0 }])
     })
 
-    test('returns row asked by SUM-function in select', () => {
+    test('returns expected error for SUM-function in select', () => {
         const selectParser = 'SELECT SUM(nonexistent) FROM Tuotteet;'
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand.value)
-        expect(result.rows).toEqual([
-            {
-                'SUM(nonexistent)': {
-                    error:
-                        'Parameter given to SUM does not match any existing column',
-                },
-            },
-        ])
+        expect(result.error).toBeDefined()
+        expect(result.error).toBe(
+            'Parameter given to SUM does not match any existing column'
+        )
     })
 
     test('returns row asked by AVG-function in select', () => {
@@ -472,19 +460,15 @@ describe('selectFrom()', () => {
         expect(result.rows).toEqual([{ 'AVG(nimi)': 0 }])
     })
 
-    test('returns row asked by AVG-function in select', () => {
+    test('returns expected error for AVG-function in select', () => {
         const selectParser = 'SELECT AVG(nonexistent) FROM Tuotteet;'
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand.value)
-        expect(result.rows).toEqual([
-            {
-                'AVG(nonexistent)': {
-                    error:
-                        'Parameter given to AVG does not match any existing column',
-                },
-            },
-        ])
+        expect(result.error).toBeDefined()
+        expect(result.error).toBe(
+            'Parameter given to AVG does not match any existing column'
+        )
     })
 })

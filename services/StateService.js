@@ -100,6 +100,7 @@ class StateService {
         }
 
         rows = this.createAdvancedRows(command, rows)
+        if (rows.error) return rows
 
         if (command.orderBy) {
             //console.log(util.inspect(command.orderBy, false, null, true))
@@ -342,14 +343,13 @@ class StateService {
     }
 
     createAggregateFunctionRow(functionField, existingRows) {
-        return [
-            {
-                [functionField.value]: executeAggregateFunction(
-                    functionField,
-                    existingRows
-                ),
-            },
-        ]
+        const executedFunction = executeAggregateFunction(
+            functionField,
+            existingRows
+        )
+        return executedFunction.error
+            ? executedFunction
+            : [{ [functionField.value]: executedFunction }]
     }
 
     checkCreateTableErrors(command) {
