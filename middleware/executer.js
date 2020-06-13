@@ -9,33 +9,25 @@ const executer = (request, response, next) => {
 
     const resultArray = []
 
-    let noErrors = true
+    let errors = false
 
     for (let command of parsedCommands) {
-        if (!noErrors) {
-            break
-        }
+        if (errors) break
 
         if (!command) {
             resultArray.push(
                 'Query was not recognised as any existing valid query'
             )
-            noErrors = false
+            errors = true
+        } else if (command.error) {
+            resultArray.push({
+                error: `${command.value.name} -query execution failed: ${command.error.details[0].message}`,
+            })
+            errors = true
         } else {
-            if (command.error) {
-                resultArray.push({
-                    error: `${command.value.name} -query execution failed: ${command.error.details[0].message}`,
-                })
-                noErrors = false
-            } else {
-                /* State palauttaa updateState:sta tuloksen muodossa { result: result }
-                tai vastaavasti virheilmoituksen muodossa { error: error }. Lisäksi SELECT *
-                palauttaa taulun rivit muodossa { result: result, rows: [] }.
-                Jos CREATE TABLE -lauseessa yritetään muodostaa duplikaattisarakkeita palautetaan lista
-                virheviestejä muodossa { error: [] }
-                */
-                resultArray.push(stateService.updateState(command.value))
-            }
+            const result = stateService.updateState(command.value)
+            if (result.error) errors = true
+            resultArray.push(result)
         }
     }
 

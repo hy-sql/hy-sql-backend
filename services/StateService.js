@@ -16,6 +16,12 @@ class StateService {
         this.state = state
     }
 
+    /* Palauttaa tuloksen muodossa { result: result }
+      tai vastaavasti virheilmoituksen muodossa { error: error }. Lisäksi SELECT
+      palauttaa taulun rivit muodossa { result: result, rows: [] }.
+      Jos CREATE TABLE -lauseessa yritetään muodostaa duplikaattisarakkeita palautetaan lista
+      virheviestejä muodossa { error: [] }
+    */
     updateState(command) {
         switch (command.name) {
             case 'CREATE TABLE':
@@ -100,6 +106,7 @@ class StateService {
         }
 
         rows = this.createAdvancedRows(command, rows)
+        if (rows.error) return rows
 
         if (command.orderBy) {
             //console.log(util.inspect(command.orderBy, false, null, true))
@@ -180,9 +187,9 @@ class StateService {
     }
 
     /*
-     *For executing DELETE FROM Table_name; or DELETE FROM Table_name WHERE...; queries
-     *Expected input is a parsed DELETE-command object. Output is an object either containing
-     the key result or error and respectively the value result string or error string respectively.
+     * For executing DELETE FROM Table_name; or DELETE FROM Table_name WHERE...; queries
+     * Expected input is a parsed DELETE-command object. Output is an object either containing
+     * the key result or error and respectively the value result string or error string respectively.
      */
     deleteFromTable(command) {
         const error = this.checkIfTableExists(command.tableName)
@@ -342,14 +349,13 @@ class StateService {
     }
 
     createAggregateFunctionRow(functionField, existingRows) {
-        return [
-            {
-                [functionField.value]: executeAggregateFunction(
-                    functionField,
-                    existingRows
-                ),
-            },
-        ]
+        const executedFunction = executeAggregateFunction(
+            functionField,
+            existingRows
+        )
+        return executedFunction.error
+            ? executedFunction
+            : [{ [functionField.value]: executedFunction }]
     }
 
     checkCreateTableErrors(command) {
