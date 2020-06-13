@@ -3,9 +3,7 @@ const Joi = require('@hapi/joi')
 const OrderBySchema = Joi.object({
     keyword: Joi.string()
         .pattern(/[;]/, { invert: true })
-        .pattern(/^ORDER BY$/)
-        .insensitive()
-        .optional()
+        .pattern(/^ORDER BY$/i)
         .messages({
             'any.required':
                 'This query is expected to contain the following keyword: ORDER BY',
