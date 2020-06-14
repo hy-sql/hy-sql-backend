@@ -21,3 +21,9 @@ Run tests: `npm run test`
 Run ESlint: `npm run lint`
 
 Examples of API usage are found at `_requests/`. HTTP POST -requests support Visual Studio REST Client.
+
+## Docker
+
+https://hub.docker.com/r/hysql/hy-sql-backend
+
+Run: `docker run -p 3001:3001 hysql/hy-sql-backend`
