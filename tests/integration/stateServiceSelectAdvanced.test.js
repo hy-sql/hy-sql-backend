@@ -352,6 +352,18 @@ describe('selectFrom()', () => {
         expect(result.rows).toEqual(expectedRows)
     })
 
+    test('returns expected error for LENGTH-function in select', () => {
+        const selectParser = 'SELECT LENGTH(nonexistent) FROM Tuotteet;'
+
+        const commandArray = splitCommandIntoArray(selectParser)
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.error).toBeDefined()
+        expect(result.error).toBe(
+            'Column name given to LENGTH as parameter does not match any existing column'
+        )
+    })
+
     test('returns row asked by MAX-function in select', () => {
         const selectParser = 'SELECT MAX(hinta) FROM Tuotteet;'
 
