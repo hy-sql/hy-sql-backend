@@ -1,5 +1,5 @@
 const Joi = require('@hapi/joi')
-const WhereSchema = require('./WhereSchema')
+const WhereSchema = require('./WhereAdvancedSchema')
 
 const DeleteSchema = Joi.object({
     name: Joi.string().required().valid('DELETE').insensitive().messages({

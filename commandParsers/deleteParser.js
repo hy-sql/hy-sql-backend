@@ -1,5 +1,5 @@
 const { DeleteSchema, DeleteWhereSchema } = require('../schemas/DeleteSchema')
-const { parseWhereToCommandObject } = require('./whereCommand')
+const { parseWhere } = require('./whereParser')
 const { queryContainsWhereKeyword } = require('./parserTools/queryContains')
 const checkForAdditionalAtEnd = require('./parserTools/checkForAdditional')
 
@@ -38,16 +38,23 @@ const parseDelete = (fullCommandAsStringArray) => {
 
 const parseDeleteWhere = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
-    parsedCommand.where = parseWhereToCommandObject(
-        fullCommandAsStringArray.slice(3)
+
+    const whereIndex = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'WHERE'
     )
+    parsedCommand.where = parseWhere(fullCommandAsStringArray.slice(whereIndex))
 
     let validationResult = DeleteWhereSchema.validate(parsedCommand)
-    validationResult = checkForAdditionalAtEnd(
-        fullCommandAsStringArray,
-        validationResult,
-        4 + validationResult.value.where.indexCounter
-    )
+
+    if (whereIndex !== 3) {
+        const errorMessage = 'WHERE should be directly after the table name'
+
+        validationResult.error
+            ? validationResult.error.details.push({ message: errorMessage })
+            : (validationResult.error = {
+                  details: [{ message: errorMessage }],
+              })
+    }
 
     return validationResult
 }
