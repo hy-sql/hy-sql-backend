@@ -5,6 +5,11 @@ const {
 const { parseWhere } = require('./whereParser')
 const { queryContainsWhereKeyword } = require('./parserTools/queryContains')
 
+/** Parses and validates a UPDATE command object from the given string array.
+ * Returns a Joi validation result object containing the parsed command object
+ * with key value and possible validation errors as object with key error.
+ * @param {string[]} fullCommandAsStringList command as string array
+ */
 const parseCommand = (fullCommandAsStringList) => {
     if (queryContainsWhereKeyword(fullCommandAsStringList)) {
         return parseUpdateWithWhere(fullCommandAsStringList)
@@ -13,6 +18,9 @@ const parseCommand = (fullCommandAsStringList) => {
     }
 }
 
+/** Handles parsing of the base UPDATE command from the given array.
+ * @param {string[]} fullCommandAsStringList command as string array
+ */
 const parseBaseCommand = (fullCommandAsStringList) => {
     let tableName = fullCommandAsStringList[1]
         ? fullCommandAsStringList[1]
@@ -36,6 +44,10 @@ const parseBaseCommand = (fullCommandAsStringList) => {
     return parsedCommand
 }
 
+/** Parses and validates a UPDATE command not containing WHERE
+ * from the given array. Returns a Joi validation result object.
+ * @param {string[]} fullCommandAsStringList command as string array
+ */
 const parseUpdateWithoutWhere = (fullCommandAsStringList) => {
     const updateCommand = parseBaseCommand(fullCommandAsStringList)
 
@@ -52,6 +64,10 @@ const parseUpdateWithoutWhere = (fullCommandAsStringList) => {
     return UpdateSchema.validate(updateCommand)
 }
 
+/** Parses and validates a UPDATE command containing WHERE from the given array.
+ * Returns a Joi validation result object.
+ * @param {string[]} fullCommandAsStringList command as string array
+ */
 const parseUpdateWithWhere = (fullCommandAsStringList) => {
     const updateCommand = parseBaseCommand(fullCommandAsStringList)
 
@@ -76,6 +92,10 @@ const parseUpdateWithWhere = (fullCommandAsStringList) => {
     return UpdateColumnsWhereSchema.validate(updateCommand)
 }
 
+/** Handles parsing of the column information from the given array.
+ * @param {string[]} columnsAndValuesAsStringList array containing information of columns and values
+ * @returns {object[]}
+ */
 const parseUpdatedColumns = (columnsAndValuesAsStringList) => {
     if (!columnsAndValuesAsStringList) return undefined
 
@@ -116,7 +136,7 @@ const parseUpdatedColumns = (columnsAndValuesAsStringList) => {
             valueType,
             value: columnValuePairAsList[1],
         }
-        // console.log('FINAL OBJECT', columnValuePair)
+
         parsedUpdatedColumns.push(columnValuePair)
     })
 

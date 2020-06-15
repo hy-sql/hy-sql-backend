@@ -4,7 +4,7 @@ const { constraintsNamePatternForSplit } = require('../helpers/regex')
 /** Parses and validates a CREATE TABLE command object from the given string array.
  * Returns a Joi validation result object containing the parsed command object
  * with key value and possible validation errors as object with key error.
- * @param {string[]} fullCommandAsStringArray
+ * @param {string[]} fullCommandAsStringArray command as string array
  */
 const parseCommand = (fullCommandAsStringArray) => {
     const parsedCommand = {

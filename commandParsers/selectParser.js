@@ -13,6 +13,11 @@ const {
 const { parseOrderBy } = require('./orderByParser')
 const { parseSelectFields } = require('./fieldParser')
 
+/** Parses and validates a SELECT command object from the given string array.
+ * Returns a Joi validation result object containing the parsed command object
+ * with key value and possible validation errors as object with key error.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ */
 const parseCommand = (fullCommandAsStringArray) => {
     switch (true) {
         case queryContainsWhereOrderByKeywords(fullCommandAsStringArray):
@@ -26,6 +31,9 @@ const parseCommand = (fullCommandAsStringArray) => {
     }
 }
 
+/** Handles parsing of the base SELECT command from the given array.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ */
 const parseBaseCommand = (fullCommandAsStringArray) => {
     const indexOfFrom = fullCommandAsStringArray.findIndex(
         (c) => c.toUpperCase() === 'FROM'
@@ -45,6 +53,10 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
     return parsedCommand
 }
 
+/** Parses and validates a SELECT command not containing WHERE or ORDER BY
+ * from the given array. Returns a Joi validation result object.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ */
 const parseSelect = (fullCommandAsStringArray) => {
     const parsedBaseCommand = parseBaseCommand(fullCommandAsStringArray)
 
@@ -55,6 +67,10 @@ const parseSelect = (fullCommandAsStringArray) => {
     return validatedParsedCommand
 }
 
+/** Parses and validates a SELECT command containing WHERE but not ORDER BY
+ * from the given array. Returns a Joi validation result object.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ */
 const parseSelectWhere = (fullCommandAsStringArray) => {
     const indexOfWhere = fullCommandAsStringArray.findIndex(
         (k) => k.toUpperCase() === 'WHERE'
@@ -71,6 +87,10 @@ const parseSelectWhere = (fullCommandAsStringArray) => {
     return validatedCommand
 }
 
+/** Parses and validates a SELECT command containing ORDER BY but not WHERE
+ * from the given array. Returns a Joi validation result object.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ */
 const parseSelectOrderBy = (fullCommandAsStringArray) => {
     const indexOfOrder = fullCommandAsStringArray.findIndex(
         (k) => k.toUpperCase() === 'ORDER'
@@ -89,6 +109,10 @@ const parseSelectOrderBy = (fullCommandAsStringArray) => {
     return validationResult
 }
 
+/** Parses and validates a SELECT command containing both WHERE and ORDER BY
+ * from the given array. Returns a Joi validation result object.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ */
 const parseSelectWhereOrderBy = (fullCommandAsStringArray) => {
     const indexOfWhere = fullCommandAsStringArray.findIndex(
         (k) => k.toUpperCase() === 'WHERE'
