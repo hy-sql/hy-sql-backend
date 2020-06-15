@@ -1,5 +1,5 @@
 /** Removes commas from the given array.
- * @param {Array} stringArray a string array
+ * @param {string[]} stringArray a string array
  */
 const cleanStringArray = (stringArray) => {
     return stringArray.map((col) => col.replace(/,/g, '').trim())
@@ -7,7 +7,7 @@ const cleanStringArray = (stringArray) => {
 
 /** Maps the given array into an array of objects that contain the original
  *  values as values of name-keys.
- * @param {Array} stringList a string array
+ * @param {string[]} stringList a string array
  */
 const namify = (stringList) => {
     return stringList.map((str) => {

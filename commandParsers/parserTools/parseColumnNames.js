@@ -4,7 +4,7 @@ const { namify, cleanStringArray } = require('./smallTools')
  * Returns parsed column namess and the updated current index in an object or
  * an object containing only the updated current index if the index passes the
  * end of the given command array.
- * @param {Array} stringArray command as string array
+ * @param {string[]} stringArray command as string array
  * @param {Number} parserCounter current index
  */
 const parseColumnNames = (stringArray, parserCounter) => {
