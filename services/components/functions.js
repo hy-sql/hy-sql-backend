@@ -1,18 +1,28 @@
 const _ = require('lodash')
 
-/* Handles string functions. Input is object containing function details and a table row.
- * Expected input format of functionDetails: { type: type, name: name, value: value, param: { paramDetails } }
+/**
+ * Handles string functions. Expected input format of functionDetails:
+ *    { type: type, name: name, value: value, param: { paramDetails } }
  *
  * Returns:
- *    - functionDetails.name === 'LENGTH': length of param.value or
- *      length of value in param.value column in input row.
+ *    - functionDetails.name === 'LENGTH': length of param.value or length of value
+ *          in param.value column in input row. If the parameter is a column that
+ *          does not exist an error object is returned.
+ * @param {Object} functionDetails object containing function details
+ * @param {Object} row table row object
  */
 const executeStringFunction = (functionDetails, row) => {
     switch (functionDetails.name) {
         case 'LENGTH':
-            return functionDetails.param.type === 'column'
-                ? row[functionDetails.param.value].toString().length
-                : functionDetails.param.value.toString().length
+            if (functionDetails.param.type === 'column') {
+                return row[functionDetails.param.value]
+                    ? row[functionDetails.param.value].toString().length
+                    : {
+                          error:
+                              'Column name given to LENGTH as parameter does not match any existing column',
+                      }
+            }
+            return functionDetails.param.value.toString().length
         case 'CONCAT':
             return 'function not implemented yet'
         case 'SUBSTRING':
@@ -20,8 +30,8 @@ const executeStringFunction = (functionDetails, row) => {
     }
 }
 
-/* Handles sql aggregate functions. Takes as input an object containing function details and the table rows.
- * Expected input format of functionDetails: { type: type, name: name, value: value, param: { paramDetails } }
+/** Handles sql aggregate functions. Expected input format of functionDetails:
+ * { type: type, name: name, value: value, param: { paramDetails } }
  *
  * Return value depends on the fields of functionDetails:
  *    - name === 'AVG': If param.value does not match any existing columns returns an error object.
@@ -35,6 +45,8 @@ const executeStringFunction = (functionDetails, row) => {
  *    - name === 'SUM': If param.value does not match any existing columns returns an error object.
  *         If it matches a column of type TEXT, 0 is returned.
  *         Otherwise sum of the values in the matched column is returned.
+ * @param {Object} functionDetails object containing function details
+ * @param {Array} rows array of table rows
  */
 const executeAggregateFunction = (functionDetails, rows) => {
     const paramValue = functionDetails.param.value
