@@ -306,7 +306,7 @@ class StateService {
     }
 
     createQueriedRows(queries, existingRows) {
-        return existingRows.reduce((rowsToReturn, row) => {
+        const createdRows = existingRows.reduce((rowsToReturn, row) => {
             const newRow = {}
 
             for (let i = 0; i < queries.length; i++) {
@@ -331,16 +331,26 @@ class StateService {
 
                     newRow[queries[i].stringValue] = expressionResult
                 } else if (queries[i].type === 'stringFunction') {
-                    newRow[queries[i].value] = executeStringFunction(
+                    const functionResult = executeStringFunction(
                         queries[i],
                         row
                     )
+
+                    functionResult.error
+                        ? (newRow.error = functionResult.error)
+                        : (newRow[queries[i].value] = functionResult)
                 }
             }
+
             rowsToReturn.push(newRow)
 
             return rowsToReturn
         }, [])
+
+        const errorRows = createdRows.filter((r) => r.error)
+        if (errorRows.length > 0) return errorRows[0]
+
+        return createdRows
     }
 
     createAggregateFunctionRow(functionField, existingRows) {
