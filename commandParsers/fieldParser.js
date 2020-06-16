@@ -32,14 +32,17 @@ const parseConditions = (slicedCommandArray) => {
                     conditionArray,
                     i
                 )
+
                 conditions[AndOrSwitch].push(
                     parseConditions(
                         conditionArray.slice(i + 1, indexOfClosingBracket)
                     )
                 )
-                i = indexOfClosingBracket + 1
+                i = indexOfClosingBracket
                 break
             }
+            case ')':
+                break
             case 'AND':
                 AndOrSwitch = 'AND'
                 break
@@ -47,16 +50,20 @@ const parseConditions = (slicedCommandArray) => {
                 AndOrSwitch = 'OR'
                 break
             default: {
-                const splitExpression = conditionArray[i].split(
-                    comparisonOperatorPattern
-                )
+                if (comparisonOperatorPattern.test(conditionArray[i])) {
+                    const splitExpression = conditionArray[i].split(
+                        comparisonOperatorPattern
+                    )
 
-                const condition = {
-                    left: parseField(splitExpression[0]),
-                    operator: splitExpression[1],
-                    right: parseField(splitExpression[2]),
+                    const condition = {
+                        left: parseField(splitExpression[0]),
+                        operator: splitExpression[1],
+                        right: parseField(splitExpression[2]),
+                    }
+                    conditions[AndOrSwitch].push(condition)
+                } else {
+                    conditions[AndOrSwitch].push(conditionArray[i])
                 }
-                conditions[AndOrSwitch].push(condition)
             }
         }
     }
@@ -102,9 +109,12 @@ const parseOrderByFields = (fieldArray) => {
         .split(',')
         .map((f) => f.trim())
         .map((f) => f.split(' '))
+        .filter(Boolean)
         .map((f) => {
             const column = parseField(f[0])
-            column.order = parseField(f[1])
+
+            if (column)
+                column.order = f[1] ? parseField(f[1]) : parseField('asc')
 
             return column
         })
@@ -145,10 +155,12 @@ const parseField = (field) => {
                 value: field.replace(/'/g, ''),
             }
         case !isNaN(field):
-            return {
-                type: 'integer',
-                value: Number(field),
-            }
+            return field
+                ? {
+                      type: 'integer',
+                      value: Number(field),
+                  }
+                : null
         case modifiedArithmeticOperator.test(field):
             return {
                 type: 'operator',

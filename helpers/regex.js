@@ -31,6 +31,15 @@ const comparisonOperators = ['>=', '<=', '<>', '=', '>', '<']
 
 const comparisonOperatorPattern = RegExp('(>=|<=|<>|=|>|<)')
 
+const comparisonOperatorPatternWithWhiteSpace = RegExp(
+    '\\s*(>=|<=|<>|=|>|<)\\s*',
+    'g'
+)
+
+const conditionPattern = new RegExp(
+    `\\w+${comparisonOperators.join('|')}(\\w+)|'`
+)
+
 const logicalOperatorsNamePattern = RegExp(
     '[ALL|AND|ANY|BETWEEN|EXISTS|IN|LIKE|NOT|OR|SOME]',
     'g'
@@ -95,7 +104,14 @@ const containsFunctionPattern = new RegExp(
     'gi'
 )
 
-const textInputPattern = new RegExp("^'\\w+'$")
+const containsFunctionPatternWithWhiteSpaces = new RegExp(
+    `((${stringFunctions.join('|')}|${aggregateFunctions.join(
+        '|'
+    )})\\s*\\(\\s*('?\\w+'?|\\*)\\s*\\))`,
+    'gi'
+)
+
+const textInputPattern = new RegExp("^'.+'$")
 
 const sortOrderKeywordPattern = new RegExp('^(ASC|DESC)$', 'i')
 
@@ -120,4 +136,7 @@ module.exports = {
     stringFunctionPattern,
     stringFunctionsNamePattern,
     textInputPattern,
+    comparisonOperatorPatternWithWhiteSpace,
+    conditionPattern,
+    containsFunctionPatternWithWhiteSpaces,
 }

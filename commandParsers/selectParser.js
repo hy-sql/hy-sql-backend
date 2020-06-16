@@ -1,4 +1,3 @@
-const util = require('util')
 const {
     SelectSchema,
     SelectWhereSchema,
@@ -28,7 +27,6 @@ const parseCommand = (fullCommandAsStringArray) => {
 }
 
 const parseBaseCommand = (fullCommandAsStringArray) => {
-    console.log(fullCommandAsStringArray)
     const indexOfFrom = fullCommandAsStringArray.findIndex(
         (c) => c.toUpperCase() === 'FROM'
     )
@@ -64,8 +62,6 @@ const parseSelect = (fullCommandAsStringArray) => {
 
     const validationResult = SelectSchema.validate(parsedBaseCommand)
 
-    console.log(util.inspect(validationResult, false, null, true))
-
     return validationResult
 }
 
@@ -81,8 +77,6 @@ const parseSelectWhere = (fullCommandAsStringArray) => {
     )
 
     const validationResult = SelectWhereSchema.validate(parsedCommand)
-
-    console.log(util.inspect(validationResult, false, null, true))
 
     return validationResult
 }
@@ -121,8 +115,6 @@ const parseSelectWhereOrderBy = (fullCommandAsStringArray) => {
     parsedCommand.orderBy = parseOrderBy(parsedCommand.additional.splice(0))
 
     const validationResult = SelectWhereOrderBySchema.validate(parsedCommand)
-
-    console.log(util.inspect(validationResult, false, null, true))
 
     return validationResult
 }
