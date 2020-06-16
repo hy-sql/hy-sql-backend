@@ -4,6 +4,12 @@ const selectParser = require('../commandParsers/selectParser')
 const updateParser = require('../commandParsers/updateParser')
 const deleteParser = require('../commandParsers/deleteParser')
 
+/**
+ * Handles selecting and utilising the correct command parser for the given command.
+ * Returns the parsed command object or null if the command is not recognised as an
+ * existing command.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ */
 const parseCommand = (fullCommandAsStringArray) => {
     //tämä pitää siistiä käyttämään yksi- ja kaksisanaisia komentoja
     switch (fullCommandAsStringArray[0].toUpperCase()) {
