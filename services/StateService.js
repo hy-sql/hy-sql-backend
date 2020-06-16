@@ -1,4 +1,3 @@
-//const util = require('util')
 const _ = require('lodash')
 const {
     executeStringFunction,
@@ -98,10 +97,6 @@ class StateService {
         let rows = table.rows
 
         if (command.where) {
-            //console.log(command.where)
-            // console.log(
-            //     util.inspect(command.where, false, null, true)
-            // )
             rows = this.filterRows(command.where.conditions, rows)
         }
 
@@ -109,7 +104,6 @@ class StateService {
         if (rows.error) return rows
 
         if (command.orderBy) {
-            //console.log(util.inspect(command.orderBy, false, null, true))
             rows = this.orderRowsBy(command.orderBy.columns, rows)
         }
 
@@ -234,13 +228,8 @@ class StateService {
     }
 
     orderRowsBy(columns, rows) {
-        //TODO
-        //console.log('columns', columns)
         const arrayOfColumnNames = columns.map((c) => c.value)
         const arrayOfOrderingKeywords = columns.map((c) => c.order.value)
-
-        //console.log(arrayOfColumnNames)
-        //console.log(arrayOfOrderingKeywords)
 
         const orderedRows = _.orderBy(
             rows,
@@ -269,14 +258,20 @@ class StateService {
     filterAndRows(conditions, existingRows) {
         const filteredRows = Object.values(conditions).reduce(
             (rowsToReturn, condition) => {
-                if (condition.OR) {
+                if (condition.AND && condition.OR) {
+                    const filteredAnd = this.filterAndRows(
+                        condition.AND,
+                        existingRows
+                    )
+
                     const filteredOr = this.filterOrRows(
                         condition.OR,
                         rowsToReturn
                     )
 
-                    return _.intersection(existingRows, filteredOr)
+                    return _.intersection(filteredAnd, filteredOr)
                 }
+
                 return _.filter(rowsToReturn, (row) =>
                     createFilter(row, condition)
                 )
