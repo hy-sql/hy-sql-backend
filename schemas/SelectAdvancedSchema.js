@@ -49,6 +49,10 @@ const SelectAdvancedSchema = Joi.object({
                     .insensitive()
                     .required(),
                 param: Joi.object(),
+            }),
+            Joi.object({
+                type: Joi.string().valid('distinct').required(),
+                value: Joi.array(),
             })
         )
         .required()

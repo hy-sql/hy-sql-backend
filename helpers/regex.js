@@ -81,6 +81,8 @@ const containsFunctionPattern = new RegExp(
 
 const sortOrderKeywordPattern = new RegExp('^(ASC|DESC)$', 'i')
 
+const distinctKeywordPattern = new RegExp('DISTINCT')
+
 module.exports = {
     constraintsNamePatternForSplit,
     constraintsNamePattern,
@@ -98,4 +100,5 @@ module.exports = {
     functionExpressionPattern,
     containsFunctionPattern,
     sortOrderKeywordPattern,
+    distinctKeywordPattern,
 }

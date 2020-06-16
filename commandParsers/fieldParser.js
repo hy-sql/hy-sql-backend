@@ -10,6 +10,7 @@ const {
     stringFunctionsNamePattern,
     aggregateFunctionsNamePattern,
     sortOrderKeywordPattern,
+    distinctKeywordPattern,
 } = require('../helpers/regex')
 const prepareConditionsForParsing = require('./parserTools/prepareConditionsForParsing')
 const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBracket')
@@ -83,6 +84,11 @@ const parseExpression = (expression) => {
 }
 
 const parseSelectFields = (fieldArray) => {
+    // console.log('fieldArray', fieldArray)
+    if (distinctKeywordPattern.test(fieldArray[0])) {
+        return parseParametersFromDistinct(fieldArray.slice(1))
+    }
+
     const selectFields = fieldArray
         .join('')
         .split(',')
@@ -92,6 +98,20 @@ const parseSelectFields = (fieldArray) => {
         })
 
     return selectFields
+}
+
+/**
+ * Returns fieldArray with distinct columns parsed in format
+ * { type: 'distinct', value: [ { type: 'column', value: ... }, { type: 'column', value: ... } ] }
+ * @param {*} fieldArray array without DISTINCT keyword, containing only columns separated with comma (,)
+ */
+const parseParametersFromDistinct = (fieldArray) => {
+    return [
+        {
+            type: 'distinct',
+            value: parseSelectFields(fieldArray),
+        },
+    ]
 }
 
 const parseOrderByFields = (fieldArray) => {
