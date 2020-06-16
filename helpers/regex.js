@@ -15,16 +15,30 @@ const constraintsNamePattern = new RegExp(
     )
 )
 
+const arithmeticOperator = new RegExp('^[+\\-*/]$')
+
 // Switched '*' sign to '**' doublesign, because of conflict with select operator '*'
-const isArithmeticOperator = new RegExp('^(\\+|-|\\/|\\*\\*|\\%)$')
+const modifiedArithmeticOperator = new RegExp('^(\\+|-|\\/|\\*\\*|\\%)$')
 
-const arithmeticOperatorPattern = new RegExp('([\\+|\\-|*|/|%])', 'g')
+const containsArithmeticOperatorPattern = new RegExp('([\\+|\\-|*|/|%])', 'g')
 
-const arithmeticExpressionPattern = new RegExp('.+([+|\\-|*|/|%]).+')
+// Have to think more about this one
+const arithmeticExpressionPattern = new RegExp(
+    '^(?!\\+|-|\\/|\\*\\*|\\%)\\w+(([+|\\-|*|/|%])\\w+)+(?!\\+|-|\\/|\\*\\*|\\%)$'
+)
 
 const comparisonOperators = ['>=', '<=', '<>', '=', '>', '<']
 
 const comparisonOperatorPattern = RegExp('(>=|<=|<>|=|>|<)')
+
+const comparisonOperatorPatternWithWhiteSpace = RegExp(
+    '\\s*(>=|<=|<>|=|>|<)\\s*',
+    'g'
+)
+
+const conditionPattern = new RegExp(
+    `\\w+${comparisonOperators.join('|')}(\\w+)|'`
+)
 
 const logicalOperatorsNamePattern = RegExp(
     '[ALL|AND|ANY|BETWEEN|EXISTS|IN|LIKE|NOT|OR|SOME]',
@@ -36,6 +50,8 @@ const stringFunctions = ['LENGTH', 'CONCAT', 'SUBSTRING']
 const aggregateFunctions = ['AVG', 'COUNT', 'MAX', 'MIN', 'SUM']
 
 const allFunctions = stringFunctions.concat(aggregateFunctions)
+
+const allFunctionsNamePattern = new RegExp(allFunctions.join('|'))
 
 const stringFunctionsNamePattern = new RegExp(stringFunctions.join('|'), 'i')
 
@@ -55,7 +71,9 @@ const aggregateFunctionsNamePattern = new RegExp(
 )
 
 const aggregateFunctionPattern = new RegExp(
-    `^(${aggregateFunctions.join('|')})\\((\\w+|\\*)\\)$`,
+    `^(${aggregateFunctions.join(
+        '|'
+    )})\\((\\w+|\\*|\\w+(([+|\\-|*|/|%])\\w+)+)\\)$`,
     'i'
 )
 
@@ -72,6 +90,13 @@ const functionExpressionPattern = new RegExp(
     )})\\(\\w+\\))`
 )
 
+const functionPattern = new RegExp(
+    `(^(${stringFunctions.join('|')}|${aggregateFunctions.join(
+        '|'
+    )})\\(('?\\w+'?|\\*)\\)$)`,
+    'i'
+)
+
 const containsFunctionPattern = new RegExp(
     `((${stringFunctions.join('|')}|${aggregateFunctions.join(
         '|'
@@ -79,26 +104,42 @@ const containsFunctionPattern = new RegExp(
     'gi'
 )
 
+const containsFunctionPatternWithWhiteSpaces = new RegExp(
+    `((${stringFunctions.join('|')}|${aggregateFunctions.join(
+        '|'
+    )})\\s*\\(\\s*('?\\w+'?|\\*)\\s*\\))`,
+    'gi'
+)
+
+const textInputPattern = new RegExp("^'.+'$")
+
 const sortOrderKeywordPattern = new RegExp('^(ASC|DESC)$', 'i')
 
 /**Regular expressions for use in the application.
  * @exports RegExp
  */
 module.exports = {
-    constraintsNamePatternForSplit,
-    constraintsNamePattern,
-    isArithmeticOperator,
-    arithmeticOperatorPattern,
-    arithmeticExpressionPattern,
-    stringFunctionsNamePattern,
-    stringFunctionPattern,
-    aggregateFunctionsNamePattern,
     aggregateFunctionPattern,
+    aggregateFunctionsNamePattern,
+    allFunctionsNamePattern,
+    arithmeticExpressionPattern,
+    arithmeticOperator,
     comparisonOperatorPattern,
-    logicalOperatorsNamePattern,
-    containsStringFunctionPattern,
+    constraintsNamePattern,
+    constraintsNamePatternForSplit,
     containsAggregateFunctionPattern,
-    functionExpressionPattern,
+    containsArithmeticOperatorPattern,
     containsFunctionPattern,
+    containsStringFunctionPattern,
+    functionExpressionPattern,
+    functionPattern,
+    logicalOperatorsNamePattern,
+    modifiedArithmeticOperator,
     sortOrderKeywordPattern,
+    stringFunctionPattern,
+    stringFunctionsNamePattern,
+    textInputPattern,
+    comparisonOperatorPatternWithWhiteSpace,
+    conditionPattern,
+    containsFunctionPatternWithWhiteSpaces,
 }

@@ -1,9 +1,9 @@
 const {
-    SelectAdvancedSchema,
-    SelectAdvancedWhereSchema,
-    SelectAdvancedOrderBySchema,
-    SelectAdvancedWhereOrderBySchema,
-} = require('../schemas/SelectAdvancedSchema')
+    SelectSchema,
+    SelectWhereSchema,
+    SelectOrderBySchema,
+    SelectWhereOrderBySchema,
+} = require('../schemas/SelectSchema')
 const { parseWhere } = require('./whereParser')
 const {
     queryContainsWhereKeyword,
@@ -40,7 +40,7 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
     )
 
     const parsedCommand = {
-        name: 'SELECT',
+        name: fullCommandAsStringArray[0],
         fields: parseSelectFields(
             fullCommandAsStringArray.slice(1, indexOfFrom)
         ),
@@ -48,6 +48,18 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
         tableName: fullCommandAsStringArray[indexOfFrom + 1],
         finalSemicolon:
             fullCommandAsStringArray[fullCommandAsStringArray.length - 1],
+    }
+
+    const additional =
+        fullCommandAsStringArray.length - 1 - (indexOfFrom + 1) > 0
+            ? fullCommandAsStringArray.slice(
+                  indexOfFrom + 2,
+                  fullCommandAsStringArray.length - 1
+              )
+            : null
+
+    if (additional) {
+        parsedCommand.additional = additional
     }
 
     return parsedCommand
@@ -60,11 +72,9 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
 const parseSelect = (fullCommandAsStringArray) => {
     const parsedBaseCommand = parseBaseCommand(fullCommandAsStringArray)
 
-    const validatedParsedCommand = SelectAdvancedSchema.validate(
-        parsedBaseCommand
-    )
+    const validationResult = SelectSchema.validate(parsedBaseCommand)
 
-    return validatedParsedCommand
+    return validationResult
 }
 
 /** Parses and validates a SELECT command containing WHERE but not ORDER BY
@@ -72,19 +82,19 @@ const parseSelect = (fullCommandAsStringArray) => {
  * @param {string[]} fullCommandAsStringArray command as string array
  */
 const parseSelectWhere = (fullCommandAsStringArray) => {
-    const indexOfWhere = fullCommandAsStringArray.findIndex(
+    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
+
+    const indexOfWhere = parsedCommand.additional.findIndex(
         (k) => k.toUpperCase() === 'WHERE'
     )
 
-    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
-
     parsedCommand.where = parseWhere(
-        fullCommandAsStringArray.slice(indexOfWhere)
+        parsedCommand.additional.splice(indexOfWhere)
     )
 
-    const validatedCommand = SelectAdvancedWhereSchema.validate(parsedCommand)
+    const validationResult = SelectWhereSchema.validate(parsedCommand)
 
-    return validatedCommand
+    return validationResult
 }
 
 /** Parses and validates a SELECT command containing ORDER BY but not WHERE
@@ -92,19 +102,17 @@ const parseSelectWhere = (fullCommandAsStringArray) => {
  * @param {string[]} fullCommandAsStringArray command as string array
  */
 const parseSelectOrderBy = (fullCommandAsStringArray) => {
-    const indexOfOrder = fullCommandAsStringArray.findIndex(
+    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
+
+    const indexOfOrder = parsedCommand.additional.findIndex(
         (k) => k.toUpperCase() === 'ORDER'
     )
 
-    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
     parsedCommand.orderBy = parseOrderBy(
-        fullCommandAsStringArray.slice(
-            indexOfOrder,
-            fullCommandAsStringArray.length - 1
-        )
+        parsedCommand.additional.splice(indexOfOrder)
     )
 
-    const validationResult = SelectAdvancedOrderBySchema.validate(parsedCommand)
+    const validationResult = SelectOrderBySchema.validate(parsedCommand)
 
     return validationResult
 }
@@ -114,30 +122,23 @@ const parseSelectOrderBy = (fullCommandAsStringArray) => {
  * @param {string[]} fullCommandAsStringArray command as string array
  */
 const parseSelectWhereOrderBy = (fullCommandAsStringArray) => {
-    const indexOfWhere = fullCommandAsStringArray.findIndex(
+    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
+
+    const indexOfWhere = parsedCommand.additional.findIndex(
         (k) => k.toUpperCase() === 'WHERE'
     )
 
-    const indexOfOrder = fullCommandAsStringArray.findIndex(
+    const indexOfOrder = parsedCommand.additional.findIndex(
         (k) => k.toUpperCase() === 'ORDER'
     )
 
-    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
-
     parsedCommand.where = parseWhere(
-        fullCommandAsStringArray.slice(indexOfWhere)
+        parsedCommand.additional.splice(indexOfWhere, indexOfOrder)
     )
 
-    parsedCommand.orderBy = parseOrderBy(
-        fullCommandAsStringArray.slice(
-            indexOfOrder,
-            fullCommandAsStringArray.length - 1
-        )
-    )
+    parsedCommand.orderBy = parseOrderBy(parsedCommand.additional.splice(0))
 
-    const validationResult = SelectAdvancedWhereOrderBySchema.validate(
-        parsedCommand
-    )
+    const validationResult = SelectWhereOrderBySchema.validate(parsedCommand)
 
     return validationResult
 }

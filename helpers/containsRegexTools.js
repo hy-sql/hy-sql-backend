@@ -1,5 +1,5 @@
 const {
-    arithmeticOperatorPattern,
+    containsArithmeticOperatorPattern,
     comparisonOperatorPattern,
     logicalOperatorsNamePattern,
     stringFunctionsNamePattern,
@@ -10,7 +10,7 @@ const {
  * @param {String} input string to test
  */
 const containsArithmeticOperator = (input) => {
-    return arithmeticOperatorPattern.test(input)
+    return containsArithmeticOperatorPattern.test(input)
 }
 
 /** Tests whether a string contains a comparison operator.

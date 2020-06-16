@@ -81,8 +81,8 @@ const parseUpdateWithWhere = (fullCommandAsStringList) => {
             : undefined
 
     const wherePartAsArray = fullCommandAsStringList.slice(
-        whereIndex
-        //fullCommandAsStringList.indexOf(';') //this is commented out because of a bug in whereParser
+        whereIndex,
+        fullCommandAsStringList.indexOf(';')
     )
 
     updateCommand.columns = parseUpdatedColumns(columnsAndValuesAsStringList)

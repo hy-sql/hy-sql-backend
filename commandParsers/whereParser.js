@@ -4,23 +4,20 @@ const { parseConditions } = require('./fieldParser')
  * @param {string[]} slicedCommandAsStringArray the WHERE part of a command as string array
  */
 const parseWhere = (slicedCommandAsStringArray) => {
-    const indexOfOrderBy = slicedCommandAsStringArray.find(
-        (s) => s.toUpperCase() === 'ORDER'
+    const indexOfOrder = slicedCommandAsStringArray.findIndex(
+        (c) => c.toUpperCase() === 'ORDER'
     )
 
     const parsedWherePart = {
         keyword: slicedCommandAsStringArray[0],
-        conditions:
-            indexOfOrderBy > 0
-                ? parseConditions(
-                      slicedCommandAsStringArray.slice(1, indexOfOrderBy)
-                  )
-                : parseConditions(
-                      slicedCommandAsStringArray.slice(
-                          1,
-                          slicedCommandAsStringArray.length - 1
-                      )
-                  ),
+        conditions: parseConditions(
+            slicedCommandAsStringArray.slice(
+                1,
+                indexOfOrder >= 0
+                    ? indexOfOrder
+                    : slicedCommandAsStringArray.length
+            )
+        ),
     }
 
     return parsedWherePart

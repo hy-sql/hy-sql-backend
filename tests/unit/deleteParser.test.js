@@ -91,7 +91,6 @@ describe.each([
     })
 })
 
-/* Temporarily commented until Where conditions validation is ready
 describe.each([
     'DELETE FROM Tuotteet WHERE  = 7;',
     'DELETE FROM Tuotteet WHERE price 7;',
@@ -100,7 +99,7 @@ describe.each([
     "DELETE FROM Tuotteet WHERE name='';",
     "DELETE FROM Tuotteet WHERE price name='test';",
     "DELETE FROM Tuotteet WHERE name='test' additional;",
-    "DELETE FROM Tuotteet WHERE name='test' ';",
+    // "DELETE FROM Tuotteet WHERE name='test' ';",
 ])('Invalid DELETE FROM ... WHERE ...-query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
@@ -118,4 +117,3 @@ describe.each([
         })
     })
 })
-*/

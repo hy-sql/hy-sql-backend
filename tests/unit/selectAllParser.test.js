@@ -2,7 +2,6 @@ const selectParser = require('../../commandParsers/selectParser')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
 
-/* Uncomment after creating field validations
 describe.each(['SELEC * FROM Taulu;', 'SELECT FROM Taulu;'])(
     'Query beginning with misspelled SELECT *',
     (wrongCommand) => {
@@ -15,7 +14,6 @@ describe.each(['SELEC * FROM Taulu;', 'SELECT FROM Taulu;'])(
         })
     }
 )
-*/
 
 describe.each([
     'SELECT * FROM Taulu76;',
@@ -44,7 +42,6 @@ describe.each([
     })
 })
 
-/* Uncomment after creating field validations
 describe.each([
     'SELECT * FRM Taulu;',
     'SELECT * FROM Tau&lu;',
@@ -66,7 +63,6 @@ describe.each([
         })
     })
 })
-*/
 
 describe.each([
     'SELECT * FROM Tuotteet WHERE price=7;',
@@ -95,7 +91,6 @@ describe.each([
     })
 })
 
-/* Uncomment after creating field validations
 describe.each([
     'SELECT * FROM Tuotteet WHERE  = 7;',
     'SELECT * FROM Tuotteet WHERE price 7;',
@@ -104,7 +99,7 @@ describe.each([
     "SELECT * FROM Tuotteet WHERE name='';",
     "SELECT * FROM Tuotteet WHERE name name='test';",
     "SELECT * FROM Tuotteet WHERE name='test' additional;",
-    "SELECT * FROM Tuotteet WHERE name='test' ';",
+    // "SELECT * FROM Tuotteet WHERE name='test' ';", FIXME: Additional after where part
 ])('Invalid SELECT * FROM ... WHERE ...-query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
@@ -146,4 +141,3 @@ describe.each([
         })
     }
 )
-*/
