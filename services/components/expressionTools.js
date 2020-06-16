@@ -4,14 +4,39 @@ const {
 } = require('./functions')
 const { calculateExpression } = require('../../utils/calculateExpression')
 
-const evaluateExpression = (expressionArray, row, rows) => {
+/**
+ * Takes an array of expression fields and maps them using evaluateExpressionPart(expressionPart, row),
+ * using columns in the expression with given row values. From The results creates
+ * a string type of expression and calculates using calculateExpression(mappedExpression)
+ * @param {Array} expressionArray
+ * @param {Object} row
+ *
+ * const expressionArray = [
+ *     { type: 'integer', value: 5 },
+ *     { type: 'operator', value: '+' },
+ *     { type: 'column', value: 'price' },
+ *     { type: 'operator', value: '*' },
+ *     { type: 'integer', value: 4 }
+ *   ]
+ *
+ * const row = { id: 6, name: 'celery', price: 6, amount: 70 }
+ *
+ * mappedExpression is '5+6*4'
+ * output is 29
+ */
+const evaluateExpression = (expressionArray, row) => {
     const mappedExpression = expressionArray
-        .map((e) => evaluateExpressionPart(e, row, rows))
+        .map((e) => evaluateExpressionPart(e, row))
         .join('')
 
     return calculateExpression(mappedExpression)
 }
 
+/**
+ * Returns result of a single expression part
+ * @param {Object} expressionPart
+ * @param {Object} row
+ */
 const evaluateExpressionPart = (expressionPart, row) => {
     switch (expressionPart.type) {
         case 'expression': {
@@ -36,7 +61,14 @@ const evaluateExpressionPart = (expressionPart, row) => {
     }
 }
 
+/**
+ * Same as evaluateExpression above, only takes aggregate expression and an array of rows as an input
+ * @param {Array} expressionArray
+ * @param {Array} rows
+ */
 const evaluateAggregateExpression = (expressionArray, rows) => {
+    console.log(expressionArray)
+    console.log(rows)
     const evaluatedExpression = expressionArray.map((e) =>
         evaluateAggregateExpressionPart(e, rows)
     )
@@ -44,6 +76,11 @@ const evaluateAggregateExpression = (expressionArray, rows) => {
     return calculateExpression(evaluatedExpression)
 }
 
+/**
+ * Returns result of a single aggregate expression part
+ * @param {Object} expressionPart
+ * @param {Array} rows
+ */
 const evaluateAggregateExpressionPart = (expressionPart, rows) => {
     switch (expressionPart.type) {
         case 'stringFunction':

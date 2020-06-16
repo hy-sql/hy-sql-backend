@@ -12,9 +12,9 @@ const {
     stringFunctionsNamePattern,
     textInputPattern,
 } = require('../helpers/regex')
-const prepareConditionsForParsing = require('./parserTools/prepareConditionsForParsing')
 const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBracket')
 const {
+    transformSplitConditionsIntoConditionsArray,
     transformOrderByInputArrayIntoOrderByFieldsArray,
 } = require('./parserTools/arrayTransformationTools')
 
@@ -23,7 +23,9 @@ const {
  * @param {string[]} slicedCommandArray array containing the conditions
  */
 const parseConditions = (slicedCommandArray) => {
-    const conditionArray = prepareConditionsForParsing(slicedCommandArray)
+    const conditionArray = transformSplitConditionsIntoConditionsArray(
+        slicedCommandArray
+    )
 
     const conditions = { AND: [], OR: [] }
 
