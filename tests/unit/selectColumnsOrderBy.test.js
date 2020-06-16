@@ -1,5 +1,5 @@
 const selectParser = require('../../commandParsers/selectParser')
-const { SelectColumnsOrderBySchema } = require('../../schemas/SelectSchema')
+const { SelectOrderBySchema } = require('../../schemas/SelectSchema')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
 
@@ -46,7 +46,7 @@ describe.each([
                 fullCommandAsStringArray
             )
 
-            const result = SelectColumnsOrderBySchema.validate(parsedCommand)
+            const result = SelectOrderBySchema.validate(parsedCommand)
 
             expect(result.error).toBeDefined()
         })

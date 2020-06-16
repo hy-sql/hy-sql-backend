@@ -1,25 +1,19 @@
-test.todo(
-    'temporary useless test so this file does not fail execution as empty'
-)
-
-/* Temporarily commented until validation of where is completed.
-When validation is ready, pick which tests are to be kept.
-Also remove the then redundant test above.
-
 const { parseWhere } = require('../../commandParsers/whereParser')
-const { queryContainsWhereKeyword } = require('./parserTools/queryContains')
-const WhereSchema = require('../../schemas/WhereAdvancedSchema')
+const {
+    queryContainsWhereKeyword,
+} = require('../../commandParsers/parserTools/queryContains')
+const WhereSchema = require('../../schemas/WhereSchema')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
 
 describe.each([
-    'WHERE price=7;',
-    'WhEre price=7;',
-    'WHERE price = 7;',
-    'WHERE price =7;',
-    "WHERE name='test';",
-    "WHERE name = ' test ';",
-    "WHERE name=' test';",
-    "WHERE name='test ';",
+    'WHERE price=7',
+    'WhEre price=7',
+    'WHERE price = 7',
+    'WHERE price =7',
+    "WHERE name='test'",
+    "WHERE name = ' test '",
+    "WHERE name=' test'",
+    "WHERE name='test '",
     "WHERE name='test' ORDER BY",
 ])('Valid WHERE-part of a query', (validCommand) => {
     describe(validCommand, () => {
@@ -33,26 +27,18 @@ describe.each([
             const parsedCommand = WhereSchema.validate(parseWhere(command))
 
             expect(parsedCommand.value).toHaveProperty('keyword')
-            expect(parsedCommand.value).toHaveProperty('columnName')
-            expect(parsedCommand.value).toHaveProperty('sign')
-            expect(parsedCommand.value).toHaveProperty('valueType')
-            expect(parsedCommand.value).toHaveProperty('value')
-            expect(parsedCommand.value).toHaveProperty('indexCounter')
+            expect(parsedCommand.value).toHaveProperty('conditions')
             expect(parsedCommand.error).toBeUndefined()
         })
     })
 })
 
 describe.each([
-    'WHERE  = 7;',
-    'WHERE price 7;',
-    'WHERE price7;',
-    "WHERE name='';",
-    "WHERE name name='test ';",
-    "WHERE name='test ''",
-    "WHERE name=''test'",
-    "WHERE name=''test''",
-    'WHERE name=test',
+    'WHERE  = 7',
+    'WHERE price 7',
+    'WHERE price7',
+    "WHERE name=''",
+    "WHERE name name='test '",
 ])('Invalid WHERE-part of a query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
@@ -63,13 +49,14 @@ describe.each([
 
         test('fails validation after parsed to command object', () => {
             const parsedCommand = WhereSchema.validate(parseWhere(command))
+
             expect(parsedCommand.value).toBeDefined()
             expect(parsedCommand.error).toBeDefined()
         })
     })
 })
 
-describe.each(['WHEE price=7;', 'price=7;'])(
+describe.each(['WHEE price=7', 'price=7'])(
     'Query part with misspelled or missing WHERE',
     (validCommand) => {
         describe(validCommand, () => {
@@ -87,4 +74,3 @@ describe.each(['WHEE price=7;', 'price=7;'])(
         })
     }
 )
-*/

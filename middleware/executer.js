@@ -33,9 +33,6 @@ const executer = (request, response, next) => {
 
     const stateArray = Array.from(state.tables.values())
 
-    console.log('resultArray:', resultArray)
-    console.log('stateArray:', stateArray)
-
     request.resultArray = {
         resultArray,
         state: stateArray,
