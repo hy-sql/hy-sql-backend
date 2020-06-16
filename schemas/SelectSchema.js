@@ -1,6 +1,7 @@
 const Joi = require('@hapi/joi')
-const OrderBySchema = require('./OrderBySchema')
 const WhereSchema = require('./WhereSchema')
+const GroupBySchema = require('./GroupBySchema')
+const OrderBySchema = require('./OrderBySchema')
 const {
     AllFieldsSchema,
     ColumnSchema,
@@ -50,16 +51,23 @@ const SelectSchema = Joi.object({
         'any.only': 'Query must end with ;',
         'any.required': 'Query must end with ;',
     }),
-
-    additional: Joi.array().max(0),
 })
 
 const SelectWhereSchema = SelectSchema.keys({
     where: WhereSchema,
 })
 
+const SelectGroupBySchema = SelectSchema.keys({
+    groupBy: GroupBySchema,
+})
+
 const SelectOrderBySchema = SelectSchema.keys({
     orderBy: OrderBySchema,
+})
+
+const SelectWhereGroupBySchema = SelectSchema.keys({
+    where: WhereSchema,
+    groupBy: GroupBySchema,
 })
 
 const SelectWhereOrderBySchema = SelectSchema.keys({
@@ -67,9 +75,24 @@ const SelectWhereOrderBySchema = SelectSchema.keys({
     orderBy: OrderBySchema,
 })
 
+const SelectGroupByOrderBySchema = SelectSchema.keys({
+    groupBy: GroupBySchema,
+    orderBy: OrderBySchema,
+})
+
+const SelectWhereGroupByOrderBySchema = SelectSchema.keys({
+    where: WhereSchema,
+    groupBy: GroupBySchema,
+    orderBy: OrderBySchema,
+})
+
 module.exports = {
     SelectSchema,
-    SelectOrderBySchema,
     SelectWhereSchema,
+    SelectGroupBySchema,
+    SelectOrderBySchema,
+    SelectWhereGroupBySchema,
     SelectWhereOrderBySchema,
+    SelectGroupByOrderBySchema,
+    SelectWhereGroupByOrderBySchema,
 }

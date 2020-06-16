@@ -1,5 +1,3 @@
-const splitCommandIntoArray = require('./parserTools/splitCommandIntoArray')
-
 const { parseSelectFields } = require('./fieldParser')
 
 const parseGroupBy = (slicedCommandAsStringArray) => {
@@ -21,11 +19,3 @@ const parseGroupBy = (slicedCommandAsStringArray) => {
 }
 
 module.exports = { parseGroupBy }
-
-const query = 'GROUP BY nimi, hinta'
-
-const splitQuery = splitCommandIntoArray(query)
-
-console.log(splitQuery)
-
-console.log(parseGroupBy(splitQuery))
