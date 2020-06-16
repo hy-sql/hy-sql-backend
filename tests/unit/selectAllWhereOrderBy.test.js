@@ -1,4 +1,4 @@
-const selectParser = require('../../commandParsers/selectParser')
+const { parseCommand } = require('../../commandParsers/selectParser')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
 
 describe.each([
@@ -11,7 +11,7 @@ describe.each([
         const command = splitCommandIntoArray(wrongCommand)
 
         test('does not contain where field', () => {
-            const parsedCommand = selectParser.parseCommand(command)
+            const parsedCommand = parseCommand(command)
             expect(parsedCommand.value).not.toHaveProperty('where')
         })
     })
@@ -29,14 +29,13 @@ describe.each([
             const command = splitCommandIntoArray(wrongCommand)
 
             test('does not contain orderBy field or format invalid', () => {
-                const parsedCommand = selectParser.parseCommand(command)
+                const parsedCommand = parseCommand(command)
                 expect(parsedCommand.value).not.toHaveProperty('orderBy')
             })
         })
     }
 )
 
-/* Uncomment after creating field validations
 describe.each([
     'SELECT * FROM Taulu where order by;',
     'SELECT * FROM Taulu where this order by this;',
@@ -44,24 +43,25 @@ describe.each([
     'SELECT * FROM Taulu where #=5 order by 5;',
     'SELECT * FROM Taulu where is=true order by false',
     'SELECT * FROM Taulu where "this"="that" order by that;',
-    "SELECT * FROM Taulu76 where name='test' ' order by column;",
+    // "SELECT * FROM Taulu76 where name='test' ' order by column;", FIXME: Additional after where part
 ])('Invalid SELECT * -query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
 
+        const parsedCommand = parseCommand(command)
+
         test('is recognised as a command', () => {
-            expect(selectParser.parseCommand(command)).toBeTruthy()
+            expect(parsedCommand).toBeTruthy()
         })
 
         test('fails validation after parsed to command object', () => {
-            const parsedCommand = selectParser.parseCommand(command)
+            const parsedCommand = parseCommand(command)
             expect(parsedCommand.value).toHaveProperty('where')
             expect(parsedCommand.value).toHaveProperty('orderBy')
             expect(parsedCommand.error).toBeDefined()
         })
     })
 })
-*/
 
 describe.each([
     "SELECT * FROM Taulu76 where name='test' order by column;",
@@ -75,17 +75,17 @@ describe.each([
         const command = splitCommandIntoArray(validCommand)
 
         test('is recognised as a command', () => {
-            expect(selectParser.parseCommand(command)).toBeTruthy()
+            expect(parseCommand(command)).toBeTruthy()
         })
 
         test('is parsed and validated succesfully', () => {
-            const parsedCommand = selectParser.parseCommand(command)
+            const parsedCommand = parseCommand(command)
 
             expect(parsedCommand.value).toBeDefined()
             expect(parsedCommand.value).toHaveProperty('where')
             expect(parsedCommand.value).toHaveProperty('orderBy')
 
-            expect(selectParser.parseCommand(command).error).toBeUndefined()
+            expect(parseCommand(command).error).toBeUndefined()
         })
     })
 })
