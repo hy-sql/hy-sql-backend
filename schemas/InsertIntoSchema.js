@@ -1,5 +1,8 @@
 const Joi = require('@hapi/joi')
 
+/**
+ * Joi schema for validating column information in INSERT INTO commands.
+ */
 const ColumnsSchema = Joi.object({
     name: Joi.string().pattern(/^\w+$/).max(64).required().messages({
         'string.pattern.base':
@@ -9,6 +12,9 @@ const ColumnsSchema = Joi.object({
     }),
 })
 
+/**
+ * Joi schema for validating value information in INSERT INTO commands.
+ */
 const ValuesSchema = Joi.object({
     column: Joi.string()
         .pattern(/^\w+$/)
@@ -42,6 +48,9 @@ const ValuesSchema = Joi.object({
         .messages({}),
 })
 
+/**
+ * Joi schema for validating INSERT INTO commands.
+ */
 const InsertIntoSchema = Joi.object({
     name: Joi.string()
         .valid('INSERT INTO')

@@ -5,9 +5,9 @@ const _ = require('lodash')
  *    { type: type, name: name, value: value, param: { paramDetails } }
  *
  * Returns:
- *    - functionDetails.name === 'LENGTH': length of param.value or length of value
- *          in param.value column in input row. If the parameter is a column that
- *          does not exist an error object is returned.
+ *   - functionDetails.name === 'LENGTH': length of param.value or length of value
+ *         in param.value column in input row. If the parameter is a column that
+ *         does not exist an error object is returned.
  * @param {Object} functionDetails object containing function details
  * @param {Object} row table row object
  */
@@ -30,19 +30,20 @@ const executeStringFunction = (functionDetails, row) => {
     }
 }
 
-/** Handles sql aggregate functions. Expected input format of functionDetails:
+/**
+ * Handles sql aggregate functions. Expected input format of functionDetails:
  * { type: type, name: name, value: value, param: { paramDetails } }
  *
  * Return value depends on the fields of functionDetails:
- *    - name === 'AVG': If param.value does not match any existing columns returns an error object.
+ *   - name === 'AVG': If param.value does not match any existing columns returns an error object.
  *         If it matches a column of type TEXT, 0 is returned.
  *         Otherwise average of the values in the matched column is returned.
- *    - name === 'COUNT': returns rows.length.
- *    - name === 'MAX': If param.value does not match any existing columns returns an error object.
+ *   - name === 'COUNT': returns rows.length.
+ *   - name === 'MAX': If param.value does not match any existing columns returns an error object.
  *         Otherwise the highest of the values in the matched column is returned.
- *    - name === 'MIN': If param.value does not match any existing columns returns an error object.
+ *   - name === 'MIN': If param.value does not match any existing columns returns an error object.
  *         Otherwise the lowest of the values in the matched column is returned.
- *    - name === 'SUM': If param.value does not match any existing columns returns an error object.
+ *   - name === 'SUM': If param.value does not match any existing columns returns an error object.
  *         If it matches a column of type TEXT, 0 is returned.
  *         Otherwise sum of the values in the matched column is returned.
  * @param {Object} functionDetails object containing function details
