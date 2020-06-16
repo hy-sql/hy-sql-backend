@@ -1,4 +1,4 @@
-const selectParser = require('../../commandParsers/selectParser')
+const { parseCommand } = require('../../commandParsers/selectParser')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
 
 describe.each([
@@ -11,10 +11,8 @@ describe.each([
         const command = splitCommandIntoArray(wrongCommand)
 
         test('does not contain orderBy field', () => {
-            expect(selectParser.parseCommand(command).value).toBeDefined()
-            expect(
-                selectParser.parseCommand(command).value.orderBy
-            ).not.toBeDefined()
+            expect(parseCommand(command).value).toBeDefined()
+            expect(parseCommand(command).value.orderBy).not.toBeDefined()
         })
     })
 })
@@ -31,11 +29,11 @@ describe.each([
         const command = splitCommandIntoArray(validCommand)
 
         test('is recognised as a command', () => {
-            expect(selectParser.parseCommand(command)).toBeTruthy()
+            expect(parseCommand(command)).toBeTruthy()
         })
 
         test('is parsed and validated succesfully', () => {
-            const parsedCommand = selectParser.parseCommand(command)
+            const parsedCommand = parseCommand(command)
 
             expect(parsedCommand.value).toBeDefined()
             expect(parsedCommand.value).toHaveProperty('name')
@@ -44,12 +42,11 @@ describe.each([
             expect(parsedCommand.value).toHaveProperty('finalSemicolon')
             expect(parsedCommand.value).toHaveProperty('orderBy')
 
-            expect(selectParser.parseCommand(command).error).toBeUndefined()
+            expect(parseCommand(command).error).toBeUndefined()
         })
     })
 })
 
-/* Uncomment after creating field validations
 describe.each([
     'SELECT * FROM Taulu order by where where;',
     'SELECT * FROM Taulu order by asc hi;',
@@ -64,12 +61,13 @@ describe.each([
         const command = splitCommandIntoArray(invalidCommand)
 
         test('is recognised as a command', () => {
-            expect(selectParser.parseCommand(command)).toBeTruthy()
+            expect(parseCommand(command)).toBeTruthy()
         })
 
         test('fails validation after parsed to command object', () => {
-            expect(selectParser.parseCommand(command).error).toBeDefined()
+            const parsedCommand = parseCommand(command)
+
+            expect(parsedCommand.error).toBeDefined()
         })
     })
 })
-*/

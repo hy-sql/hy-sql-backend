@@ -1,18 +1,27 @@
 const _ = require('lodash')
 const splitBracketsFromFunctionExpressionArray = require('./splitBracketsFromFunctionExpressionArray')
 const { containsFunctionPattern } = require('../../helpers/regex')
+const {
+    transformCommandArrayIntoConditionsArray,
+} = require('./arrayTransformationTools')
 
 const prepareConditionsForParsing = (slicedCommandArray) => {
-    const conditionsArray = slicedCommandArray
-        .join('')
-        .replace(/AND/gi, ' AND ')
-        .replace(/OR/gi, ' OR ')
-        .split(' ')
-        .filter(Boolean)
+    const conditionsArray = transformCommandArrayIntoConditionsArray(
+        slicedCommandArray
+    )
 
-    const newArray = conditionsArray.reduce((newArray, c) => {
+    return splitBracketsFromConditionsArray(conditionsArray)
+}
+
+const splitBracketsFromConditionsArray = (conditionsArray) => {
+    const splitConditionsArray = conditionsArray.reduce((newArray, c) => {
         if (!c.match(containsFunctionPattern)) {
-            newArray.push(c.replace('(', ' ( ').replace(')', ' ) ').split(' '))
+            newArray.push(
+                c
+                    .replace('(', ' ( ')
+                    .replace(')', ' ) ')
+                    .split(/ +(?=(?:(?:[^']*'){2})*[^']*$)/g)
+            )
         } else {
             const splitArray = splitBracketsFromFunctionExpressionArray(c)
             splitArray.forEach((e) => newArray.push(e))
@@ -21,7 +30,7 @@ const prepareConditionsForParsing = (slicedCommandArray) => {
         return newArray
     }, [])
 
-    return _.flatten(newArray).filter(Boolean)
+    return _.flatten(splitConditionsArray).filter(Boolean)
 }
 
 module.exports = prepareConditionsForParsing

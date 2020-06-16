@@ -9,7 +9,7 @@ const parseOrderBy = (slicedCommandAsStringArray) => {
                       .slice(0, 2)
                       .join(' ')
                       .toUpperCase(),
-                  columns: parseOrderByFields(
+                  fields: parseOrderByFields(
                       slicedCommandAsStringArray.slice(2)
                   ),
               }

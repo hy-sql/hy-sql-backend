@@ -25,7 +25,7 @@ const evaluateExpressionPart = (expressionPart, row) => {
             return executeStringFunction(expressionPart, row)
         case 'aggregateFunction':
             return executeAggregateFunction(expressionPart)
-        case 'string':
+        case 'text':
             return expressionPart.value
         case 'integer':
             return expressionPart.value

@@ -19,7 +19,6 @@ describe.each([
         describe(validCommand, () => {
             test('is valid and parsed', () => {
                 const parsedCommand = selectParser.parseCommand(command)
-                // console.log(parsedCommand.value.where.conditions)
                 expect(parsedCommand.value).toBeDefined()
                 expect(parsedCommand.value.fields).toBeDefined()
                 expect(parsedCommand.error).not.toBeDefined()
@@ -28,7 +27,6 @@ describe.each([
     }
 )
 
-//ei mene läpi vielä
 /**
  * Invalid SELECT ... WHERE ... with aritmetic expression
  */
@@ -45,9 +43,7 @@ describe.each([
         describe(invalidCommand, () => {
             test('fails validation', () => {
                 const parsedCommand = selectParser.parseCommand(command)
-                // expect(parsedCommand.value).not.toBeDefined()
-                // expect(parsedCommand.value.fields).not.toBeDefined()
-                // expect(parsedCommand.error).toBeDefined()
+                expect(parsedCommand.error).toBeDefined()
             })
         })
     }
@@ -60,8 +56,8 @@ describe.each([
     'SELECT nimi, hinta FROM Taulu WHERE hinta+1=5 AND 2*hinta<10;',
     'SELECT nimi, hinta FROM Taulu WHERE hinta*2=20 OR hinta*2=10;',
     'SELECT nimi, hinta FROM Taulu WHERE (hinta*hinta>=20 AND hinta < 15) OR hinta+1=6;',
-    "SELECT nimi, hinta FROM Taulu WHERE hinta*h<=20 OR nimi='nauris;",
-    "SELECT nimi, hinta FROM Taulu WHERE hinta/2=10 AND nimi='nauris;",
+    "SELECT nimi, hinta FROM Taulu WHERE hinta*h<=20 OR nimi='nauris';",
+    "SELECT nimi, hinta FROM Taulu WHERE hinta/2=10 AND nimi='nauris';",
 ])(
     'Valid SELECT with WHERE condition containing AND and OR operators',
     (validCommand) => {
@@ -70,7 +66,6 @@ describe.each([
         describe(validCommand, () => {
             test('is valid and parsed', () => {
                 const parsedCommand = selectParser.parseCommand(command)
-                // console.log(parsedCommand.value.where.conditions)
                 expect(parsedCommand.value).toBeDefined()
                 expect(parsedCommand.value.fields).toBeDefined()
                 expect(parsedCommand.error).not.toBeDefined()
@@ -79,7 +74,6 @@ describe.each([
     }
 )
 
-//ei mene läpi vielä
 /**
  * Invalid SELECT ... WHERE ... AND ... OR ... with aritmetic expression
  */
@@ -97,9 +91,7 @@ describe.each([
         describe(invalidCommand, () => {
             test('fails validation', () => {
                 const parsedCommand = selectParser.parseCommand(command)
-                // expect(parsedCommand.value).not.toBeDefined()
-                // expect(parsedCommand.value.fields).not.toBeDefined()
-                // expect(parsedCommand.error).toBeDefined()
+                expect(parsedCommand.error).toBeDefined()
             })
         })
     }
@@ -122,7 +114,6 @@ describe.each([
         describe(validCommand, () => {
             test('is valid and parsed', () => {
                 const parsedCommand = selectParser.parseCommand(command)
-                // console.log(parsedCommand.value.where.conditions)
                 expect(parsedCommand.value).toBeDefined()
                 expect(parsedCommand.value.fields).toBeDefined()
                 expect(parsedCommand.error).not.toBeDefined()
@@ -131,10 +122,9 @@ describe.each([
     }
 )
 
-//ei mene vielä läpi
-/**
- * Invalid SELECT ... WHERE ... with function operation
- */
+// /**
+//  * Invalid SELECT ... WHERE ... with function operation
+//  */
 describe.each([
     'SELECT nimi, hinta FROM Taulu WHERE LEgTH(nimi)=8;', //typo
     'SELECT nimi, hinta FROM Taulu WHERE LEN(nimi)<8;', //typo
@@ -149,9 +139,7 @@ describe.each([
         describe(invalidCommand, () => {
             test('fails validation', () => {
                 const parsedCommand = selectParser.parseCommand(command)
-                // expect(parsedCommand.value).not.toBeDefined()
-                // expect(parsedCommand.value.fields).not.toBeDefined()
-                // expect(parsedCommand.error).toBeDefined()
+                expect(parsedCommand.error).toBeDefined()
             })
         })
     }

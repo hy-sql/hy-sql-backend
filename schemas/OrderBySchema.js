@@ -1,4 +1,28 @@
 const Joi = require('@hapi/joi')
+const { ColumnSchema } = require('./FieldSchemas')
+const FunctionSchema = require('./FunctionSchema')
+const ExpressionSchema = require('./ExpressionSchema')
+
+const OrderByColumnSchema = ColumnSchema.keys({
+    order: Joi.object({
+        type: Joi.string().valid('order').required(),
+        value: Joi.string().valid('asc', 'desc'),
+    }).optional(),
+})
+
+const OrderByFunctionSchema = FunctionSchema.keys({
+    order: Joi.object({
+        type: Joi.string().valid('order').required(),
+        value: Joi.string().valid('asc', 'desc'),
+    }).optional(),
+})
+
+const OrderByExpressionSchema = ExpressionSchema.keys({
+    order: Joi.object({
+        type: Joi.string().valid('order').required(),
+        value: Joi.string().valid('asc', 'desc'),
+    }).optional(),
+})
 
 const OrderBySchema = Joi.object({
     keyword: Joi.string()
@@ -15,24 +39,13 @@ const OrderBySchema = Joi.object({
                 'ORDER BY is either misspelled, missing or in the wrong position',
         }),
 
-    columns: Joi.array(),
-
-    order: Joi.string()
-        .pattern(/[;]/, { invert: true })
-        .pattern(/^ASC.+$|^DESC.+$/i, { name: 'extra', invert: true })
-        .pattern(/^ASC$|^DESC$/i)
-        .allow('')
-        .insensitive()
-        .max(64)
-        .optional()
-        .messages({
-            'string.pattern.invert.base':
-                'Semicolon should be only found at the end of a query',
-            'string.pattern.base':
-                'Not a sorting keyword at the end of the query',
-            'string.pattern.invert.name':
-                'Extra characters at the end of the line are causing command to fail',
-        }),
+    fields: Joi.array()
+        .items(
+            OrderByColumnSchema,
+            OrderByFunctionSchema,
+            OrderByExpressionSchema
+        )
+        .min(1),
 })
 
 module.exports = OrderBySchema

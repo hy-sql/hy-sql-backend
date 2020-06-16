@@ -23,16 +23,18 @@ Content-Type: application/json
 
 {
   "commandArray": [
-  "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER, lkm INTEGER);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('retiisi', 7, 20);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('porkkana', 5, 40);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('nauris', 4, 40);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('lanttu', 8, 20);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri', 4, 30);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri', 6, 70);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleriiii', 6, 70);",
-  "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('null', 6, 70);",
-  "SELECT AVG(*) FROM Tuotteet;"
+  "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+  "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('porkkana',5);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu',8);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',6);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',4);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',3);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',2);",
+  "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',5);",
+  "SELECT 5*hinta+3, LENGTH(nimi) FROM Tuotteet WHERE hinta=LENGTH(nimi) OR (hinta+1=5 AND nimi<>'banaani') OR (hinta=2*hinta) ORDER BY LENGTH(nimi) DESC, hinta;"
   ]
 }
 

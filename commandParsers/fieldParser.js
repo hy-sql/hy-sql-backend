@@ -1,19 +1,23 @@
 const _ = require('lodash')
 const {
-    isArithmeticOperator,
-    arithmeticExpressionPattern,
-    stringFunctionPattern,
     aggregateFunctionPattern,
-    comparisonOperatorPattern,
-    arithmeticOperatorPattern,
-    containsFunctionPattern,
-    stringFunctionsNamePattern,
     aggregateFunctionsNamePattern,
+    arithmeticExpressionPattern,
+    containsArithmeticOperatorPattern,
+    comparisonOperatorPattern,
+    containsFunctionPattern,
+    modifiedArithmeticOperator,
     sortOrderKeywordPattern,
     distinctKeywordPattern,
+    stringFunctionPattern,
+    stringFunctionsNamePattern,
+    textInputPattern,
 } = require('../helpers/regex')
 const prepareConditionsForParsing = require('./parserTools/prepareConditionsForParsing')
 const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBracket')
+const {
+    transformOrderByInputArrayIntoOrderByFieldsArray,
+} = require('./parserTools/arrayTransformationTools')
 
 const parseConditions = (slicedCommandArray) => {
     const conditionArray = prepareConditionsForParsing(slicedCommandArray)
@@ -32,14 +36,17 @@ const parseConditions = (slicedCommandArray) => {
                     conditionArray,
                     i
                 )
+
                 conditions[AndOrSwitch].push(
                     parseConditions(
                         conditionArray.slice(i + 1, indexOfClosingBracket)
                     )
                 )
-                i = indexOfClosingBracket + 1
+                i = indexOfClosingBracket
                 break
             }
+            case ')':
+                break
             case 'AND':
                 AndOrSwitch = 'AND'
                 break
@@ -47,16 +54,20 @@ const parseConditions = (slicedCommandArray) => {
                 AndOrSwitch = 'OR'
                 break
             default: {
-                const splitExpression = conditionArray[i].split(
-                    comparisonOperatorPattern
-                )
+                if (comparisonOperatorPattern.test(conditionArray[i])) {
+                    const splitExpression = conditionArray[i].split(
+                        comparisonOperatorPattern
+                    )
 
-                const condition = {
-                    left: parseField(splitExpression[0]),
-                    operator: splitExpression[1],
-                    right: parseField(splitExpression[2]),
+                    const condition = {
+                        left: parseField(splitExpression[0]),
+                        operator: splitExpression[1],
+                        right: parseField(splitExpression[2]),
+                    }
+                    conditions[AndOrSwitch].push(condition)
+                } else {
+                    conditions[AndOrSwitch].push(conditionArray[i])
                 }
-                conditions[AndOrSwitch].push(condition)
             }
         }
     }
@@ -73,7 +84,7 @@ const parseExpression = (expression) => {
             .map((e) =>
                 containsFunctionPattern.test(e)
                     ? e
-                    : e.split(arithmeticOperatorPattern).filter(Boolean)
+                    : e.split(containsArithmeticOperatorPattern).filter(Boolean)
             )
             .filter(Boolean)
     )
@@ -115,20 +126,22 @@ const parseParametersFromDistinct = (fieldArray) => {
 }
 
 const parseOrderByFields = (fieldArray) => {
-    const orderByFields = fieldArray
-        .join(' ')
-        .trim()
-        .split(',')
-        .map((f) => f.trim())
-        .map((f) => f.split(' '))
-        .map((f) => {
-            const column = parseField(f[0])
-            column.order = parseField(f[1])
+    console.log('fieldArray', fieldArray)
+    const orderByFields = transformOrderByInputArrayIntoOrderByFieldsArray(
+        fieldArray
+    )
 
-            return column
-        })
+    console.log(orderByFields)
 
-    return orderByFields
+    return orderByFields.map((f) => {
+        const column = parseField(f[0])
+
+        console.log(column)
+
+        if (column) column.order = f[1] ? parseField(f[1]) : parseField('asc')
+
+        return column
+    })
 }
 
 const parseField = (field) => {
@@ -158,17 +171,19 @@ const parseField = (field) => {
                 value: parseExpression(field),
                 stringValue: field,
             }
-        case /^'\w+'/.test(field):
+        case textInputPattern.test(field):
             return {
-                type: 'string',
+                type: 'text',
                 value: field.replace(/'/g, ''),
             }
         case !isNaN(field):
-            return {
-                type: 'integer',
-                value: Number(field),
-            }
-        case isArithmeticOperator.test(field):
+            return field
+                ? {
+                      type: 'integer',
+                      value: Number(field),
+                  }
+                : null
+        case modifiedArithmeticOperator.test(field):
             return {
                 type: 'operator',
                 value: field === '**' ? '*' : field,
