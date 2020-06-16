@@ -81,6 +81,9 @@ const containsFunctionPattern = new RegExp(
 
 const sortOrderKeywordPattern = new RegExp('^(ASC|DESC)$', 'i')
 
+/**Regular expressions for use in the application.
+ * @exports RegExp
+ */
 module.exports = {
     constraintsNamePatternForSplit,
     constraintsNamePattern,
