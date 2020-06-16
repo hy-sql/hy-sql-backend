@@ -8,8 +8,8 @@ const _ = require('lodash')
  *   - functionDetails.name === 'LENGTH': length of param.value or length of value
  *         in param.value column in input row. If the parameter is a column that
  *         does not exist an error object is returned.
- * @param {Object} functionDetails object containing function details
- * @param {Object} row table row object
+ * @param {object} functionDetails object containing function details
+ * @param {object} row table row object
  */
 const executeStringFunction = (functionDetails, row) => {
     switch (functionDetails.name) {
@@ -46,8 +46,8 @@ const executeStringFunction = (functionDetails, row) => {
  *   - name === 'SUM': If param.value does not match any existing columns returns an error object.
  *         If it matches a column of type TEXT, 0 is returned.
  *         Otherwise sum of the values in the matched column is returned.
- * @param {Object} functionDetails object containing function details
- * @param {Array} rows array of table rows
+ * @param {object} functionDetails object containing function details
+ * @param {object[]} rows array of table rows
  */
 const executeAggregateFunction = (functionDetails, rows) => {
     const paramValue = functionDetails.param.value
