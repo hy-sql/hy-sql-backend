@@ -485,4 +485,61 @@ describe('selectFrom()', () => {
             'Parameter given to AVG does not match any existing column'
         )
     })
+
+    test('returns expected rows with multiple function expressions', () => {
+        const expectedRows = [
+            {
+                hinta: 7,
+                'MAX(hinta)': 8,
+                'MIN(hinta)': 4,
+                'COUNT(*)': 7,
+            },
+            {
+                hinta: 5,
+                'MAX(hinta)': 8,
+                'MIN(hinta)': 4,
+                'COUNT(*)': 7,
+            },
+            {
+                hinta: 4,
+                'MAX(hinta)': 8,
+                'MIN(hinta)': 4,
+                'COUNT(*)': 7,
+            },
+            {
+                hinta: 8,
+                'MAX(hinta)': 8,
+                'MIN(hinta)': 4,
+                'COUNT(*)': 7,
+            },
+            {
+                hinta: 4,
+                'MAX(hinta)': 8,
+                'MIN(hinta)': 4,
+                'COUNT(*)': 7,
+            },
+            {
+                hinta: 6,
+                'MAX(hinta)': 8,
+                'MIN(hinta)': 4,
+                'COUNT(*)': 7,
+            },
+            {
+                hinta: 6,
+                'MAX(hinta)': 8,
+                'MIN(hinta)': 4,
+                'COUNT(*)': 7,
+            },
+        ]
+
+        const selectParser =
+            'SELECT hinta, MAX(hinta), MIN(hinta), COUNT(*) FROM Tuotteet;'
+
+        const commandArray = splitCommandIntoArray(selectParser)
+
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual(expectedRows)
+    })
 })

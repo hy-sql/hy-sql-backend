@@ -102,7 +102,7 @@ class StateService {
         this.state.insertIntoTable(command.tableName, newRow)
 
         return {
-            result: `INSERT INTO ${command.tableName} -queries[i] was executed succesfully`,
+            result: `INSERT INTO ${command.tableName} -query was executed succesfully`,
         }
     }
 
@@ -134,10 +134,7 @@ class StateService {
 
         const result = `SELECT ${command.fields
             .map((c) => c.value)
-            .join(', ')} FROM ${
-            command.tableName
-        } -queries[i] executed successfully`
-
+            .join(', ')} FROM ${command.tableName} -query executed successfully`
         return {
             result,
             rows,
@@ -289,11 +286,22 @@ class StateService {
             return existingRows
         }
 
-        if (command.fields[0].type === 'aggregateFunction') {
-            return this.createAggregateFunctionRow(
+        if (
+            command.fields[0].type === 'aggregateFunction' &&
+            command.fields.length === 1
+        ) {
+            const functionResult = this.createAggregateFunctionRow(
                 command.fields[0],
                 existingRows
             )
+            return functionResult.error
+                ? functionResult
+                : [
+                      this.createAggregateFunctionRow(
+                          command.fields[0],
+                          existingRows
+                      ),
+                  ]
         }
 
         return this.createQueriedRows(command.fields, existingRows)
@@ -365,7 +373,7 @@ class StateService {
 
     /**
      * Handles creating result rows for createAdvancedRows().
-     * @param {object} command SELECT command object
+     * @param {object} queries command.fields of SELECT command
      * @param {object[]} existingRows array of row objects
      */
     createQueriedRows(queries, existingRows) {
@@ -402,6 +410,16 @@ class StateService {
                     functionResult.error
                         ? (newRow.error = functionResult.error)
                         : (newRow[queries[i].value] = functionResult)
+                } else if (queries[i].type === 'aggregateFunction') {
+                    const functionResult = this.createAggregateFunctionRow(
+                        queries[i],
+                        existingRows
+                    )
+
+                    functionResult.error
+                        ? (newRow.error = functionResult.error)
+                        : (newRow[queries[i].value] =
+                              functionResult[queries[i].value])
                 }
             }
 
@@ -428,7 +446,7 @@ class StateService {
         )
         return executedFunction.error
             ? executedFunction
-            : [{ [functionField.value]: executedFunction }]
+            : { [functionField.value]: executedFunction }
     }
 
     /**
