@@ -1,83 +1,51 @@
 const Joi = require('@hapi/joi')
+const { ColumnSchema, IntegerSchema, TextSchema } = require('./FieldSchemas')
+const ExpressionSchema = require('./ExpressionSchema')
+const FunctionSchema = require('./FunctionSchema')
+const { comparisonOperatorPattern } = require('../helpers/regex')
 
-/* WhereSchema expects the following keyes; keyword, columnName, sign, valueType and value.
-  Of these the valueType must be added when parsing to indicate wheter the value is an integer or a string,
-  to indicate on what rules it should be validated. The valueType must be either 'TEXT' or 'INTEGER'. If value is
-  undefined valueType should default to 'INTEGER'.
-  The validation rules for a value are: an integer must be a number, a string must be surrounded by quotes and
-  only contain underscores and alphanumeric characters.
-*/
+const ConditionSchema = Joi.object({
+    left: Joi.alternatives()
+        .try(
+            ColumnSchema,
+            IntegerSchema,
+            TextSchema,
+            ExpressionSchema.shared(FunctionSchema),
+            FunctionSchema.shared(ExpressionSchema)
+        )
+        .required(),
+    operator: Joi.string().pattern(comparisonOperatorPattern).required(),
+    right: Joi.alternatives()
+        .try(
+            ColumnSchema,
+            IntegerSchema,
+            TextSchema,
+            ExpressionSchema.shared(FunctionSchema),
+            FunctionSchema.shared(ExpressionSchema)
+        )
+        .required(),
+}).id('conditionSchema')
+
+const ConditionsSchema = Joi.object({
+    AND: Joi.link('#conditionsArray'),
+    OR: Joi.link('#conditionsArray'),
+})
+    .required()
+    .id('conditionsSchema')
+
+const conditionsArraySchema = Joi.array()
+    .items(Joi.link('#conditionSchema'), Joi.link('#conditionsSchema'))
+    .id('conditionsArray')
 
 const WhereSchema = Joi.object({
     keyword: Joi.string()
-        .required()
         .pattern(/;/, { invert: true })
-        .pattern(/^([Ww][Hh][Ee][Rr][Ee])$/)
-        .messages({
-            'any.required':
-                'This query is expected to contain the following keyword: WHERE',
-            'string.pattern.invert.base':
-                'Semicolon should only be found at the end of a query',
-            'string.pattern.base':
-                'WHERE is either misspelled, missing or in the wrong position',
-        }),
+        .pattern(/^WHERE$/i)
+        .required(),
 
-    columnName: Joi.string()
-        .required()
-        .pattern(/;/, { invert: true })
-        .pattern(/^\w+$/)
-        .max(64)
-        .messages({
-            'any.required': 'WHERE must be followed by a column name',
-            'string.pattern.invert.base':
-                'Semicolon should only be found at the end of a query',
-            'string.pattern.base':
-                'Column names should only contain one or more alphanumeric characters and underscores',
-            'string.max': 'Column name is too long',
-        }),
-
-    sign: Joi.string()
-        .required()
-        .valid('=', '<=', '>=', '<>', '>', '<')
-        .messages({
-            'any.only':
-                'After WHERE, column name and the value must be separated by: =, <=, <>, >=, > or <',
-            'any.required':
-                'After WHERE, column name and the value must be separated by: =, <=, <>, >=, > or <',
-        }),
-
-    valueType: Joi.string().valid('INTEGER', 'TEXT').insensitive().required(),
-
-    value: Joi.alternatives().conditional('valueType', {
-        is: 'INTEGER',
-        then: Joi.number().required().messages({
-            'any.required':
-                'After WHERE, a value must be defined after the column name',
-        }),
-        otherwise: Joi.string()
-            .required()
-            .pattern(/;/, { invert: true })
-            .pattern(/^\w+$/)
-            .max(64)
-            .messages({
-                'any.required':
-                    'After WHERE, a value must be defined after the column name',
-                'string.pattern.invert.base':
-                    'Semicolon should only be found at the end of a query',
-                'string.pattern.base':
-                    'Number and string values in the query should only contain alphanumeric characters and underscores',
-                'string.max': 'A string value is too long',
-            }),
-    }),
-
-    indexCounter: Joi.number().optional(),
-
-    correctQuotes: Joi.boolean().valid(true).required().messages({
-        'any.only':
-            'In a query all string values must be in quotes. There is either extra quotes or quotes missing',
-        'any.required':
-            'In a query all string values must be in quotes. There is either extra quotes or quotes missing',
-    }),
+    conditions: ConditionsSchema.shared(
+        conditionsArraySchema.shared(ConditionSchema).shared(ConditionsSchema)
+    ),
 })
 
 module.exports = WhereSchema

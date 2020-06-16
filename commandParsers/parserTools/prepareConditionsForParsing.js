@@ -1,18 +1,45 @@
 const _ = require('lodash')
 const splitBracketsFromFunctionExpressionArray = require('./splitBracketsFromFunctionExpressionArray')
-const { containsFunctionPattern } = require('../../helpers/regex')
+const {
+    containsFunctionPattern,
+    comparisonOperatorPatternWithWhiteSpace,
+    containsFunctionPatternWithWhiteSpaces,
+} = require('../../helpers/regex')
 
 const prepareConditionsForParsing = (slicedCommandArray) => {
-    const conditionsArray = slicedCommandArray
-        .join('')
+    const conditionsArray = transformCommandArrayIntoConditionsArray(
+        slicedCommandArray
+    )
+
+    return splitBracketsFromConditionsArray(conditionsArray)
+}
+
+const transformCommandArrayIntoConditionsArray = (commandArray) => {
+    const conditionsArray = commandArray
+        .join(' ')
+        .replace(containsFunctionPatternWithWhiteSpaces, (m) =>
+            m.replace(/\s+/g, '')
+        )
+        .replace(comparisonOperatorPatternWithWhiteSpace, (m) =>
+            m.replace(/\s+/g, '')
+        )
         .replace(/AND/gi, ' AND ')
         .replace(/OR/gi, ' OR ')
-        .split(' ')
+        .split(/ +(?=(?:(?:[^']*'){2})*[^']*$)/g)
         .filter(Boolean)
 
-    const newArray = conditionsArray.reduce((newArray, c) => {
+    return conditionsArray
+}
+
+const splitBracketsFromConditionsArray = (conditionsArray) => {
+    const splitConditionsArray = conditionsArray.reduce((newArray, c) => {
         if (!c.match(containsFunctionPattern)) {
-            newArray.push(c.replace('(', ' ( ').replace(')', ' ) ').split(' '))
+            newArray.push(
+                c
+                    .replace('(', ' ( ')
+                    .replace(')', ' ) ')
+                    .split(/ +(?=(?:(?:[^']*'){2})*[^']*$)/g)
+            )
         } else {
             const splitArray = splitBracketsFromFunctionExpressionArray(c)
             splitArray.forEach((e) => newArray.push(e))
@@ -21,7 +48,7 @@ const prepareConditionsForParsing = (slicedCommandArray) => {
         return newArray
     }, [])
 
-    return _.flatten(newArray).filter(Boolean)
+    return _.flatten(splitConditionsArray).filter(Boolean)
 }
 
 module.exports = prepareConditionsForParsing

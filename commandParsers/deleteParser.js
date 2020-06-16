@@ -42,7 +42,13 @@ const parseDeleteWhere = (fullCommandAsStringArray) => {
     const whereIndex = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'WHERE'
     )
-    parsedCommand.where = parseWhere(fullCommandAsStringArray.slice(whereIndex))
+
+    parsedCommand.where = parseWhere(
+        fullCommandAsStringArray.slice(
+            whereIndex,
+            fullCommandAsStringArray.length - 1
+        )
+    )
 
     let validationResult = DeleteWhereSchema.validate(parsedCommand)
 
