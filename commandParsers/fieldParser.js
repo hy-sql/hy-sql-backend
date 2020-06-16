@@ -14,6 +14,9 @@ const {
 } = require('../helpers/regex')
 const prepareConditionsForParsing = require('./parserTools/prepareConditionsForParsing')
 const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBracket')
+const {
+    transformOrderByInputArrayIntoOrderByFieldsArray,
+} = require('./parserTools/arrayTransformationTools')
 
 const parseConditions = (slicedCommandArray) => {
     const conditionArray = prepareConditionsForParsing(slicedCommandArray)
@@ -103,23 +106,22 @@ const parseSelectFields = (fieldArray) => {
 }
 
 const parseOrderByFields = (fieldArray) => {
-    const orderByFields = fieldArray
-        .join(' ')
-        .trim()
-        .split(',')
-        .map((f) => f.trim())
-        .map((f) => f.split(' '))
-        .filter(Boolean)
-        .map((f) => {
-            const column = parseField(f[0])
+    console.log('fieldArray', fieldArray)
+    const orderByFields = transformOrderByInputArrayIntoOrderByFieldsArray(
+        fieldArray
+    )
 
-            if (column)
-                column.order = f[1] ? parseField(f[1]) : parseField('asc')
+    console.log(orderByFields)
 
-            return column
-        })
+    return orderByFields.map((f) => {
+        const column = parseField(f[0])
 
-    return orderByFields
+        console.log(column)
+
+        if (column) column.order = f[1] ? parseField(f[1]) : parseField('asc')
+
+        return column
+    })
 }
 
 const parseField = (field) => {
