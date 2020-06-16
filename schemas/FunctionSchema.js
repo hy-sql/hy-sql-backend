@@ -11,8 +11,12 @@ const {
     TextSchema,
 } = require('./FieldSchemas')
 
-// Works for now, have to think about it later
+/**
+ * Joi schema for validating functions.
+ */
 const FunctionSchema = Joi.object({
+    // Works for now, have to think about it later
+
     type: Joi.string().valid('stringFunction', 'aggregateFunction').required(),
     name: Joi.string().pattern(allFunctionsNamePattern).required(),
     value: Joi.when('type', {

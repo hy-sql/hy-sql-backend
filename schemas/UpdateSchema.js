@@ -1,6 +1,9 @@
 const Joi = require('@hapi/joi')
 const WhereSchema = require('./WhereSchema')
 
+/**
+ * Joi schema for validating column information in UPDATE commands.
+ */
 const ColumnsSchema = Joi.object({
     columnName: Joi.string()
         .required()
@@ -43,6 +46,9 @@ const ColumnsSchema = Joi.object({
     }),
 })
 
+/**
+ * Joi schema for validating UPDATE commands.
+ */
 const UpdateSchema = Joi.object({
     name: Joi.string()
         .pattern(/[;]./, { invert: true })
@@ -81,6 +87,9 @@ const UpdateSchema = Joi.object({
     }),
 })
 
+/**
+ * Joi schema for validating UPDATE commands containing WHERE.
+ */
 const UpdateColumnsWhereSchema = UpdateSchema.keys({
     where: WhereSchema,
 })
