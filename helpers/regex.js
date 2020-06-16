@@ -15,7 +15,7 @@ const constraintsNamePattern = new RegExp(
     )
 )
 
-const arithmeticOperator = new RegExp('^[+\\-*/]$')
+const arithmeticOperator = new RegExp('^[+\\-*/%]$')
 
 // Switched '*' sign to '**' doublesign, because of conflict with select operator '*'
 const modifiedArithmeticOperator = new RegExp('^(\\+|-|\\/|\\*\\*|\\%)$')
