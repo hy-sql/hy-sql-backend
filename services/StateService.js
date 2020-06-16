@@ -104,7 +104,7 @@ class StateService {
         if (rows.error) return rows
 
         if (command.orderBy) {
-            rows = this.orderRowsBy(command.orderBy.columns, rows)
+            rows = this.orderRowsBy(command.orderBy.fields, rows)
         }
 
         const result = `SELECT ${command.fields
@@ -227,9 +227,9 @@ class StateService {
         return _.intersection(andRows, orRows)
     }
 
-    orderRowsBy(columns, rows) {
-        const arrayOfColumnNames = columns.map((c) => c.value)
-        const arrayOfOrderingKeywords = columns.map((c) => c.order.value)
+    orderRowsBy(fields, rows) {
+        const arrayOfColumnNames = fields.map((f) => f.value)
+        const arrayOfOrderingKeywords = fields.map((f) => f.order.value)
 
         const orderedRows = _.orderBy(
             rows,

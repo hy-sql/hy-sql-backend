@@ -1,7 +1,23 @@
 const Joi = require('@hapi/joi')
 const { ColumnSchema } = require('./FieldSchemas')
+const FunctionSchema = require('./FunctionSchema')
+const ExpressionSchema = require('./ExpressionSchema')
 
 const OrderByColumnSchema = ColumnSchema.keys({
+    order: Joi.object({
+        type: Joi.string().valid('order').required(),
+        value: Joi.string().valid('asc', 'desc'),
+    }).optional(),
+})
+
+const OrderByFunctionSchema = FunctionSchema.keys({
+    order: Joi.object({
+        type: Joi.string().valid('order').required(),
+        value: Joi.string().valid('asc', 'desc'),
+    }).optional(),
+})
+
+const OrderByExpressionSchema = ExpressionSchema.keys({
     order: Joi.object({
         type: Joi.string().valid('order').required(),
         value: Joi.string().valid('asc', 'desc'),
@@ -23,7 +39,13 @@ const OrderBySchema = Joi.object({
                 'ORDER BY is either misspelled, missing or in the wrong position',
         }),
 
-    columns: Joi.array().items(OrderByColumnSchema).min(1),
+    fields: Joi.array()
+        .items(
+            OrderByColumnSchema,
+            OrderByFunctionSchema,
+            OrderByExpressionSchema
+        )
+        .min(1),
 })
 
 module.exports = OrderBySchema
