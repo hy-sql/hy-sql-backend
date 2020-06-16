@@ -6,35 +6,40 @@ const {
     aggregateFunctionsNamePattern,
 } = require('../helpers/regex')
 
-/** Tests whether a string contains an arithmetic operator.
+/**
+ * Tests whether a string contains an arithmetic operator.
  * @param {String} input string to test
  */
 const containsArithmeticOperator = (input) => {
     return containsArithmeticOperatorPattern.test(input)
 }
 
-/** Tests whether a string contains a comparison operator.
+/**
+ * Tests whether a string contains a comparison operator.
  * @param {String} input string to test
  */
 const containsComparisonOperator = (input) => {
     return comparisonOperatorPattern.test(input)
 }
 
-/** Tests whether a string contains a logical operator.
+/**
+ * Tests whether a string contains a logical operator.
  * @param {String} input string to test
  */
 const containsLogicalOperator = (input) => {
     return logicalOperatorsNamePattern.test(input)
 }
 
-/** Tests whether a string contains a string function.
+/**
+ * Tests whether a string contains a string function.
  * @param {String} input string to test
  */
 const containsStringFunctionsPattern = (input) => {
     return stringFunctionsNamePattern.test(input)
 }
 
-/** Tests whether a string contains an aggregate function.
+/**
+ * Tests whether a string contains an aggregate function.
  * @param {String} input string to test
  */
 const containsAggregateFunctionsPattern = (input) => {

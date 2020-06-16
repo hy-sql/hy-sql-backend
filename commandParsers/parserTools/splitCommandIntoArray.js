@@ -1,4 +1,5 @@
-/** Transforms the given command string into the format required by the command parsers.
+/**
+ * Transforms the given command string into the format required by the command parsers.
  * Returns the command as string array.
  * @param {String} commandString the command/query as string
  */

@@ -1,6 +1,7 @@
 const { namify, cleanStringArray } = require('./smallTools')
 
-/** Parses column names from the given array while keeping count of current index.
+/**
+ * Parses column names from the given array while keeping count of current index.
  * Returns parsed column namess and the updated current index in an object or
  * an object containing only the updated current index if the index passes the
  * end of the given command array.

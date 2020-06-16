@@ -1,7 +1,8 @@
 const { CreateTableSchema } = require('../schemas/CreateTableSchema')
 const { constraintsNamePatternForSplit } = require('../helpers/regex')
 
-/** Parses and validates a CREATE TABLE command object from the given string array.
+/**
+ * Parses and validates a CREATE TABLE command object from the given string array.
  * Returns a Joi validation result object containing the parsed command object
  * with key value and possible validation errors as object with key error.
  * @param {string[]} fullCommandAsStringArray command as string array
@@ -28,7 +29,8 @@ const parseCommand = (fullCommandAsStringArray) => {
     return CreateTableSchema.validate(parsedCommand)
 }
 
-/** Handles parsing of the column information contained in the given array.
+/**
+ * Handles parsing of the column information contained in the given array.
  * @param {string[]} columnsAsStringList array containing the column information
  */
 const parseColumns = (columnsAsStringList) => {
@@ -51,7 +53,8 @@ const parseColumns = (columnsAsStringList) => {
     return columns
 }
 
-/** Handles parsing of the column constraints contained in the given array.
+/**
+ * Handles parsing of the column constraints contained in the given array.
  * @param {string[]} constraintsAsStringArray array containing the column constraints
  */
 const parseColumnConstraints = (constraintsAsStringArray) => {

@@ -1,7 +1,8 @@
 const { InsertIntoSchema } = require('../schemas/InsertIntoSchema')
 const { parseColumnNames } = require('./parserTools/parseColumnNames')
 
-/** Parses and validates an INSERT INTO command object from the given string array.
+/**
+ * Parses and validates an INSERT INTO command object from the given string array.
  * Returns a Joi validation result object containing the parsed command object
  * with key value and possible validation errors as object with key error.
  * @param {string[]} fullCommandAsStringArray command as string array
@@ -131,7 +132,8 @@ const parseCommand = (fullCommandAsStringArray) => {
     return palautettava
 }
 
-/** Creates a new array by forming a string from the contents of the given array
+/**
+ * Creates a new array by forming a string from the contents of the given array
  * and splitting it using ',' as the separator.
  * @param {string[]} columnsAsStringList string array
  */
@@ -142,7 +144,8 @@ const cleanStringArray = (columnsAsStringList) => {
         .map((col) => col.trim())
 }
 
-/** Handles parsing of the column values information from the given arrays.
+/**
+ * Handles parsing of the column values information from the given arrays.
  * @param {string[]} columnList array containing the column information
  * @param {string[]} stringArray array containing the values information
  */

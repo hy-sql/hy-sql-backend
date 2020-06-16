@@ -1,5 +1,9 @@
 const { parseOrderByFields } = require('./fieldParser')
 
+/**
+ * Parses the ORDER BY part of a command into an object from the given string array.
+ * @param {string[]} slicedCommandAsStringArray the ORDER BY part of a command as string array
+ */
 const parseOrderBy = (slicedCommandAsStringArray) => {
     const parsedOrderByPart =
         slicedCommandAsStringArray.slice(0, 2).join(' ').toUpperCase() ===

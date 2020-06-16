@@ -158,7 +158,7 @@ class StateService {
         })
 
         newRows = _.sortBy(newRows, 'id')
-        this.state.updateRows(command.tableName, newRows)
+        this.state.replaceRows(command.tableName, newRows)
 
         const result = `Rows in table ${command.tableName} updated`
 
@@ -199,7 +199,7 @@ class StateService {
             rows = []
         }
 
-        this.state.deleteFromTable(command.tableName, rows)
+        this.state.replaceRows(command.tableName, rows)
 
         const result = command.where
             ? `Requested rows from table ${command.tableName} deleted succesfully`

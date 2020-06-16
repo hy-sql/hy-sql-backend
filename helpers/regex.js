@@ -115,7 +115,8 @@ const textInputPattern = new RegExp("^'.+'$")
 
 const sortOrderKeywordPattern = new RegExp('^(ASC|DESC)$', 'i')
 
-/**Regular expressions for use in the application.
+/**
+ * Regular expressions for use in the application.
  * @exports RegExp
  */
 module.exports = {

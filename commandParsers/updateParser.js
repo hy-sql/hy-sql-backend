@@ -5,7 +5,8 @@ const {
 const { parseWhere } = require('./whereParser')
 const { queryContainsWhereKeyword } = require('./parserTools/queryContains')
 
-/** Parses and validates a UPDATE command object from the given string array.
+/**
+ * Parses and validates a UPDATE command object from the given string array.
  * Returns a Joi validation result object containing the parsed command object
  * with key value and possible validation errors as object with key error.
  * @param {string[]} fullCommandAsStringList command as string array
@@ -18,7 +19,8 @@ const parseCommand = (fullCommandAsStringList) => {
     }
 }
 
-/** Handles parsing of the base UPDATE command from the given array.
+/**
+ * Handles parsing of the base UPDATE command from the given array.
  * @param {string[]} fullCommandAsStringList command as string array
  */
 const parseBaseCommand = (fullCommandAsStringList) => {
@@ -44,7 +46,8 @@ const parseBaseCommand = (fullCommandAsStringList) => {
     return parsedCommand
 }
 
-/** Parses and validates a UPDATE command not containing WHERE
+/**
+ * Parses and validates a UPDATE command not containing WHERE
  * from the given array. Returns a Joi validation result object.
  * @param {string[]} fullCommandAsStringList command as string array
  */
@@ -64,7 +67,8 @@ const parseUpdateWithoutWhere = (fullCommandAsStringList) => {
     return UpdateSchema.validate(updateCommand)
 }
 
-/** Parses and validates a UPDATE command containing WHERE from the given array.
+/**
+ * Parses and validates a UPDATE command containing WHERE from the given array.
  * Returns a Joi validation result object.
  * @param {string[]} fullCommandAsStringList command as string array
  */
@@ -92,7 +96,8 @@ const parseUpdateWithWhere = (fullCommandAsStringList) => {
     return UpdateColumnsWhereSchema.validate(updateCommand)
 }
 
-/** Handles parsing of the column information from the given array.
+/**
+ * Handles parsing of the column information from the given array.
  * @param {string[]} columnsAndValuesAsStringList array containing information of columns and values
  * @returns {object[]}
  */

@@ -1,4 +1,5 @@
-/** Checks whether a command contains the keyword WHERE. Check is
+/**
+ * Checks whether a command contains the keyword WHERE. Check is
  * case-insensitive. Returns true or false.
  * @param {string[]} fullCommandAsStringArray command as string array
  * @returns {Boolean} WHERE was found true/false
@@ -10,7 +11,8 @@ const queryContainsWhereKeyword = (fullCommandAsStringArray) => {
     return where !== -1
 }
 
-/** Checks whether a command contains the keywords ORDER and BY and that they
+/**
+ * Checks whether a command contains the keywords ORDER and BY and that they
  * are in the correct order. Check is case-insensitive. Returns true or false.
  * @param {string[]} fullCommandAsStringArray command as string array
  * @returns {Boolean} ORDER BY was found true/false
@@ -27,7 +29,8 @@ const queryContainsOrderByKeywords = (fullCommandAsStringArray) => {
     return hasOrder > 0 && hasBy > 0 ? hasOrder < hasBy : false
 }
 
-/** Checks whether a command contains the keywords ORDER, BY and WHERE and that they
+/**
+ * Checks whether a command contains the keywords ORDER, BY and WHERE and that they
  * are in the correct order. Check is case-insensitive. Returns true or false.
  * @param {string[]} fullCommandAsStringArray command as string array
  * @returns {Boolean} ORDER BY and WHERE were found true/false

@@ -3,7 +3,8 @@ const { parseWhere } = require('./whereParser')
 const { queryContainsWhereKeyword } = require('./parserTools/queryContains')
 const checkForAdditionalAtEnd = require('./parserTools/checkForAdditional')
 
-/** Parses and validates a DELETE command object from the given string array.
+/**
+ * Parses and validates a DELETE command object from the given string array.
  * Returns a Joi validation result object containing the parsed command object
  * with key value and possible validation errors as object with key error.
  * @param {string[]} fullCommandAsStringArray command as string array
@@ -16,7 +17,8 @@ const parseCommand = (fullCommandAsStringArray) => {
     return parseDelete(fullCommandAsStringArray)
 }
 
-/** Handles parsing of the base DELETE command from the given array.
+/**
+ * Handles parsing of the base DELETE command from the given array.
  * @param {string[]} fullCommandAsStringArray command as string array
  */
 const parseBaseCommand = (fullCommandAsStringArray) => {
@@ -32,7 +34,8 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
     }
 }
 
-/** Parses and validates a DELETE command not containing WHERE
+/**
+ * Parses and validates a DELETE command not containing WHERE
  * from the given array. Returns a Joi validation result object.
  * @param {string[]} fullCommandAsStringArray command as string array
  */
@@ -48,7 +51,8 @@ const parseDelete = (fullCommandAsStringArray) => {
     return validationResult
 }
 
-/** Parses and validates a DELETE command containing WHERE from the given array.
+/**
+ * Parses and validates a DELETE command containing WHERE from the given array.
  * Returns a Joi validation result object.
  * @param {string[]} fullCommandAsStringArray command as string array
  */
