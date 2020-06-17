@@ -382,7 +382,12 @@ class StateService {
 
             for (let i = 0; i < queries.length; i++) {
                 if (queries[i].type === 'column') {
-                    newRow[queries[i].value] = row[queries[i].value]
+                    const valueOfQueriedColumn = row[queries[i].value]
+                    if (valueOfQueriedColumn) {
+                        newRow[queries[i].value] = row[queries[i].value]
+                    } else {
+                        newRow.error = `no such column ${queries[i].value}`
+                    }
                 } else if (
                     queries[i].type === 'expression' &&
                     containsAggregateFunction(queries[i].value)
