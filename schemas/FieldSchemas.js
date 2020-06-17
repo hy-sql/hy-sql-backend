@@ -5,11 +5,17 @@ const {
     sortOrderKeywordPattern,
 } = require('../helpers/regex')
 
+/**
+ * Joi schema for validating field objects of fields that are supposed to contain *.
+ */
 const AllFieldsSchema = Joi.object({
     type: Joi.string().valid('all').required(),
     value: Joi.string().valid('*').required(),
 })
 
+/**
+ * Joi schema for validating column objects.
+ */
 const ColumnSchema = Joi.object({
     type: Joi.string().valid('column').required(),
     value: Joi.string()
@@ -21,11 +27,17 @@ const ColumnSchema = Joi.object({
         .required(),
 })
 
+/**
+ * Joi schema for validating field objects of type text.
+ */
 const TextSchema = Joi.object({
     type: Joi.string().valid('text').required(),
     value: Joi.string().required(),
 })
 
+/**
+ * Joi schema for validating field objects of type integer.
+ */
 const IntegerSchema = Joi.object({
     type: Joi.string().valid('integer').required(),
     value: Joi.number().required().messages({
@@ -34,11 +46,17 @@ const IntegerSchema = Joi.object({
     }),
 })
 
+/**
+ * Joi schema for validating arithmetic operator objects.
+ */
 const ArithmeticOperatorSchema = Joi.object({
     type: Joi.string().valid('operator').required(),
     value: Joi.string().pattern(arithmeticOperator).required(),
 })
 
+/**
+ * Joi schema for validating ASC and DESC keyword objects.
+ */
 const SortOrderKeyword = Joi.object({
     type: Joi.string().valid('order').required(),
     value: Joi.string().pattern(sortOrderKeywordPattern).required(),

@@ -15,12 +15,15 @@ class StateService {
         this.state = state
     }
 
-    /* Palauttaa tuloksen muodossa { result: result }
-      tai vastaavasti virheilmoituksen muodossa { error: error }. Lisäksi SELECT
-      palauttaa taulun rivit muodossa { result: result, rows: [] }.
-      Jos CREATE TABLE -lauseessa yritetään muodostaa duplikaattisarakkeita palautetaan lista
-      virheviestejä muodossa { error: [] }
-    */
+    /**
+     * Handles updating state based on the given command.
+     * Returns:
+     *   - if the update was successful either a result object of form { result: result } or
+     *      { result: result, rows: [] } for SELECT commands
+     *   - id the commans is not executable successfully an error object of form { error: error }
+     *     is returned
+     * @param {object} command command object
+     */
     updateState(command) {
         switch (command.name) {
             case 'CREATE TABLE':
@@ -38,6 +41,13 @@ class StateService {
         }
     }
 
+    /**
+     * Handles updating the state according to a CREATE TABLE command.
+     * Returns error object if the table name given in command already exists or
+     * if some of the columns to be created have duplicate names.
+     * Returns result object if the table was added to existing tables successfully.
+     * @param {object} command CREATE TABLE command object
+     */
     createTable(command) {
         let error = this.checkCreateTableErrors(command)
         if (error) return { error: error }
@@ -53,6 +63,13 @@ class StateService {
         return { result: `Table ${newTable.name} created successfully` }
     }
 
+    /**
+     * Handles updating the state according to a INSERT INTO command.
+     * Returns error object if the table name given in command does not exist
+     * or when attempting to add values of wrong data type into columns.
+     * Returns result object if the row was added to the table successfully.
+     * @param {object} command INSERT INTO command object
+     */
     insertIntoTable(command) {
         const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
@@ -85,10 +102,18 @@ class StateService {
         this.state.insertIntoTable(command.tableName, newRow)
 
         return {
-            result: `INSERT INTO ${command.tableName} -queries[i] was executed succesfully`,
+            result: `INSERT INTO ${command.tableName} -query was executed succesfully`,
         }
     }
 
+    /**
+     * Handles SELECT commands.
+     * Returns error object if the table name given in command does not exist
+     * or the commans is not executable (for example MAX is called for a nonexitent
+     * column).
+     * Returns result object of form { result: result, rows: [] } if successful.
+     * @param {object} command SELECT command object
+     */
     selectFrom(command) {
         const error = this.checkIfTableExists(command.tableName)
         if (error) return { error: error }
@@ -109,19 +134,19 @@ class StateService {
 
         const result = `SELECT ${command.fields
             .map((c) => c.value)
-            .join(', ')} FROM ${
-            command.tableName
-        } -queries[i] executed successfully`
-
+            .join(', ')} FROM ${command.tableName} -query executed successfully`
         return {
             result,
             rows,
         }
     }
 
-    /*
-     *For executing UPDATE ... or UPDATE ... WHERE; queries
-     *Input is parsed command object and output either result or error object
+    /**
+     * Handles updating the state according to a UPDATE command.
+     * Returns error object if the table name given in command does not exist
+     * or when attempting to add values of wrong data type into columns.
+     * Returns result object if the rows of the table were updated successfully.
+     * @param {object} command UPDATE command object
      */
     updateTable(command) {
         let error = this.checkIfTableExists(command.tableName)
@@ -140,8 +165,7 @@ class StateService {
         let newRows = []
         let rowsToUpdate = table.rows
 
-        /*
-         * If command object has property 'where' it's filtered in order
+        /* If command object has property 'where' it's filtered in order
          * to update only the rows that are spesified in queries[i]
          */
         if (command.where) {
@@ -158,7 +182,7 @@ class StateService {
         })
 
         newRows = _.sortBy(newRows, 'id')
-        this.state.updateRows(command.tableName, newRows)
+        this.state.replaceRows(command.tableName, newRows)
 
         const result = `Rows in table ${command.tableName} updated`
 
@@ -180,10 +204,11 @@ class StateService {
         return row
     }
 
-    /*
-     * For executing DELETE FROM Table_name; or DELETE FROM Table_name WHERE...; queries
-     * Expected input is a parsed DELETE-command object. Output is an object either containing
-     * the key result or error and respectively the value result string or error string respectively.
+    /**
+     * Handles updating the state according to a DELETE command.
+     * Returns error object if the table name given in command does not exist.
+     * Returns result object if the required rows were successfully deleted from table.
+     * @param {object} command DELETE command object
      */
     deleteFromTable(command) {
         const error = this.checkIfTableExists(command.tableName)
@@ -199,7 +224,7 @@ class StateService {
             rows = []
         }
 
-        this.state.deleteFromTable(command.tableName, rows)
+        this.state.replaceRows(command.tableName, rows)
 
         const result = command.where
             ? `Requested rows from table ${command.tableName} deleted succesfully`
@@ -210,6 +235,12 @@ class StateService {
         }
     }
 
+    /**
+     * Handles filtering of the given rows according to the given conditions.
+     * @param {object} conditions conditions to filter by
+     * @param {object[]} rows rows to filter
+     * @returns {object[]} rows matching the conditions
+     */
     filterRows(conditions, rows) {
         const filteredAndRows =
             conditions.AND.length > 0
@@ -227,6 +258,11 @@ class StateService {
         return _.intersection(andRows, orRows)
     }
 
+    /**
+     * Handles re-ordering the given rows according to given field information
+     * @param {object[]} fields array of field objects
+     * @param {object[]} rows array of row objects
+     */
     orderRowsBy(fields, rows) {
         const arrayOfColumnNames = fields.map((f) => f.value)
         const arrayOfOrderingKeywords = fields.map((f) => f.order.value)
@@ -240,21 +276,44 @@ class StateService {
         return orderedRows
     }
 
+    /**
+     * Handles creating result rows for SELECT command.
+     * @param {object} command SELECT command object
+     * @param {object[]} existingRows array of row objects
+     */
     createAdvancedRows(command, existingRows) {
         if (command.fields[0].type === 'all') {
             return existingRows
         }
 
-        if (command.fields[0].type === 'aggregateFunction') {
-            return this.createAggregateFunctionRow(
+        if (
+            command.fields[0].type === 'aggregateFunction' &&
+            command.fields.length === 1
+        ) {
+            const functionResult = this.createAggregateFunctionRow(
                 command.fields[0],
                 existingRows
             )
+            return functionResult.error
+                ? functionResult
+                : [
+                      this.createAggregateFunctionRow(
+                          command.fields[0],
+                          existingRows
+                      ),
+                  ]
         }
 
         return this.createQueriedRows(command.fields, existingRows)
     }
 
+    /**
+     * Handles filtering of the given rows according to the given conditions
+     * for filterRows().
+     * @param {object} conditions conditions to filter by
+     * @param {object[]} existingRows rows to filter
+     * @returns {object[]} rows matching the conditions
+     */
     filterAndRows(conditions, existingRows) {
         const filteredRows = Object.values(conditions).reduce(
             (rowsToReturn, condition) => {
@@ -282,6 +341,13 @@ class StateService {
         return filteredRows
     }
 
+    /**
+     * Handles filtering of the given rows according to the given conditions
+     * for filterRows().
+     * @param {object} conditions conditions to filter by
+     * @param {object[]} existingRows rows to filter
+     * @returns {object[]} rows matching the conditions
+     */
     filterOrRows(conditions, existingRows) {
         const filteredRows = Object.values(conditions).reduce(
             (rowsToReturn, condition) => {
@@ -305,6 +371,11 @@ class StateService {
         return filteredRows
     }
 
+    /**
+     * Handles creating result rows for createAdvancedRows().
+     * @param {object} queries command.fields of SELECT command
+     * @param {object[]} existingRows array of row objects
+     */
     createQueriedRows(queries, existingRows) {
         const createdRows = existingRows.reduce((rowsToReturn, row) => {
             const newRow = {}
@@ -339,6 +410,16 @@ class StateService {
                     functionResult.error
                         ? (newRow.error = functionResult.error)
                         : (newRow[queries[i].value] = functionResult)
+                } else if (queries[i].type === 'aggregateFunction') {
+                    const functionResult = this.createAggregateFunctionRow(
+                        queries[i],
+                        existingRows
+                    )
+
+                    functionResult.error
+                        ? (newRow.error = functionResult.error)
+                        : (newRow[queries[i].value] =
+                              functionResult[queries[i].value])
                 }
             }
 
@@ -353,6 +434,11 @@ class StateService {
         return createdRows
     }
 
+    /**
+     * Handles creating a result row from an aggragate function.
+     * @param {object} functionField object containing the function information
+     * @param {object[]} existingRows array of row objects
+     */
     createAggregateFunctionRow(functionField, existingRows) {
         const executedFunction = executeAggregateFunction(
             functionField,
@@ -360,9 +446,15 @@ class StateService {
         )
         return executedFunction.error
             ? executedFunction
-            : [{ [functionField.value]: executedFunction }]
+            : { [functionField.value]: executedFunction }
     }
 
+    /**
+     * Checks whether a table exists with the table name given in the command.
+     * Also checks if there are duplicate column names.
+     * Returns either an error message or nothing.
+     * @param {object} command CREATE TABLE command object
+     */
     checkCreateTableErrors(command) {
         if (this.state.tableExists(command.tableName)) {
             return `Table ${command.tableName} already exists`
@@ -376,25 +468,31 @@ class StateService {
             return duplicates.map((e) => `duplicate column ${e}: ${e}`)
     }
 
+    /**
+     * Checks whether a table by the given name already exists.
+     * Returns either an error message or nothing.
+     * @param {String} tableName name to be searched for
+     */
     checkIfTableExists(tableName) {
         if (!this.state.tableExists(tableName))
             return `No such table ${tableName}`
     }
 
+    /**
+     * Checks an array for duplicate values and returns an array of them.
+     * @param {Array} arr array to be checked
+     */
     findDuplicates(arr) {
         return arr.filter((item, index) => arr.indexOf(item) !== index)
     }
 
+    /**
+     * Retrieves and returns a table object with a name matching the given one.
+     * Returns undefined if no such table exists.
+     * @param {String} tableName the name of the wanted table
+     */
     findTable(tableName) {
         return this.state.getTableByName(tableName)
-    }
-
-    pickColumnsFromRow(columns, row) {
-        let filteredRow = {}
-        columns.forEach((column) => {
-            filteredRow[column.name] = row[column.name]
-        })
-        return filteredRow
     }
 }
 

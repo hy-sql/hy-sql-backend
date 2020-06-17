@@ -13,14 +13,20 @@ const {
     stringFunctionsNamePattern,
     textInputPattern,
 } = require('../helpers/regex')
-const prepareConditionsForParsing = require('./parserTools/prepareConditionsForParsing')
 const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBracket')
 const {
+    transformSplitConditionsIntoConditionsArray,
     transformOrderByInputArrayIntoOrderByFieldsArray,
 } = require('./parserTools/arrayTransformationTools')
 
+/**
+ * Handles parsing of conditions from the given array.
+ * @param {string[]} slicedCommandArray array containing the conditions
+ */
 const parseConditions = (slicedCommandArray) => {
-    const conditionArray = prepareConditionsForParsing(slicedCommandArray)
+    const conditionArray = transformSplitConditionsIntoConditionsArray(
+        slicedCommandArray
+    )
 
     const conditions = { AND: [], OR: [] }
 
@@ -75,6 +81,10 @@ const parseConditions = (slicedCommandArray) => {
     return conditions
 }
 
+/**
+ * Handles parsing of an expression from the given string.
+ * @param {String} expression expression as string
+ */
 const parseExpression = (expression) => {
     const splitExpression = _.flatten(
         expression
@@ -94,6 +104,10 @@ const parseExpression = (expression) => {
     )
 }
 
+/**
+ * Handles parsing of fields in SELECT.
+ * @param {string[]} fieldArray array containing the field information
+ */
 const parseSelectFields = (fieldArray) => {
     // console.log('fieldArray', fieldArray)
     if (distinctKeywordPattern.test(fieldArray[0])) {
@@ -125,18 +139,17 @@ const parseParametersFromDistinct = (fieldArray) => {
     ]
 }
 
+/*
+ * Handles parsing of fields in ORDER BY.
+ * @param {string[]} fieldArray array containing the field information
+ */
 const parseOrderByFields = (fieldArray) => {
-    console.log('fieldArray', fieldArray)
     const orderByFields = transformOrderByInputArrayIntoOrderByFieldsArray(
         fieldArray
     )
 
-    console.log(orderByFields)
-
     return orderByFields.map((f) => {
         const column = parseField(f[0])
-
-        console.log(column)
 
         if (column) column.order = f[1] ? parseField(f[1]) : parseField('asc')
 
@@ -144,6 +157,11 @@ const parseOrderByFields = (fieldArray) => {
     })
 }
 
+/**
+ * Handles parsing of a field into field object.
+ * @param {String} field field as string
+ * @returns {object} field object
+ */
 const parseField = (field) => {
     switch (true) {
         case stringFunctionPattern.test(field):
@@ -201,6 +219,10 @@ const parseField = (field) => {
     }
 }
 
+/**
+ * Handles parsing of a parameter from a string function .
+ * @param {string[]} functionAsString array containing the string function
+ */
 const parseParameterFromStringFunction = (functionAsString) => {
     return parseField(
         functionAsString
@@ -210,6 +232,10 @@ const parseParameterFromStringFunction = (functionAsString) => {
     )
 }
 
+/**
+ * Handles parsing of a parameter from a aggregate function .
+ * @param {string[]} functionAsString array containing the aggregate function
+ */
 const parseParameterFromAggregateFunction = (functionAsString) => {
     return parseField(
         functionAsString

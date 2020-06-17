@@ -1,3 +1,10 @@
+/**
+ * Searches for the index of the closing bracket that matches the opening one
+ * at the given index.
+ * @param {string[]} conditionsArray array of command conditions
+ * @param {Number} IndexOfOpeningBracket index of opening bracket
+ * @returns {Number} index of the matching closing bracket
+ */
 const findIndexOfClosingBracket = (conditionsArray, IndexOfOpeningBracket) => {
     let brackets = { opening: 0, closing: 0 }
 

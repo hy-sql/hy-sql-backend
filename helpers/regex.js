@@ -15,7 +15,7 @@ const constraintsNamePattern = new RegExp(
     )
 )
 
-const arithmeticOperator = new RegExp('^[+\\-*/]$')
+const arithmeticOperator = new RegExp('^[+\\-*/%]$')
 
 // Switched '*' sign to '**' doublesign, because of conflict with select operator '*'
 const modifiedArithmeticOperator = new RegExp('^(\\+|-|\\/|\\*\\*|\\%)$')
@@ -117,6 +117,10 @@ const sortOrderKeywordPattern = new RegExp('^(ASC|DESC)$', 'i')
 
 const distinctKeywordPattern = new RegExp('DISTINCT')
 
+/**
+ * Regular expressions for use in the application.
+ * @exports RegExp
+ */
 module.exports = {
     aggregateFunctionPattern,
     aggregateFunctionsNamePattern,

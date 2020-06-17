@@ -6,6 +6,9 @@ const {
 } = require('./FieldSchemas')
 const { arithmeticExpressionPattern } = require('../helpers/regex')
 
+/**
+ * Joi schema for validating arithmetic expressions.
+ */
 const ExpressionSchema = Joi.object({
     type: Joi.string().valid('expression').required(),
     value: Joi.array()

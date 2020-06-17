@@ -1,6 +1,9 @@
 const Joi = require('@hapi/joi')
 const { constraintsNamePattern } = require('../helpers/regex')
 
+/**
+ * Joi schema for validating column information in CREATE TABLE commands.
+ */
 const ColumnsSchema = Joi.object({
     name: Joi.string()
         .pattern(/[;]/, { invert: true })
@@ -42,6 +45,9 @@ const ColumnsSchema = Joi.object({
     ),
 })
 
+/**
+ * Joi schema for validating CREATE TABLE commands.
+ */
 const CreateTableSchema = Joi.object({
     name: Joi.string()
         .pattern(/[;]./, { invert: true })

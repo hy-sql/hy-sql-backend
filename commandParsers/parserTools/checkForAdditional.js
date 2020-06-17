@@ -1,5 +1,13 @@
-/* if there is something additional between expected end of query and the ending semicolon
-  an error about the nonbelonging part is created and added to the given validation object */
+/**
+ * If the length of the given command array exceeds the given expected length
+ * an error message is created and added into the given validation object. The created
+ * error contains the additonal part starting at the expected length and ending at
+ * fullCommandAsStringArray[fullCommandAsStringArray.length - 2].
+ * @param {string[]} fullCommandAsStringArray full command as array
+ * @param {Object} validationResult Joi validation result object
+ * @param {Number} expectedLength expected length
+ * @returns {Object} Joi validation result object
+ */
 const checkForAdditionalAtEnd = (
     fullCommandAsStringArray,
     validationResult,
