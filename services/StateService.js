@@ -2,6 +2,7 @@ const _ = require('lodash')
 const {
     executeStringFunction,
     executeAggregateFunction,
+    executeSelectDistinct,
 } = require('./components/functions')
 const {
     evaluateExpression,
@@ -284,6 +285,12 @@ class StateService {
     createAdvancedRows(command, existingRows) {
         if (command.fields[0].type === 'all') {
             return existingRows
+        }
+
+        if (command.fields[0].type === 'distinct') {
+            const queriedColumns = command.fields[0].value
+            const rows = this.createQueriedRows(queriedColumns, existingRows)
+            return executeSelectDistinct(rows)
         }
 
         if (
