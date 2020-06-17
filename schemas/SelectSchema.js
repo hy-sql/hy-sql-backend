@@ -11,6 +11,9 @@ const {
 const ExpressionSchema = require('./ExpressionSchema')
 const FunctionSchema = require('./FunctionSchema')
 
+/**
+ * Joi schema for validating SELECT commands not containing WHERE or ORDER BY.
+ */
 const SelectSchema = Joi.object({
     name: Joi.string().required().valid('SELECT').insensitive().messages({
         'any.only': 'Query must begin with SELECT *',
@@ -53,6 +56,9 @@ const SelectSchema = Joi.object({
     }),
 })
 
+/**
+ * Joi schema for validating SELECT commands containing WHERE but not ORDER BY.
+ */
 const SelectWhereSchema = SelectSchema.keys({
     where: WhereSchema,
 })
@@ -61,6 +67,9 @@ const SelectGroupBySchema = SelectSchema.keys({
     groupBy: GroupBySchema,
 })
 
+/**
+ * Joi schema for validating SELECT commands containing ORDER BY but not WHERE.
+ */
 const SelectOrderBySchema = SelectSchema.keys({
     orderBy: OrderBySchema,
 })
@@ -70,6 +79,9 @@ const SelectWhereGroupBySchema = SelectSchema.keys({
     groupBy: GroupBySchema,
 })
 
+/**
+ * Joi schema for validating SELECT commands containing WHERE and ORDER BY.
+ */
 const SelectWhereOrderBySchema = SelectSchema.keys({
     where: WhereSchema,
     orderBy: OrderBySchema,

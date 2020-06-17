@@ -1,5 +1,10 @@
 const { evaluateExpressionPart } = require('./expressionTools')
 
+/**
+ * Creates a filter for lodash _.filter for a row based on the given condition.
+ * @param {object} row the row in question
+ * @param {object} condition the condition
+ */
 const createFilter = (row, condition) => {
     switch (condition.operator) {
         case '=':

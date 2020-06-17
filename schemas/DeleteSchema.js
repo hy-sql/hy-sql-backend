@@ -1,6 +1,9 @@
 const Joi = require('@hapi/joi')
 const WhereSchema = require('./WhereSchema')
 
+/**
+ * Joi schema for validating DELETE commands not containing WHERE.
+ */
 const DeleteSchema = Joi.object({
     name: Joi.string().required().valid('DELETE').insensitive().messages({
         'any.only': 'Query must begin with DELETE',
@@ -38,6 +41,9 @@ const DeleteSchema = Joi.object({
     }),
 })
 
+/**
+ * Joi schema for validating DELETE commands containing WHERE.
+ */
 const DeleteWhereSchema = DeleteSchema.keys({
     where: WhereSchema,
 })

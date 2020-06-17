@@ -3,6 +3,9 @@ const { ColumnSchema } = require('./FieldSchemas')
 const FunctionSchema = require('./FunctionSchema')
 const ExpressionSchema = require('./ExpressionSchema')
 
+/**
+ * Joi schema for validating fields in ORDER BY objects.
+ */
 const OrderByColumnSchema = ColumnSchema.keys({
     order: Joi.object({
         type: Joi.string().valid('order').required(),
@@ -10,6 +13,9 @@ const OrderByColumnSchema = ColumnSchema.keys({
     }).optional(),
 })
 
+/**
+ * Joi schema for validating fields containing functions in ORDER BY objects.
+ */
 const OrderByFunctionSchema = FunctionSchema.keys({
     order: Joi.object({
         type: Joi.string().valid('order').required(),
@@ -17,6 +23,9 @@ const OrderByFunctionSchema = FunctionSchema.keys({
     }).optional(),
 })
 
+/**
+ * Joi schema for validating fields containing expressions in ORDER BY objects.
+ */
 const OrderByExpressionSchema = ExpressionSchema.keys({
     order: Joi.object({
         type: Joi.string().valid('order').required(),
@@ -24,6 +33,9 @@ const OrderByExpressionSchema = ExpressionSchema.keys({
     }).optional(),
 })
 
+/**
+ * Joi schema for validating ORDER BY objects.
+ */
 const OrderBySchema = Joi.object({
     keyword: Joi.string()
         .pattern(/[;]/, { invert: true })

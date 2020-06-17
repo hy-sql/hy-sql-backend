@@ -1,3 +1,9 @@
+/**
+ * Checks whether a command contains the keyword WHERE. Check is
+ * case-insensitive. Returns true or false.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {Boolean} WHERE was found true/false
+ */
 const queryContainsWhereKeyword = (fullCommandAsStringArray) => {
     return fullCommandAsStringArray.some(
         (string) => string.toUpperCase() === 'WHERE'
@@ -19,6 +25,12 @@ const queryContainsGroupByKeywords = (fullCommandAsStringArray) => {
     return hasGroupBy
 }
 
+/**
+ * Checks whether a command contains the keywords ORDER and BY and that they
+ * are in the correct order. Check is case-insensitive. Returns true or false.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {Boolean} ORDER BY was found true/false
+ */
 const queryContainsOrderByKeywords = (fullCommandAsStringArray) => {
     const indexOfOrder = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'ORDER'
@@ -77,6 +89,12 @@ const queryContainsGroupByOrderByKeywords = (fullCommandAsStringArray) => {
     return indexOfGroup < indexOfOrder && hasGroupBy && hasOrderBy
 }
 
+/**
+ * Checks whether a command contains the keywords ORDER, BY and WHERE and that they
+ * are in the correct order. Check is case-insensitive. Returns true or false.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {Boolean} ORDER BY and WHERE were found true/false
+ */
 const queryContainsWhereOrderByKeywords = (fullCommandAsStringArray) => {
     const indexOfWhere = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'WHERE'
