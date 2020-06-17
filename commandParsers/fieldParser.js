@@ -200,7 +200,7 @@ const parseField = (field) => {
 }
 
 /**
- * Handles parsing of a parameter from a string function .
+ * Handles parsing of a parameter from a string function.
  * @param {string[]} functionAsString array containing the string function
  */
 const parseParameterFromStringFunction = (functionAsString) => {
@@ -213,7 +213,7 @@ const parseParameterFromStringFunction = (functionAsString) => {
 }
 
 /**
- * Handles parsing of a parameter from a aggregate function .
+ * Handles parsing of a parameter from a aggregate function.
  * @param {string[]} functionAsString array containing the aggregate function
  */
 const parseParameterFromAggregateFunction = (functionAsString) => {

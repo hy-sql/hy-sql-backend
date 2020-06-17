@@ -6,7 +6,7 @@
  */
 const queryContainsWhereKeyword = (fullCommandAsStringArray) => {
     const where = fullCommandAsStringArray.findIndex(
-        (string) => string.toUpperCase() === 'WHERE'
+        (s) => s.toUpperCase() === 'WHERE'
     )
     return where !== -1
 }
@@ -51,8 +51,23 @@ const queryContainsWhereOrderByKeywords = (fullCommandAsStringArray) => {
         : false
 }
 
+/**
+ * Checks whether a command contains the keyword LIMIT. Check is
+ * case-insensitive. Returns true or false.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {Boolean} LIMIT was found true/false
+ */
+const queryContainsLimitKeyword = (fullCommandAsStringArray) => {
+    const limit = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'LIMIT'
+    )
+
+    return limit !== -1
+}
+
 module.exports = {
     queryContainsWhereKeyword,
     queryContainsOrderByKeywords,
     queryContainsWhereOrderByKeywords,
+    queryContainsLimitKeyword,
 }
