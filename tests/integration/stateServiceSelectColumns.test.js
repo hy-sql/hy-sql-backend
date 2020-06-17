@@ -44,6 +44,33 @@ describe('selectFromTable()', () => {
         expect(result.rows.length).toBe(1)
         expect(result.rows[0]['nimi']).toBe('tuote')
     })
+
+    test('returns error when queried column does not exist', () => {
+        const state = new State(new Map())
+        const stateService = new StateService(state)
+
+        const commands = [
+            'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
+            'INSERT INTO Tuotteet (nimi, hinta) VALUES (tuote, 10);',
+        ]
+
+        const splitCommandArray = commands.map((input) =>
+            splitCommandIntoArray(input)
+        )
+
+        const parsedCommands = splitCommandArray.map((c) =>
+            commandService.parseCommand(c)
+        )
+
+        parsedCommands.forEach((c) => stateService.updateState(c.value))
+
+        const selectParser = 'SELECT invalid from Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectParser)
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.selectFrom(parsedCommand.value)
+        expect(result.rows).not.toBeDefined()
+        expect(result.error).toBe('no such column invalid')
+    })
 })
 
 describe('selectFrom() with command.where', () => {
