@@ -136,7 +136,7 @@ class StateService {
         let result
         if (command.fields[0].type === 'distinct') {
             result = `SELECT DISTINCT ${command.fields[0].value
-                .map((c) => c.value)
+                .map((c) => (c.type === 'expression' ? c.stringValue : c.value))
                 .join(', ')} FROM ${
                 command.tableName
             } -query executed successfully`

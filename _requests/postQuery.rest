@@ -265,6 +265,6 @@ Content-Type: application/json
     "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 7);",
     "INSERT INTO Tuotteet (nimi, hinta) VALUES ('olut', 7);",
     "INSERT INTO Tuotteet (nimi, hinta) VALUES ('olut', 7);",
-    "SELECT DISTINCT nimi, hinta FROM Tuotteet WHERE hinta=7 ORDER BY nimi ASC;"
+    "SELECT DISTINCT length(nimi), hinta, hinta+1 FROM Tuotteet;"
   ]
 }

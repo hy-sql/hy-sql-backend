@@ -800,4 +800,52 @@ describe('selectFrom() with DISTINCT keyword', () => {
         const result = stateService.updateState(parsedCommand.value)
         expect(result.error).toBeDefined()
     })
+
+    test('length()-function returns correct columns', () => {
+        const expectedRows = [
+            {
+                'length(nimi)': 7,
+            },
+            {
+                'length(nimi)': 6,
+            },
+            {
+                'length(nimi)': 4,
+            },
+        ]
+
+        const selectParser = 'SELECT DISTINCT length(nimi) FROM Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectParser)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual(expectedRows)
+    })
+
+    test('aritmetic function returns correct columns', () => {
+        const expectedRows = [
+            {
+                'hinta+1': 8,
+            },
+            {
+                'hinta+1': 6,
+            },
+            {
+                'hinta+1': 5,
+            },
+            {
+                'hinta+1': 4,
+            },
+            {
+                'hinta+1': 3,
+            },
+        ]
+
+        const selectParser = 'SELECT DISTINCT hinta+1 FROM Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectParser)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual(expectedRows)
+    })
 })
