@@ -5,10 +5,22 @@
  * @returns {Boolean} WHERE was found true/false
  */
 const queryContainsWhereKeyword = (fullCommandAsStringArray) => {
-    const where = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'WHERE'
+    return fullCommandAsStringArray.some((s) => s.toUpperCase() === 'WHERE')
+}
+
+const queryContainsGroupByKeywords = (fullCommandAsStringArray) => {
+    const indexOfGroup = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'GROUP'
     )
-    return where !== -1
+
+    if (indexOfGroup < 0) return false
+
+    const hasGroupBy =
+        indexOfGroup >= 0 &&
+        fullCommandAsStringArray[indexOfGroup + 1] &&
+        fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY'
+
+    return hasGroupBy
 }
 
 /**
@@ -18,15 +30,61 @@ const queryContainsWhereKeyword = (fullCommandAsStringArray) => {
  * @returns {Boolean} ORDER BY was found true/false
  */
 const queryContainsOrderByKeywords = (fullCommandAsStringArray) => {
-    const hasOrder = fullCommandAsStringArray.findIndex(
+    const indexOfOrder = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'ORDER'
     )
 
-    const hasBy = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'BY'
+    if (indexOfOrder < 0) return false
+
+    const hasOrderBy =
+        indexOfOrder >= 0 &&
+        fullCommandAsStringArray[indexOfOrder + 1] &&
+        fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() === 'BY'
+
+    return hasOrderBy
+}
+
+const queryContainsWhereGroupByKeywords = (fullCommandAsStringArray) => {
+    const indexOfWhere = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'WHERE'
     )
 
-    return hasOrder > 0 && hasBy > 0 ? hasOrder < hasBy : false
+    const indexOfGroup = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'GROUP'
+    )
+
+    if (indexOfWhere < 0 || indexOfGroup < 0) return false
+
+    const hasGroupBy =
+        indexOfGroup >= 0 &&
+        fullCommandAsStringArray[indexOfGroup + 1] &&
+        fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY'
+
+    return indexOfWhere >= 0 && indexOfWhere < indexOfGroup && hasGroupBy
+}
+
+const queryContainsGroupByOrderByKeywords = (fullCommandAsStringArray) => {
+    const indexOfGroup = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'GROUP'
+    )
+
+    const indexOfOrder = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'ORDER'
+    )
+
+    if (indexOfGroup < 0 || indexOfOrder < 0) return false
+
+    const hasGroupBy =
+        indexOfGroup >= 0 &&
+        fullCommandAsStringArray[indexOfGroup + 1] &&
+        fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY'
+
+    const hasOrderBy =
+        indexOfOrder >= 0 &&
+        fullCommandAsStringArray[indexOfOrder + 1] &&
+        fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() === 'BY'
+
+    return indexOfGroup < indexOfOrder && hasGroupBy && hasOrderBy
 }
 
 /**
@@ -36,19 +94,56 @@ const queryContainsOrderByKeywords = (fullCommandAsStringArray) => {
  * @returns {Boolean} ORDER BY and WHERE were found true/false
  */
 const queryContainsWhereOrderByKeywords = (fullCommandAsStringArray) => {
-    const hasWhere = fullCommandAsStringArray.findIndex(
+    const indexOfWhere = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'WHERE'
     )
-    const hasOrder = fullCommandAsStringArray.findIndex(
+
+    const indexOfOrder = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'ORDER'
     )
-    const hasBy = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'BY'
+
+    if (indexOfWhere < 0 || indexOfOrder < 0) return false
+
+    const hasOrderBy =
+        indexOfOrder >= 0 &&
+        fullCommandAsStringArray[indexOfOrder + 1] &&
+        fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() === 'BY'
+
+    return indexOfWhere >= 0 && indexOfWhere < indexOfOrder && hasOrderBy
+}
+
+const queryContainsWhereGroupByOrderByKeywords = (fullCommandAsStringArray) => {
+    const indexOfWhere = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'WHERE'
     )
 
-    return hasWhere > 0 && hasOrder > 0 && hasBy > 0
-        ? hasWhere < hasOrder && hasOrder < hasBy
-        : false
+    const indexOfGroup = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'GROUP'
+    )
+
+    const indexOfOrder = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'ORDER'
+    )
+
+    if (indexOfWhere < 0 || indexOfGroup < 0 || indexOfOrder < 0) return false
+
+    const hasGroupBy =
+        indexOfGroup >= 0 &&
+        fullCommandAsStringArray[indexOfGroup + 1] &&
+        fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY'
+
+    const hasOrderBy =
+        indexOfOrder >= 0 &&
+        fullCommandAsStringArray[indexOfOrder + 1] &&
+        fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() === 'BY'
+
+    return (
+        indexOfWhere >= 0 &&
+        indexOfWhere < indexOfGroup &&
+        indexOfGroup < indexOfOrder &&
+        hasGroupBy &&
+        hasOrderBy
+    )
 }
 
 /**
@@ -58,16 +153,16 @@ const queryContainsWhereOrderByKeywords = (fullCommandAsStringArray) => {
  * @returns {Boolean} LIMIT was found true/false
  */
 const queryContainsLimitKeyword = (fullCommandAsStringArray) => {
-    const limit = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'LIMIT'
-    )
-
-    return limit !== -1
+    return fullCommandAsStringArray.some((s) => s.toUpperCase() === 'LIMIT')
 }
 
 module.exports = {
     queryContainsWhereKeyword,
+    queryContainsGroupByKeywords,
     queryContainsOrderByKeywords,
+    queryContainsWhereGroupByKeywords,
     queryContainsWhereOrderByKeywords,
     queryContainsLimitKeyword,
+    queryContainsGroupByOrderByKeywords,
+    queryContainsWhereGroupByOrderByKeywords,
 }

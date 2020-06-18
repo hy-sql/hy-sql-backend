@@ -166,8 +166,8 @@ const parseField = (field) => {
         case arithmeticExpressionPattern.test(field):
             return {
                 type: 'expression',
-                value: parseExpression(field),
-                stringValue: field,
+                expressionParts: parseExpression(field),
+                value: field,
             }
         case textInputPattern.test(field):
             return {

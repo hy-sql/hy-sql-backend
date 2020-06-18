@@ -34,4 +34,11 @@ const parseOffset = (slicedCommandAsStringArray) => {
     return offset
 }
 
+//TODO
+//const limitInCorrectPosition = (fullCommandAsStringArray) => {
+//    return true
+//}
+
+//const offsetInCorrectPosition =
+
 module.exports = { parseLimit }

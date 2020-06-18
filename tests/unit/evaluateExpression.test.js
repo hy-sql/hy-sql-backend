@@ -2,7 +2,7 @@ const {
     evaluateExpression,
 } = require('../../services/components/expressionTools')
 
-test('transforms successfully', () => {
+test('evaluates successfully', () => {
     const expressionArray = [
         { type: 'integer', value: 5 },
         { type: 'operator', value: '+' },
