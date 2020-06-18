@@ -122,9 +122,14 @@ class StateService {
         const table = this.findTable(command.tableName)
         const existingRows = table.rows
 
-        const selectedRows = this.selectRows(command, existingRows)
+        let selectedRows = this.selectRows(command, existingRows)
 
         if (selectedRows.error) return { error: selectedRows.error }
+
+        if (command.limit) {
+            selectedRows = this.limitRows(command.limit, selectedRows)
+            if (selectedRows.error) return { error: selectedRows.error }
+        }
 
         const result = `SELECT ${command.fields
             .map((c) => c.value)
@@ -228,6 +233,43 @@ class StateService {
         return {
             result,
         }
+    }
+
+    limitRows(limitObject, rows) {
+        let limitedRows = rows
+
+        if (limitObject.offset) {
+            const offset =
+                limitObject.offset.field.type === 'expression'
+                    ? evaluateExpression(
+                          limitObject.offset.field.expressionParts,
+                          {},
+                          limitedRows
+                      )
+                    : limitObject.offset.field.value
+
+            limitedRows = _.drop(limitedRows, offset)
+        }
+
+        const limit =
+            limitObject.field.type === 'expression'
+                ? evaluateExpression(
+                      limitObject.field.expressionParts,
+                      {},
+                      limitedRows
+                  )
+                : limitObject.field.value
+
+        if (limit >= 0) limitedRows = _.take(limitedRows, limit)
+
+        if (limitedRows.length === 0) {
+            return {
+                error:
+                    'No rows left to return. Try changing value given to LIMIT or OFFSET.',
+            }
+        }
+
+        return limitedRows
     }
 
     /**

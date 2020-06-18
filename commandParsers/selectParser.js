@@ -73,6 +73,9 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
 
     if (queryContainsLimitKeyword(fullCommandAsStringArray)) {
         parsedCommand.limit = parseLimit(fullCommandAsStringArray)
+        parsedCommand.indexOfLimit = fullCommandAsStringArray.findIndex(
+            (s) => s.toUpperCase() === 'LIMIT'
+        )
     }
 
     return parsedCommand
@@ -85,6 +88,7 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
  */
 const parseSelect = (fullCommandAsStringArray) => {
     const parsedBaseCommand = parseBaseCommand(fullCommandAsStringArray)
+    delete parseBaseCommand.indexOfLimit
 
     const validationResult = SelectSchema.validate(parsedBaseCommand)
 
@@ -106,10 +110,13 @@ const parseSelectWhere = (fullCommandAsStringArray) => {
     parsedCommand.where = parseWhere(
         fullCommandAsStringArray.slice(
             indexOfWhere,
-            fullCommandAsStringArray.length - 1
+            parsedCommand.limit
+                ? parsedCommand.indexOfLimit
+                : fullCommandAsStringArray.length - 1
         )
     )
 
+    delete parseBaseCommand.indexOfLimit
     const validationResult = SelectWhereSchema.validate(parsedCommand)
 
     return validationResult
@@ -125,10 +132,13 @@ const parseSelectGroupBy = (fullCommandAsStringArray) => {
     parsedCommand.groupBy = parseGroupBy(
         fullCommandAsStringArray.slice(
             indexOfGroup,
-            fullCommandAsStringArray.length - 1
+            parsedCommand.limit
+                ? parsedCommand.indexOfLimit
+                : fullCommandAsStringArray.length - 1
         )
     )
 
+    delete parseBaseCommand.indexOfLimit
     const validationResult = SelectGroupBySchema.validate(parsedCommand)
 
     return validationResult
@@ -149,10 +159,13 @@ const parseSelectOrderBy = (fullCommandAsStringArray) => {
     parsedCommand.orderBy = parseOrderBy(
         fullCommandAsStringArray.slice(
             indexOfOrder,
-            fullCommandAsStringArray.length - 1
+            parsedCommand.limit
+                ? parsedCommand.indexOfLimit
+                : fullCommandAsStringArray.length - 1
         )
     )
 
+    delete parseBaseCommand.indexOfLimit
     const validationResult = SelectOrderBySchema.validate(parsedCommand)
 
     return validationResult
@@ -176,10 +189,13 @@ const parseSelectWhereGroupBy = (fullCommandAsStringArray) => {
     parsedCommand.groupBy = parseGroupBy(
         fullCommandAsStringArray.slice(
             indexOfGroup,
-            fullCommandAsStringArray.length - 1
+            parsedCommand.limit
+                ? parsedCommand.indexOfLimit
+                : fullCommandAsStringArray.length - 1
         )
     )
 
+    delete parseBaseCommand.indexOfLimit
     const validationResult = SelectWhereGroupBySchema.validate(parsedCommand)
 
     return validationResult
@@ -208,10 +224,13 @@ const parseSelectWhereOrderBy = (fullCommandAsStringArray) => {
     parsedCommand.orderBy = parseOrderBy(
         fullCommandAsStringArray.slice(
             indexOfOrder,
-            fullCommandAsStringArray.length - 1
+            parsedCommand.limit
+                ? parsedCommand.indexOfLimit
+                : fullCommandAsStringArray.length - 1
         )
     )
 
+    delete parseBaseCommand.indexOfLimit
     const validationResult = SelectWhereOrderBySchema.validate(parsedCommand)
 
     return validationResult
@@ -235,10 +254,13 @@ const parseSelectGroupByOrderBy = (fullCommandAsStringArray) => {
     parsedCommand.orderBy = parseOrderBy(
         fullCommandAsStringArray.slice(
             indexOfOrder,
-            fullCommandAsStringArray.length - 1
+            parsedCommand.limit
+                ? parsedCommand.indexOfLimit
+                : fullCommandAsStringArray.length - 1
         )
     )
 
+    delete parseBaseCommand.indexOfLimit
     const validationResult = SelectGroupByOrderBySchema.validate(parsedCommand)
 
     return validationResult
@@ -270,10 +292,13 @@ const parseSelectWhereGroupByOrderBy = (fullCommandAsStringArray) => {
     parsedCommand.orderBy = parseOrderBy(
         fullCommandAsStringArray.slice(
             indexOfOrder,
-            fullCommandAsStringArray.length - 1
+            parsedCommand.limit
+                ? parsedCommand.indexOfLimit
+                : fullCommandAsStringArray.length - 1
         )
     )
 
+    delete parseBaseCommand.indexOfLimit
     const validationResult = SelectWhereGroupByOrderBySchema.validate(
         parsedCommand
     )
