@@ -10,6 +10,7 @@ const {
 } = require('./FieldSchemas')
 const ExpressionSchema = require('./ExpressionSchema')
 const FunctionSchema = require('./FunctionSchema')
+const LimitSchema = require('./LimitSchema')
 
 /**
  * Joi schema for validating SELECT commands not containing WHERE or ORDER BY.
@@ -54,6 +55,8 @@ const SelectSchema = Joi.object({
         'any.only': 'Query must end with ;',
         'any.required': 'Query must end with ;',
     }),
+
+    limit: LimitSchema,
 })
 
 /**

@@ -1,30 +1,50 @@
 const { parseField } = require('./fieldParser')
+const { checkLimitPosition } = require('./parserTools/checkCorrectPosition')
 
-//TODO siivoa lopuksi ylimääräiset ja duplikaatit ja tiivistä
-// Add check that correct type of fields for both thursday after discussing it. VALIDOINTIIN
-// TODO JSDoc comments
-
-const parseLimit = (slicedCommandAsStringArray) => {
-    console.log(slicedCommandAsStringArray)
-
-    const leftToParse = slicedCommandAsStringArray
+/**
+ * Handles parsing of the LIMIT part of a command into an LIMIT object
+ * from the given string array.
+ * @param {sting[]} fullCommandAsStringArray the LIMIT part of a command as string array
+ */
+const parseLimit = (fullCommandAsStringArray) => {
     const limit = {}
 
-    limit.keyword = leftToParse.splice(0, 1).toUpperCase()
+    limit.correctlyPlaced = checkLimitPosition(fullCommandAsStringArray)
 
-    const indexOfOffset = leftToParse.findIndex(
+    const indexOfLimit = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'LIMIT'
+    )
+    const slicedCommandAsStringArray = fullCommandAsStringArray.slice(
+        indexOfLimit
+    )
+
+    limit.keyword = slicedCommandAsStringArray[0].toUpperCase()
+
+    const indexOfOffset = slicedCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'OFFSET'
     )
 
     if (indexOfOffset !== -1) {
-        limit.offset = parseOffset(leftToParse.splice(indexOfOffset))
+        limit.offset = parseOffset(
+            slicedCommandAsStringArray.slice(indexOfOffset)
+        )
     }
 
-    limit.field = parseField(leftToParse.join(''))
+    limit.field =
+        indexOfOffset !== -1
+            ? parseField(
+                  slicedCommandAsStringArray.slice(1, indexOfOffset).join('')
+              )
+            : parseField(slicedCommandAsStringArray.slice(1).join(''))
 
     return limit
 }
 
+/**
+ * Handles parsing of the OFFSET part of the LIMIT part of a command into an OFFSET object
+ * from the given string array.
+ * @param {sting[]} slicedCommandAsStringArray the OFFSET part of the LIMIT part of a command as string array
+ */
 const parseOffset = (slicedCommandAsStringArray) => {
     const offset = {
         keyword: slicedCommandAsStringArray[0].toUpperCase(),
@@ -33,12 +53,5 @@ const parseOffset = (slicedCommandAsStringArray) => {
 
     return offset
 }
-
-//TODO
-//const limitInCorrectPosition = (fullCommandAsStringArray) => {
-//    return true
-//}
-
-//const offsetInCorrectPosition =
 
 module.exports = { parseLimit }

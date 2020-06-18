@@ -15,14 +15,14 @@ const {
     queryContainsOrderByKeywords,
     queryContainsWhereGroupByKeywords,
     queryContainsWhereOrderByKeywords,
-    //queryContainsLimitKeyword,
     queryContainsGroupByOrderByKeywords,
     queryContainsWhereGroupByOrderByKeywords,
+    queryContainsLimitKeyword,
 } = require('./parserTools/queryContains')
 const { parseOrderBy } = require('./orderByParser')
 const { parseSelectFields } = require('./fieldParser')
-//const { parseLimit } = require('./limitParser')
 const { parseGroupBy } = require('./groupByParser')
+const { parseLimit } = require('./limitParser')
 
 /**
  * Parses and validates a SELECT command object from the given string array.
@@ -71,18 +71,10 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
             fullCommandAsStringArray[fullCommandAsStringArray.length - 1],
     }
 
-    /* fix to fit new
-    // TODO: Check here or elsewhere in parser that limit is after order by and where.
     if (queryContainsLimitKeyword(fullCommandAsStringArray)) {
-        const indexOfLimit = parsedCommand.additional.findIndex(
-            (s) => s.toUpperCase() === 'LIMIT'
-        )
-
-        parsedCommand.limit = parseLimit(
-            parsedCommand.additional.splice(indexOfLimit)
-        )
+        parsedCommand.limit = parseLimit(fullCommandAsStringArray)
     }
-    */
+
     return parsedCommand
 }
 

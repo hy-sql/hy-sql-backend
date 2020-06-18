@@ -162,7 +162,7 @@ module.exports = {
     queryContainsOrderByKeywords,
     queryContainsWhereGroupByKeywords,
     queryContainsWhereOrderByKeywords,
-    queryContainsLimitKeyword,
     queryContainsGroupByOrderByKeywords,
     queryContainsWhereGroupByOrderByKeywords,
+    queryContainsLimitKeyword,
 }
