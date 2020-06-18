@@ -478,7 +478,12 @@ class StateService {
     createRowsWithNewFields(command, existingRows) {
         const createdRows = existingRows.reduce((rowsToReturn, row) => {
             for (let i = 0; i < command.fields.length; i++) {
-                if (
+                if (command.fields[i].type === 'column') {
+                    const valueOfQueriedColumn = row[command.fields[i].value]
+                    if (!valueOfQueriedColumn) {
+                        row.error = `no such column ${command.fields[i].value}`
+                    }
+                } else if (
                     command.fields[i].type === 'expression' &&
                     containsAggregateFunction(command.fields[i].expressionParts)
                 ) {
