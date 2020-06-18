@@ -1,4 +1,7 @@
 const Joi = require('@hapi/joi')
+const { ColumnSchema } = require('./FieldSchemas')
+const FunctionSchema = require('./FunctionSchema')
+const ExpressionSchema = require('./ExpressionSchema')
 
 const GroupBySchema = Joi.object({
     keyword: Joi.string()
@@ -13,7 +16,9 @@ const GroupBySchema = Joi.object({
                 'ORDER BY is either misspelled, missing or in the wrong position',
         }),
 
-    columns: Joi.array(),
+    fields: Joi.array()
+        .items(ColumnSchema, FunctionSchema, ExpressionSchema)
+        .min(1),
 })
 
 module.exports = GroupBySchema
