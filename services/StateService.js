@@ -126,17 +126,13 @@ class StateService {
 
         if (selectedRows.error) return { error: selectedRows.error }
 
-        const orderedRows = command.orderBy
-            ? this.orderRowsBy(command.orderBy.fields, selectedRows)
-            : selectedRows
-
         const result = `SELECT ${command.fields
             .map((c) => c.value)
             .join(', ')} FROM ${command.tableName} -query executed successfully`
 
         return {
             result,
-            rows: orderedRows,
+            rows: selectedRows,
         }
     }
 
@@ -385,7 +381,9 @@ class StateService {
             : existingRows
 
         if (command.fields[0].type === 'all') {
-            return filteredRows
+            return command.orderBy
+                ? this.orderRowsBy(command.orderBy.fields, filteredRows)
+                : filteredRows
         }
 
         if (
@@ -430,15 +428,25 @@ class StateService {
         if (rowsWithNewFieldsAndFunctions.error)
             return rowsWithNewFieldsAndFunctions
 
-        const selectedRows = rowsWithNewFieldsAndFunctions.map((row) =>
+        const orderedRows = command.orderBy
+            ? this.orderRowsBy(
+                  command.orderBy.fields,
+                  rowsWithNewFieldsAndFunctions
+              )
+            : rowsWithNewFieldsAndFunctions
+
+        const selectedRows = orderedRows.map((row) =>
             _.pick(row, fieldsToReturn)
         )
 
-        const finalGroupedRows = command.groupBy
-            ? this.groupRowsBy(selectedRows, command.groupBy.fields)
+        return command.groupBy
+            ? command.orderBy
+                ? this.orderRowsBy(
+                      command.orderBy.fields,
+                      this.groupRowsBy(selectedRows, command.groupBy.fields)
+                  )
+                : this.groupRowsBy(selectedRows, command.groupBy.fields)
             : selectedRows
-
-        return finalGroupedRows
     }
 
     /**
