@@ -133,9 +133,20 @@ class StateService {
             rows = this.orderRowsBy(command.orderBy.fields, rows)
         }
 
-        const result = `SELECT ${command.fields
-            .map((c) => c.value)
-            .join(', ')} FROM ${command.tableName} -query executed successfully`
+        let result
+        if (command.fields[0].type === 'distinct') {
+            result = `SELECT DISTINCT ${command.fields[0].value
+                .map((c) => c.value)
+                .join(', ')} FROM ${
+                command.tableName
+            } -query executed successfully`
+        } else {
+            result = `SELECT ${command.fields
+                .map((c) => c.value)
+                .join(', ')} FROM ${
+                command.tableName
+            } -query executed successfully`
+        }
         return {
             result,
             rows,

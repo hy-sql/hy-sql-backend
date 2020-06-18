@@ -263,6 +263,8 @@ Content-Type: application/json
     "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
     "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 7);",
     "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 7);",
-    "SELECT DISTINCT nimi, hinta FROM Tuotteet;"
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('olut', 7);",
+    "INSERT INTO Tuotteet (nimi, hinta) VALUES ('olut', 7);",
+    "SELECT DISTINCT nimi, hinta FROM Tuotteet WHERE hinta=7 ORDER BY nimi ASC;"
   ]
 }

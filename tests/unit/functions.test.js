@@ -1,6 +1,7 @@
 const {
     executeAggregateFunction,
     executeStringFunction,
+    executeSelectDistinct,
 } = require('../../services/components/functions')
 
 const rows = [
@@ -288,5 +289,49 @@ describe('executeAggregateFunction()', () => {
         expect(executeAggregateFunction(functionDetailList[19], rows)).toEqual({
             error: 'Parameter given to AVG does not match any existing column',
         })
+    })
+})
+
+describe('executeSelectDistinct()', () => {
+    const rows = [
+        {
+            nimi: 'olut',
+            hinta: 3,
+        },
+        {
+            nimi: 'olut',
+            hinta: 3,
+        },
+        {
+            nimi: 'olut',
+            hinta: 2,
+        },
+        {
+            nimi: 'nauris',
+            hinta: 3,
+        },
+        {
+            nimi: 'nauris',
+            hinta: 3,
+        },
+    ]
+
+    test('filters out duplicate rows', () => {
+        const expectedRows = [
+            {
+                nimi: 'olut',
+                hinta: 3,
+            },
+            {
+                nimi: 'olut',
+                hinta: 2,
+            },
+            {
+                nimi: 'nauris',
+                hinta: 3,
+            },
+        ]
+        const result = executeSelectDistinct(rows)
+        expect(result).toEqual(expectedRows)
     })
 })
