@@ -239,52 +239,26 @@ describe('selectFrom()', () => {
         expect(result.rows).toEqual(expectedRows)
     })
 
-    test(`returns expected rows for: ${queries[9]}`, () => {
-        const expectedRows = [
-            {
-                nimi: 'porkkana',
-                hinta: 5,
-            },
-            {
-                nimi: 'nauris',
-                hinta: 4,
-            },
-            {
-                nimi: 'lanttu',
-                hinta: 8,
-            },
-            {
-                nimi: 'selleri',
-                hinta: 6,
-            },
-            {
-                nimi: 'maito',
-                hinta: 6,
-            },
-        ]
-
+    test(`returns expected error for: ${queries[9]}`, () => {
         const commandArray = splitCommandIntoArray(queries[9])
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand.value)
 
-        expect(result.error).toBeUndefined()
-        expect(result.rows).toEqual(expectedRows)
+        expect(result.rows).toBeUndefined()
+        expect(result).toEqual({
+            error: 'Value given to LIMIT or OFFSET is negative.',
+        })
     })
 
-    test(`returns expected rows for: ${queries[10]}`, () => {
-        const expectedRows = [
-            {
-                nimi: 'porkkana',
-                hinta: 5,
-            },
-        ]
-
+    test(`returns expected error for: ${queries[10]}`, () => {
         const commandArray = splitCommandIntoArray(queries[10])
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand.value)
 
-        expect(result.error).toBeUndefined()
-        expect(result.rows).toEqual(expectedRows)
+        expect(result.rows).toBeUndefined()
+        expect(result).toEqual({
+            error: 'Value given to LIMIT or OFFSET is negative.',
+        })
     })
 
     test(`returns expected rows for: ${queries[11]}`, () => {

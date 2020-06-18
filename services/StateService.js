@@ -235,11 +235,18 @@ class StateService {
         }
     }
 
+    /**
+     * Handles narrowing down the amount of rows to be returned according to the values
+     * given to LIMIT ... OFFSET in a query.
+     * @param {object} limitObject .limit of a command object
+     * @param {object[]} rows rows to limit
+     */
     limitRows(limitObject, rows) {
         let limitedRows = rows
 
+        let offset = undefined
         if (limitObject.offset) {
-            const offset =
+            offset =
                 limitObject.offset.field.type === 'expression'
                     ? evaluateExpression(
                           limitObject.offset.field.expressionParts,
@@ -261,6 +268,10 @@ class StateService {
                 : limitObject.field.value
 
         if (limit >= 0) limitedRows = _.take(limitedRows, limit)
+
+        if (limit < 0 || offset < 0) {
+            return { error: 'Value given to LIMIT or OFFSET is negative.' }
+        }
 
         if (limitedRows.length === 0) {
             return {
