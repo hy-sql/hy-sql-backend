@@ -9,7 +9,7 @@ const parseGroupBy = (slicedCommandAsStringArray) => {
                       .slice(0, 2)
                       .join(' ')
                       .toUpperCase(),
-                  columns: parseSelectFields(
+                  fields: parseSelectFields(
                       slicedCommandAsStringArray.slice(2)
                   ),
               }

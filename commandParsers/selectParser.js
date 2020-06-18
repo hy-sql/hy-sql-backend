@@ -112,7 +112,7 @@ const parseSelectWhere = (fullCommandAsStringArray) => {
 const parseSelectGroupBy = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
 
-    const indexOfGroup = parsedCommand.findIndex(
+    const indexOfGroup = fullCommandAsStringArray.findIndex(
         (k) => k.toUpperCase() === 'GROUP'
     )
 
@@ -159,7 +159,7 @@ const parseSelectWhereGroupBy = (fullCommandAsStringArray) => {
         (k) => k.toUpperCase() === 'WHERE'
     )
 
-    const indexOfGroup = parsedCommand.findIndex(
+    const indexOfGroup = fullCommandAsStringArray.findIndex(
         (k) => k.toUpperCase() === 'GROUP'
     )
 
@@ -174,7 +174,7 @@ const parseSelectWhereGroupBy = (fullCommandAsStringArray) => {
         )
     )
 
-    const validationResult = SelectWhereGroupBySchema.validate(parseCommand)
+    const validationResult = SelectWhereGroupBySchema.validate(parsedCommand)
 
     return validationResult
 }
@@ -214,7 +214,7 @@ const parseSelectWhereOrderBy = (fullCommandAsStringArray) => {
 const parseSelectGroupByOrderBy = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
 
-    const indexOfGroup = parsedCommand.findIndex(
+    const indexOfGroup = fullCommandAsStringArray.findIndex(
         (k) => k.toUpperCase() === 'GROUP'
     )
 
@@ -245,7 +245,7 @@ const parseSelectWhereGroupByOrderBy = (fullCommandAsStringArray) => {
         (k) => k.toUpperCase() === 'WHERE'
     )
 
-    const indexOfGroup = parsedCommand.findIndex(
+    const indexOfGroup = fullCommandAsStringArray.findIndex(
         (k) => k.toUpperCase() === 'GROUP'
     )
 
