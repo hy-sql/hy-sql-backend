@@ -1,6 +1,6 @@
 const Joi = require('@hapi/joi')
 const { IntegerSchema } = require('./FieldSchemas')
-const ExpressionSchema = require('./ExpressionSchema')
+const { SimplerExpressionSchema } = require('./ExpressionSchema')
 
 /**
  * Joi schema for validating OFFSET objects in LIMIT objects.
@@ -11,7 +11,7 @@ const OffsetSchema = Joi.object({
         .required(),
 
     field: Joi.alternatives()
-        .try(IntegerSchema, ExpressionSchema)
+        .try(IntegerSchema, SimplerExpressionSchema)
         .required()
         .messages({
             'any.required':
@@ -25,7 +25,7 @@ const OffsetSchema = Joi.object({
  * Joi schema for validating LIMIT objects.
  */
 const LimitSchema = Joi.object({
-    correctlyPlaced: Joi.boolean().valid(true).required().messages({
+    correctlyPositioned: Joi.boolean().valid(true).required().messages({
         'any.only':
             'OFFSET must always be after LIMIT and LIMIT can not be before WHERE, GROUP BY or ORDER BY',
     }),
@@ -35,7 +35,7 @@ const LimitSchema = Joi.object({
         .required(),
 
     field: Joi.alternatives()
-        .try(IntegerSchema, ExpressionSchema)
+        .try(IntegerSchema, SimplerExpressionSchema)
         .required()
         .messages({
             'any.required':

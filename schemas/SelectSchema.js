@@ -8,7 +8,7 @@ const {
     TextSchema,
     IntegerSchema,
 } = require('./FieldSchemas')
-const ExpressionSchema = require('./ExpressionSchema')
+const { ExpressionSchema } = require('./ExpressionSchema')
 const FunctionSchema = require('./FunctionSchema')
 const LimitSchema = require('./LimitSchema')
 

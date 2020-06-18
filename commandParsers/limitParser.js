@@ -9,13 +9,14 @@ const { checkLimitPosition } = require('./parserTools/checkCorrectPosition')
 const parseLimit = (fullCommandAsStringArray) => {
     const limit = {}
 
-    limit.correctlyPlaced = checkLimitPosition(fullCommandAsStringArray)
+    limit.correctlyPositioned = checkLimitPosition(fullCommandAsStringArray)
 
     const indexOfLimit = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'LIMIT'
     )
     const slicedCommandAsStringArray = fullCommandAsStringArray.slice(
-        indexOfLimit
+        indexOfLimit,
+        fullCommandAsStringArray.length - 1
     )
 
     limit.keyword = slicedCommandAsStringArray[0].toUpperCase()

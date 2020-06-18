@@ -1,7 +1,7 @@
 const Joi = require('@hapi/joi')
 const { ColumnSchema } = require('./FieldSchemas')
 const FunctionSchema = require('./FunctionSchema')
-const ExpressionSchema = require('./ExpressionSchema')
+const { ExpressionSchema } = require('./ExpressionSchema')
 
 /**
  * Joi schema for validating fields in ORDER BY objects.

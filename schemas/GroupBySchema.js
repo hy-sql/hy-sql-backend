@@ -1,7 +1,7 @@
 const Joi = require('@hapi/joi')
 const { ColumnSchema } = require('./FieldSchemas')
 const FunctionSchema = require('./FunctionSchema')
-const ExpressionSchema = require('./ExpressionSchema')
+const { ExpressionSchema } = require('./ExpressionSchema')
 
 const GroupBySchema = Joi.object({
     keyword: Joi.string()
