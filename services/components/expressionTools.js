@@ -41,7 +41,7 @@ const evaluateExpressionPart = (expressionPart, row) => {
     switch (expressionPart.type) {
         case 'expression': {
             const expressionResult = evaluateExpression(
-                expressionPart.value,
+                expressionPart.expressionParts,
                 row
             )
             return expressionResult
@@ -67,8 +67,6 @@ const evaluateExpressionPart = (expressionPart, row) => {
  * @param {Array} rows
  */
 const evaluateAggregateExpression = (expressionArray, rows) => {
-    console.log(expressionArray)
-    console.log(rows)
     const evaluatedExpression = expressionArray.map((e) =>
         evaluateAggregateExpressionPart(e, rows)
     )
