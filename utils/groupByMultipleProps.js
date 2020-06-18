@@ -1,5 +1,11 @@
 const _ = require('lodash')
 
+/**
+ * Groups collection elements by multiple properties.
+ * @param {Collection} collection
+ * @param {Array} props
+ * @returns Multiple nested arrays grouped by given properties
+ */
 const groupByMultipleProps = (collection, props) => {
     if (!props.length) return collection
 
