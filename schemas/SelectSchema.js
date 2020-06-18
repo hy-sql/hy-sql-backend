@@ -6,8 +6,8 @@ const {
     ColumnSchema,
     TextSchema,
     IntegerSchema,
-    DistinctSchema,
 } = require('./FieldSchemas')
+const DistinctSchema = require('./DistinctSchema')
 const ExpressionSchema = require('./ExpressionSchema')
 const FunctionSchema = require('./FunctionSchema')
 
