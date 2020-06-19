@@ -1,6 +1,7 @@
 const Joi = require('@hapi/joi')
 const WhereSchema = require('./WhereSchema')
 const GroupBySchema = require('./GroupBySchema')
+const HavingSchema = require('./HavingSchema')
 const OrderBySchema = require('./OrderBySchema')
 const {
     AllFieldsSchema,
@@ -72,6 +73,11 @@ const SelectGroupBySchema = SelectSchema.keys({
     groupBy: GroupBySchema,
 })
 
+const SelectGroupByHavingSchema = SelectSchema.keys({
+    groupBy: GroupBySchema,
+    having: HavingSchema,
+})
+
 /**
  * Joi schema for validating SELECT commands containing ORDER BY but not WHERE.
  */
@@ -82,6 +88,12 @@ const SelectOrderBySchema = SelectSchema.keys({
 const SelectWhereGroupBySchema = SelectSchema.keys({
     where: WhereSchema,
     groupBy: GroupBySchema,
+})
+
+const SelectWhereGroupByHavingSchema = SelectSchema.keys({
+    where: WhereSchema,
+    groupBy: GroupBySchema,
+    having: HavingSchema,
 })
 
 /**
@@ -97,9 +109,22 @@ const SelectGroupByOrderBySchema = SelectSchema.keys({
     orderBy: OrderBySchema,
 })
 
+const SelectGroupByHavingOrderBySchema = SelectSchema.keys({
+    groupBy: GroupBySchema,
+    having: HavingSchema,
+    orderBy: OrderBySchema,
+})
+
 const SelectWhereGroupByOrderBySchema = SelectSchema.keys({
     where: WhereSchema,
     groupBy: GroupBySchema,
+    orderBy: OrderBySchema,
+})
+
+const SelectWhereGroupByHavingOrderBySchema = SelectSchema.keys({
+    where: WhereSchema,
+    groupBy: GroupBySchema,
+    having: HavingSchema,
     orderBy: OrderBySchema,
 })
 
@@ -107,9 +132,13 @@ module.exports = {
     SelectSchema,
     SelectWhereSchema,
     SelectGroupBySchema,
+    SelectGroupByHavingSchema,
     SelectOrderBySchema,
     SelectWhereGroupBySchema,
+    SelectWhereGroupByHavingSchema,
     SelectWhereOrderBySchema,
     SelectGroupByOrderBySchema,
+    SelectGroupByHavingOrderBySchema,
     SelectWhereGroupByOrderBySchema,
+    SelectWhereGroupByHavingOrderBySchema,
 }
