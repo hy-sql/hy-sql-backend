@@ -3,6 +3,7 @@ const {
     executeStringFunction,
     executeSelectDistinct,
 } = require('../../services/components/functions')
+const SQLError = require('../../models/SQLError')
 
 const rows = [
     { id: 1, nimi: 'retiisi', hinta: 7, lkm: 20 },
@@ -226,9 +227,13 @@ describe('executeAggregateFunction()', () => {
     })
 
     test(`returns the expected error object with ${functionDetailList[7].value}`, () => {
-        expect(executeAggregateFunction(functionDetailList[7], rows)).toEqual({
-            error: 'Parameter given to MAX does not match any existing column',
-        })
+        expect(() =>
+            executeAggregateFunction(functionDetailList[7], rows)
+        ).toThrowError(
+            new SQLError(
+                'Parameter given to MAX does not match any existing column'
+            )
+        )
     })
 
     test(`returns the expected result with ${functionDetailList[8].value}`, () => {
@@ -246,9 +251,13 @@ describe('executeAggregateFunction()', () => {
     })
 
     test(`returns the expected error object with ${functionDetailList[11].value}`, () => {
-        expect(executeAggregateFunction(functionDetailList[11], rows)).toEqual({
-            error: 'Parameter given to MIN does not match any existing column',
-        })
+        expect(() =>
+            executeAggregateFunction(functionDetailList[11], rows)
+        ).toThrowError(
+            new SQLError(
+                'Parameter given to MIN does not match any existing column'
+            )
+        )
     })
 
     test(`returns the expected result with ${functionDetailList[12].value}`, () => {
@@ -264,9 +273,13 @@ describe('executeAggregateFunction()', () => {
     })
 
     test(`returns the expected error object with ${functionDetailList[15].value}`, () => {
-        expect(executeAggregateFunction(functionDetailList[15], rows)).toEqual({
-            error: 'Parameter given to SUM does not match any existing column',
-        })
+        expect(() =>
+            executeAggregateFunction(functionDetailList[15], rows)
+        ).toThrowError(
+            new SQLError(
+                'Parameter given to SUM does not match any existing column'
+            )
+        )
     })
 
     test(`returns the expected result with ${functionDetailList[16].value}`, () => {
@@ -286,9 +299,13 @@ describe('executeAggregateFunction()', () => {
     })
 
     test(`returns the expected error object with ${functionDetailList[19].value}`, () => {
-        expect(executeAggregateFunction(functionDetailList[19], rows)).toEqual({
-            error: 'Parameter given to AVG does not match any existing column',
-        })
+        expect(() =>
+            executeAggregateFunction(functionDetailList[19], rows)
+        ).toThrowError(
+            new SQLError(
+                'Parameter given to AVG does not match any existing column'
+            )
+        )
     })
 })
 

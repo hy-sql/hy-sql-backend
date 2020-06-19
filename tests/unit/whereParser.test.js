@@ -28,7 +28,6 @@ describe.each([
 
             expect(parsedCommand.value).toHaveProperty('keyword')
             expect(parsedCommand.value).toHaveProperty('conditions')
-            expect(parsedCommand.error).toBeUndefined()
         })
     })
 })

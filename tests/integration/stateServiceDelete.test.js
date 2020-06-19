@@ -2,6 +2,7 @@ const State = require('../../models/State')
 const StateService = require('../../services/StateService')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const SQLError = require('../../models/SQLError')
 
 const initialiseState = () => {
     const initTable = new Map([
@@ -92,21 +93,18 @@ describe('Valid DELETE-command', () => {
         (command) => {
             const { stateService } = initialiseState()
             const parsedCommand = parseCommand(command)
-            expect(parsedCommand.error).toBeUndefined()
 
-            const result = stateService.updateState(parsedCommand.value)
+            const result = stateService.updateState(parsedCommand)
 
             expect(result.result).toBeDefined()
-            expect(result.error).toBeUndefined()
         }
     )
 
     test(`${queries[0]} deletes all rows from the table`, () => {
         const { state, stateService } = initialiseState()
         const parsedCommand = parseCommand(queries[0])
-        expect(parsedCommand.error).toBeUndefined()
 
-        stateService.updateState(parsedCommand.value)
+        stateService.updateState(parsedCommand)
         const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(0)
@@ -115,9 +113,8 @@ describe('Valid DELETE-command', () => {
     test(`${queries[1]} deletes the correct rows from the table`, () => {
         const { state, stateService } = initialiseState()
         const parsedCommand = parseCommand(queries[1])
-        expect(parsedCommand.error).toBeUndefined()
 
-        stateService.updateState(parsedCommand.value)
+        stateService.updateState(parsedCommand)
         const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(4)
@@ -127,9 +124,8 @@ describe('Valid DELETE-command', () => {
     test(`${queries[2]} deletes the correct rows from the table`, () => {
         const { state, stateService } = initialiseState()
         const parsedCommand = parseCommand(queries[2])
-        expect(parsedCommand.error).toBeUndefined()
 
-        stateService.updateState(parsedCommand.value)
+        stateService.updateState(parsedCommand)
         const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(4)
@@ -139,9 +135,8 @@ describe('Valid DELETE-command', () => {
     test(`${queries[3]} deletes the correct rows from the table`, () => {
         const { state, stateService } = initialiseState()
         const parsedCommand = parseCommand(queries[3])
-        expect(parsedCommand.error).toBeUndefined()
 
-        stateService.updateState(parsedCommand.value)
+        stateService.updateState(parsedCommand)
         const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(2)
@@ -151,9 +146,8 @@ describe('Valid DELETE-command', () => {
     test(`${queries[4]} deletes the correct rows from the table`, () => {
         const { state, stateService } = initialiseState()
         const parsedCommand = parseCommand(queries[4])
-        expect(parsedCommand.error).toBeUndefined()
 
-        stateService.updateState(parsedCommand.value)
+        stateService.updateState(parsedCommand)
         const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(1)
@@ -163,9 +157,8 @@ describe('Valid DELETE-command', () => {
     test(`${queries[5]} deletes the correct rows from the table`, () => {
         const { state, stateService } = initialiseState()
         const parsedCommand = parseCommand(queries[5])
-        expect(parsedCommand.error).toBeUndefined()
 
-        stateService.updateState(parsedCommand.value)
+        stateService.updateState(parsedCommand)
         const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(4)
@@ -175,9 +168,8 @@ describe('Valid DELETE-command', () => {
     test(`${queries[6]} deletes the correct rows from the table`, () => {
         const { state, stateService } = initialiseState()
         const parsedCommand = parseCommand(queries[6])
-        expect(parsedCommand.error).toBeUndefined()
 
-        stateService.updateState(parsedCommand.value)
+        stateService.updateState(parsedCommand)
         const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(3)
@@ -187,9 +179,8 @@ describe('Valid DELETE-command', () => {
     test(`${queries[7]} deletes the correct rows from the table`, () => {
         const { state, stateService } = initialiseState()
         const parsedCommand = parseCommand(queries[7])
-        expect(parsedCommand.error).toBeUndefined()
 
-        stateService.updateState(parsedCommand.value)
+        stateService.updateState(parsedCommand)
         const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(1)
@@ -199,9 +190,8 @@ describe('Valid DELETE-command', () => {
     test(`${queries[8]} deletes the correct rows from the table`, () => {
         const { state, stateService } = initialiseState()
         const parsedCommand = parseCommand(queries[8])
-        expect(parsedCommand.error).toBeUndefined()
 
-        stateService.updateState(parsedCommand.value)
+        stateService.updateState(parsedCommand)
         const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toHaveLength(1)
@@ -211,10 +201,9 @@ describe('Valid DELETE-command', () => {
     test(`${queries[9]} deletes the correct rows from the table`, () => {
         const { state, stateService } = initialiseState()
         const parsedCommand = parseCommand(queries[9])
-        expect(parsedCommand.error).toBeUndefined()
 
         const rowsBefore = state.getTableByName('Tuotteet').rows
-        stateService.updateState(parsedCommand.value)
+        stateService.updateState(parsedCommand)
         const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toEqual(rowsBefore)
@@ -223,9 +212,8 @@ describe('Valid DELETE-command', () => {
     test(`${queries[10]} deletes the correct rows from the table`, () => {
         const { state, stateService } = initialiseState()
         const parsedCommand = parseCommand(queries[10])
-        expect(parsedCommand.error).toBeUndefined()
 
-        stateService.updateState(parsedCommand.value)
+        stateService.updateState(parsedCommand)
         const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toContainEqual({ id: 1, nimi: 'omena', hinta: 7 })
@@ -234,9 +222,8 @@ describe('Valid DELETE-command', () => {
     test(`${queries[11]} deletes the correct rows from the table`, () => {
         const { state, stateService } = initialiseState()
         const parsedCommand = parseCommand(queries[11])
-        expect(parsedCommand.error).toBeUndefined()
 
-        stateService.updateState(parsedCommand.value)
+        stateService.updateState(parsedCommand)
         const rows = state.getTableByName('Tuotteet').rows
 
         expect(rows).toEqual([])
@@ -248,12 +235,9 @@ describe('If referenced table does not exist ', () => {
         const state = new State(new Map())
         const stateService = new StateService(state)
         const parsedCommand = parseCommand('DELETE FROM Tuotteet;')
-        expect(parsedCommand.error).toBeUndefined()
 
-        const result = stateService.updateState(parsedCommand.value)
-
-        expect(result.error).toBeDefined()
-        expect(result.error).toBe('No such table Tuotteet')
-        expect(result.result).toBeUndefined()
+        expect(() => stateService.updateState(parsedCommand)).toThrowError(
+            new SQLError('No such table Tuotteet')
+        )
     })
 })

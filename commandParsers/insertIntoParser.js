@@ -1,5 +1,7 @@
+const Joi = require('@hapi/joi')
 const { InsertIntoSchema } = require('../schemas/InsertIntoSchema')
 const { parseColumnNames } = require('./parserTools/parseColumnNames')
+const SQLError = require('../models/SQLError')
 
 /**
  * Parses and validates an INSERT INTO command object from the given string array.
@@ -15,17 +17,9 @@ const parseCommand = (fullCommandAsStringArray) => {
         .indexOf('VALUES')
 
     if (anchorLocation === -1) {
-        return {
-            value: { name: fullCommandAsStringArray.slice(0, 2).join(' ') },
-            error: {
-                details: [
-                    {
-                        message:
-                            'INSERT INTO needs a VALUES keyword before the actual values to be inserted',
-                    },
-                ],
-            },
-        }
+        throw new SQLError(
+            'INSERT INTO needs a VALUES keyword before the actual values to be inserted'
+        )
     }
 
     let parsedCommand = {
@@ -55,8 +49,7 @@ const parseCommand = (fullCommandAsStringArray) => {
     }
 
     //VALUES kentät
-    const parseErrors = []
-    let lohko = []
+    let block = []
     loop1: for (
         let index = anchorLocation + 1;
         index < fullCommandAsStringArray.length;
@@ -66,70 +59,43 @@ const parseCommand = (fullCommandAsStringArray) => {
             case ';':
                 parsedCommand.finalSemicolon = ';'
                 if (index < fullCommandAsStringArray.length - 1)
-                    parseErrors.push({
-                        message: 'There is unparsed text after semicolon',
-                    })
+                    throw new SQLError('There is unparsed text after semicolon')
                 break loop1
             case '(':
                 if (!parsedCommand.valuesOpeningBracket) {
                     parsedCommand.valuesOpeningBracket = '('
                     continue loop1
                 } else {
-                    parseErrors.push({
-                        message: 'Too many opening brackets in values',
-                    })
-                    continue loop1
+                    throw new SQLError('Too many opening brackets in values')
                 }
             case '))':
-                if (!parsedCommand.valuesClosingBracket) {
-                    parsedCommand.values = addAttributesToValuesArray(
-                        parsedCommand.columns,
-                        cleanStringArray(lohko)
-                    )
-                    parseErrors.push({
-                        message: 'Too many closing brackets in values',
-                    })
-                    parsedCommand.valuesClosingBracket = ')'
-                    lohko = []
-                    continue loop1
-                } else {
-                    parseErrors.push({
-                        message: 'Too many closing brackets in values',
-                    })
-                    continue loop1
-                }
+                throw new SQLError('Too many closing brackets in values')
             case ')':
                 if (!parsedCommand.valuesClosingBracket) {
                     parsedCommand.values = addAttributesToValuesArray(
                         parsedCommand.columns,
-                        cleanStringArray(lohko)
+                        cleanStringArray(block)
                     )
                     parsedCommand.valuesClosingBracket = ')'
-                    lohko = []
+                    block = []
                     continue loop1
                 } else {
-                    parseErrors.push({
-                        message: 'Too many closing brackets in values',
-                    })
-                    continue loop1
+                    throw new SQLError('Too many closing brackets in values')
                 }
             default:
-                lohko.push(fullCommandAsStringArray[index])
+                block.push(fullCommandAsStringArray[index])
         }
     }
-    if (lohko.length !== 0) {
+    if (block.length !== 0) {
         parsedCommand.values = addAttributesToValuesArray(
             parsedCommand.columns,
-            cleanStringArray(lohko)
+            cleanStringArray(block)
         )
     }
 
-    const palautettava = InsertIntoSchema.validate(parsedCommand)
-    if (!palautettava.error && parseErrors.length > 0) {
-        palautettava.error = { details: [] }
-        parseErrors.map((pe) => palautettava.error.details.push(pe))
-    }
-    return palautettava
+    const validatedCommand = Joi.attempt(parsedCommand, InsertIntoSchema)
+
+    return validatedCommand
 }
 
 /**
@@ -150,7 +116,7 @@ const cleanStringArray = (columnsAsStringList) => {
  * @param {string[]} stringArray array containing the values information
  */
 const addAttributesToValuesArray = (columnList, stringArray) => {
-    const taulukko = stringArray.map((value, index) =>
+    const arr = stringArray.map((value, index) =>
         value.match('[0-9]')
             ? {
                   column: columnList[index] ? columnList[index].name : null,
@@ -163,7 +129,7 @@ const addAttributesToValuesArray = (columnList, stringArray) => {
                   type: 'TEXT',
               }
     )
-    return taulukko
+    return arr
 }
 
 module.exports = { parseCommand }

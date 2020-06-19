@@ -23,14 +23,12 @@ describe.each([
             fullCommandAsStringArray
         )
 
-        expect(parsedCommand.value).toBeDefined()
-        expect(parsedCommand.value).toHaveProperty('name')
-        expect(parsedCommand.value).toHaveProperty('openingBracket')
-        expect(parsedCommand.value).toHaveProperty('columns')
-        expect(parsedCommand.value).toHaveProperty('closingBracket')
-        expect(parsedCommand.value).toHaveProperty('finalSemicolon')
-
-        expect(parsedCommand.error).not.toBeDefined()
+        expect(parsedCommand).toBeDefined()
+        expect(parsedCommand).toHaveProperty('name')
+        expect(parsedCommand).toHaveProperty('openingBracket')
+        expect(parsedCommand).toHaveProperty('columns')
+        expect(parsedCommand).toHaveProperty('closingBracket')
+        expect(parsedCommand).toHaveProperty('finalSemicolon')
     })
 })
 
@@ -44,12 +42,10 @@ describe.each([
 ])('invalid command with the right name (CREATE TABLE) testing', (command) => {
     const fullCommandAsStringArray = splitCommandIntoArray(command)
 
-    test('valid command is parsed but validation fails', () => {
-        const parsedCommand = createTableParser.parseCommand(
-            fullCommandAsStringArray
-        )
-
-        expect(parsedCommand.error).toBeDefined()
+    test('fails validation after parsed to command object', () => {
+        expect(() => {
+            commandService.parseCommand(fullCommandAsStringArray)
+        }).toThrow()
     })
 })
 
@@ -61,9 +57,9 @@ describe.each([
 ])('invalid command name testing', (command) => {
     const fullCommandAsStringArray = splitCommandIntoArray(command)
 
-    test('invalid command is not recognized and false returned', () => {
-        const result = commandService.parseCommand(fullCommandAsStringArray)
-
-        expect(result).toBeFalsy()
+    test('fails validation after parsed to command object', () => {
+        expect(() => {
+            commandService.parseCommand(fullCommandAsStringArray)
+        }).toThrow()
     })
 })

@@ -30,7 +30,7 @@ describe('groupRowsBy()', () => {
         const parsedCommands = splitCommandArray.map((c) =>
             commandService.parseCommand(c)
         )
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
     })
 
     const queries = [
@@ -79,7 +79,7 @@ describe('groupRowsBy()', () => {
 
         const commandArray = splitCommandIntoArray(queries[0])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -102,7 +102,7 @@ describe('groupRowsBy()', () => {
 
         const commandArray = splitCommandIntoArray(queries[1])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -117,7 +117,7 @@ describe('groupRowsBy()', () => {
 
         const commandArray = splitCommandIntoArray(queries[2])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -156,7 +156,7 @@ describe('groupRowsBy()', () => {
 
         const commandArray = splitCommandIntoArray(queries[3])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -215,7 +215,7 @@ describe('groupRowsBy()', () => {
 
         const commandArray = splitCommandIntoArray(queries[4])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })

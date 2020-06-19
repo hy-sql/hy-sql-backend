@@ -8,8 +8,10 @@ describe.each(['DEL FROM Taulu;'])(
         describe(wrongCommand, () => {
             const command = splitCommandIntoArray(wrongCommand)
 
-            test('does not pass validation', () => {
-                expect(deleteParser.parseCommand(command).error).toBeDefined()
+            test('fails validation after parsed to command object', () => {
+                expect(() => {
+                    deleteParser.parseCommand(command)
+                }).toThrow()
             })
         })
     }
@@ -31,13 +33,11 @@ describe.each([
         test('is parsed and validated succesfully', () => {
             const parsedCommand = deleteParser.parseCommand(command)
 
-            expect(parsedCommand.value).toBeDefined()
-            expect(parsedCommand.value).toHaveProperty('name')
-            expect(parsedCommand.value).toHaveProperty('from')
-            expect(parsedCommand.value).toHaveProperty('tableName')
-            expect(parsedCommand.value).toHaveProperty('finalSemicolon')
-
-            expect(parsedCommand.error).toBeUndefined()
+            expect(parsedCommand).toBeDefined()
+            expect(parsedCommand).toHaveProperty('name')
+            expect(parsedCommand).toHaveProperty('from')
+            expect(parsedCommand).toHaveProperty('tableName')
+            expect(parsedCommand).toHaveProperty('finalSemicolon')
         })
     })
 })
@@ -54,12 +54,10 @@ describe.each([
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
 
-        test('is recognised as a command', () => {
-            expect(commandService.parseCommand(command)).toBeTruthy()
-        })
-
         test('fails validation after parsed to command object', () => {
-            expect(deleteParser.parseCommand(command).error).toBeDefined()
+            expect(() => {
+                deleteParser.parseCommand(command)
+            }).toThrow()
         })
     })
 })
@@ -84,9 +82,8 @@ describe.each([
         test('is parsed and validated succesfully', () => {
             const parsedCommand = deleteParser.parseCommand(command)
 
-            expect(parsedCommand.value).toBeDefined()
-            expect(parsedCommand.value).toHaveProperty('where')
-            expect(parsedCommand.error).toBeUndefined()
+            expect(parsedCommand).toBeDefined()
+            expect(parsedCommand).toHaveProperty('where')
         })
     })
 })
@@ -104,16 +101,10 @@ describe.each([
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
 
-        test('is recognised as a command', () => {
-            expect(commandService.parseCommand(command)).toBeTruthy()
-        })
-
         test('fails validation after parsed to command object', () => {
-            const parsedCommand = deleteParser.parseCommand(command)
-
-            expect(parsedCommand.value).toBeDefined()
-            expect(parsedCommand.value).toHaveProperty('where')
-            expect(parsedCommand.error).toBeDefined()
+            expect(() => {
+                deleteParser.parseCommand(command)
+            }).toThrow()
         })
     })
 })

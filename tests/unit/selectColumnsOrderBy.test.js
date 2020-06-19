@@ -1,5 +1,4 @@
 const selectParser = require('../../commandParsers/selectParser')
-const { SelectOrderBySchema } = require('../../schemas/SelectSchema')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
 
@@ -42,13 +41,9 @@ describe.each([
         const fullCommandAsStringArray = splitCommandIntoArray(command)
 
         test('invalid command is parsed but validation fails', () => {
-            const parsedCommand = selectParser.parseCommand(
-                fullCommandAsStringArray
-            )
-
-            const result = SelectOrderBySchema.validate(parsedCommand)
-
-            expect(result.error).toBeDefined()
+            expect(() =>
+                selectParser.parseCommand(fullCommandAsStringArray)
+            ).toThrowError()
         })
     }
 )

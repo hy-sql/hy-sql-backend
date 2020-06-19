@@ -1,7 +1,7 @@
 const insertIntoParser = require('../../commandParsers/insertIntoParser')
-const { InsertIntoSchema } = require('../../schemas/InsertIntoSchema')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const SQLError = require('../../models/SQLError')
 
 describe.each([
     "INSERT INTO Tuotteet (id, nimi, hinta) VALUES (1, 'nauris', 3);",
@@ -40,14 +40,10 @@ describe.each([
 ])('invalid command with the right name (CREATE TABLE) testing', (command) => {
     const fullCommandAsStringArray = splitCommandIntoArray(command)
 
-    test('valid command is parsed but validation fails', () => {
-        const parsedCommand = insertIntoParser.parseCommand(
-            fullCommandAsStringArray
-        )
-
-        const result = InsertIntoSchema.validate(parsedCommand)
-
-        expect(result.error).toBeDefined()
+    test('fails validation after parsed to command object', () => {
+        expect(() => {
+            insertIntoParser.parseCommand(fullCommandAsStringArray)
+        }).toThrow()
     })
 })
 
@@ -60,9 +56,9 @@ describe.each([
     const fullCommandAsStringArray = splitCommandIntoArray(command)
 
     test('invalid command is NOT recognized and false returned', () => {
-        const result = commandService.parseCommand(fullCommandAsStringArray)
-
-        expect(result).toBeFalsy()
+        expect(() =>
+            commandService.parseCommand(fullCommandAsStringArray)
+        ).toThrowError()
     })
 })
 describe.each(["INSERT INTO Tuotteet (id, nimi, hinta) (1, 'nauris', 3);"])(
@@ -71,11 +67,13 @@ describe.each(["INSERT INTO Tuotteet (id, nimi, hinta) (1, 'nauris', 3);"])(
         const fullCommandAsStringArray = splitCommandIntoArray(command)
 
         test('missing VALUES keyword returns an error', () => {
-            const parsedCommand = insertIntoParser.parseCommand(
-                fullCommandAsStringArray
+            expect(() =>
+                insertIntoParser.parseCommand(fullCommandAsStringArray)
+            ).toThrowError(
+                new SQLError(
+                    'INSERT INTO needs a VALUES keyword before the actual values to be inserted'
+                )
             )
-
-            expect(parsedCommand.error).toBeDefined()
         })
     }
 )
