@@ -109,7 +109,6 @@ const parseExpression = (expression) => {
  * @param {string[]} fieldArray array containing the field information
  */
 const parseSelectFields = (fieldArray) => {
-    // console.log('fieldArray', fieldArray)
     if (distinctKeywordPattern.test(fieldArray[0])) {
         return parseParametersFromDistinct(fieldArray.slice(1))
     }
@@ -186,8 +185,8 @@ const parseField = (field) => {
         case arithmeticExpressionPattern.test(field):
             return {
                 type: 'expression',
-                value: parseExpression(field),
-                stringValue: field,
+                expressionParts: parseExpression(field),
+                value: field,
             }
         case textInputPattern.test(field):
             return {

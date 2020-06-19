@@ -10,6 +10,7 @@ const {
     containsAggregateFunction,
 } = require('./components/expressionTools')
 const { createFilter } = require('./components/filterTools')
+const groupByMultipleProps = require('../utils/groupByMultipleProps')
 
 class StateService {
     constructor(state) {
@@ -120,23 +121,17 @@ class StateService {
         if (error) return { error: error }
 
         const table = this.findTable(command.tableName)
-        let rows = table.rows
+        const existingRows = table.rows
 
-        if (command.where) {
-            rows = this.filterRows(command.where.conditions, rows)
-        }
+        const selectedRows = this.selectRows(command, existingRows)
 
-        rows = this.createAdvancedRows(command, rows)
-        if (rows.error) return rows
-
-        if (command.orderBy) {
-            rows = this.orderRowsBy(command.orderBy.fields, rows)
-        }
+        if (selectedRows.error) return { error: selectedRows.error }
 
         let result
+
         if (command.fields[0].type === 'distinct') {
             result = `SELECT DISTINCT ${command.fields[0].value
-                .map((c) => (c.type === 'expression' ? c.stringValue : c.value))
+                .map((c) => c.value)
                 .join(', ')} FROM ${
                 command.tableName
             } -query executed successfully`
@@ -147,9 +142,10 @@ class StateService {
                 command.tableName
             } -query executed successfully`
         }
+
         return {
             result,
-            rows,
+            rows: selectedRows,
         }
     }
 
@@ -178,7 +174,7 @@ class StateService {
         let rowsToUpdate = table.rows
 
         /* If command object has property 'where' it's filtered in order
-         * to update only the rows that are spesified in queries[i]
+         * to update only the rows that are spesified in command.fields[i]
          */
         if (command.where) {
             rowsToUpdate = this.filterRows(
@@ -293,37 +289,6 @@ class StateService {
      * @param {object} command SELECT command object
      * @param {object[]} existingRows array of row objects
      */
-    createAdvancedRows(command, existingRows) {
-        if (command.fields[0].type === 'all') {
-            return existingRows
-        }
-
-        if (command.fields[0].type === 'distinct') {
-            const queriedColumns = command.fields[0].value
-            const rows = this.createQueriedRows(queriedColumns, existingRows)
-            return executeSelectDistinct(rows)
-        }
-
-        if (
-            command.fields[0].type === 'aggregateFunction' &&
-            command.fields.length === 1
-        ) {
-            const functionResult = this.createAggregateFunctionRow(
-                command.fields[0],
-                existingRows
-            )
-            return functionResult.error
-                ? functionResult
-                : [
-                      this.createAggregateFunctionRow(
-                          command.fields[0],
-                          existingRows
-                      ),
-                  ]
-        }
-
-        return this.createQueriedRows(command.fields, existingRows)
-    }
 
     /**
      * Handles filtering of the given rows according to the given conditions
@@ -389,67 +354,194 @@ class StateService {
         return filteredRows
     }
 
-    /**
-     * Handles creating result rows for createAdvancedRows().
-     * @param {object} queries command.fields of SELECT command
-     * @param {object[]} existingRows array of row objects
-     */
-    createQueriedRows(queries, existingRows) {
-        const createdRows = existingRows.reduce((rowsToReturn, row) => {
-            const newRow = {}
+    createFunctionRows(command, existingRows) {
+        const fields =
+            command.fields[0].type === 'distinct'
+                ? command.fields[0].value
+                : command.fields
 
-            for (let i = 0; i < queries.length; i++) {
-                if (queries[i].type === 'column') {
-                    const valueOfQueriedColumn = row[queries[i].value]
-                    if (valueOfQueriedColumn) {
-                        newRow[queries[i].value] = row[queries[i].value]
-                    } else {
-                        newRow.error = `no such column ${queries[i].value}`
-                    }
-                } else if (
-                    queries[i].type === 'expression' &&
-                    containsAggregateFunction(queries[i].value)
-                ) {
-                    const evaluated = evaluateAggregateExpression(
-                        queries[i].value,
+        const createdRows = existingRows.reduce((rowsToReturn, row) => {
+            for (let i = 0; i < command.fields.length; i++) {
+                if (fields[i].type === 'stringFunction') {
+                    const functionResult = executeStringFunction(fields[i], row)
+
+                    functionResult.error
+                        ? (row.error = functionResult.error)
+                        : (row[fields[i].value] = functionResult)
+                } else if (fields[i].type === 'aggregateFunction') {
+                    const functionResult = this.createAggregateFunctionRow(
+                        fields[i],
                         existingRows
                     )
-                    newRow[queries[i].stringValue] = evaluated
-                    return [{ [queries[i].stringValue]: evaluated }]
-                } else if (queries[i].type === 'expression') {
+
+                    functionResult.error
+                        ? (row.error = functionResult.error)
+                        : (row[fields[i].value] =
+                              functionResult[fields[i].value])
+                }
+            }
+
+            return rowsToReturn
+        }, existingRows)
+
+        const errorRows = createdRows.filter((r) => r.error)
+        if (errorRows.length > 0) return errorRows[0]
+
+        return createdRows
+    }
+
+    selectRows(command, existingRows) {
+        const filteredRows = command.where
+            ? this.filterRows(command.where.conditions, existingRows)
+            : existingRows
+
+        if (command.fields[0].type === 'all') {
+            return command.orderBy
+                ? this.orderRowsBy(command.orderBy.fields, filteredRows)
+                : filteredRows
+        }
+
+        if (
+            command.fields[0].type === 'aggregateFunction' &&
+            command.fields.length === 1
+        ) {
+            const functionResult = this.createAggregateFunctionRow(
+                command.fields[0],
+                filteredRows
+            )
+            return functionResult.error
+                ? functionResult
+                : [
+                      this.createAggregateFunctionRow(
+                          command.fields[0],
+                          filteredRows
+                      ),
+                  ]
+        }
+
+        const fieldsToReturn =
+            command.fields[0].type === 'distinct'
+                ? command.fields[0].value.map((f) => f.value)
+                : command.fields.map((f) => f.value)
+
+        const rowsWithNewFields = this.createRowsWithNewFields(
+            command,
+            filteredRows
+        )
+
+        const initialGroupedRows = command.groupBy
+            ? this.initialGroupRowsBy(rowsWithNewFields, command.groupBy.fields)
+            : rowsWithNewFields
+
+        const rowsWithNewFieldsAndFunctions = command.groupBy
+            ? _.flatten(
+                  initialGroupedRows.map((rowGroup) =>
+                      this.createFunctionRows(command, rowGroup)
+                  )
+              )
+            : initialGroupedRows.length > 1
+            ? this.createFunctionRows(command, initialGroupedRows)
+            : initialGroupedRows
+
+        if (rowsWithNewFieldsAndFunctions.error)
+            return rowsWithNewFieldsAndFunctions
+
+        const orderedRows = command.orderBy
+            ? this.orderRowsBy(
+                  command.orderBy.fields,
+                  rowsWithNewFieldsAndFunctions
+              )
+            : rowsWithNewFieldsAndFunctions
+
+        const selectedRows = orderedRows.map((row) =>
+            _.pick(row, fieldsToReturn)
+        )
+
+        const distinctRows =
+            command.fields[0].type === 'distinct'
+                ? executeSelectDistinct(selectedRows)
+                : selectedRows
+
+        return command.groupBy
+            ? command.orderBy
+                ? this.orderRowsBy(
+                      command.orderBy.fields,
+                      this.groupRowsBy(distinctRows, command.groupBy.fields)
+                  )
+                : this.groupRowsBy(distinctRows, command.groupBy.fields)
+            : distinctRows
+    }
+
+    /**
+     * Groups rows for individual aggregate function evaluation
+     * @param {Array} rows
+     * @param {Array} fields
+     */
+    initialGroupRowsBy(rows, fields) {
+        return _.flattenDepth(
+            groupByMultipleProps(
+                rows,
+                fields.map((f) => f.value)
+            ),
+            fields.length - 1
+        )
+    }
+
+    groupRowsBy(rows, fields) {
+        return _.chain(rows)
+            .flattenDepth(
+                groupByMultipleProps(
+                    rows,
+                    fields.map((f) => f.value)
+                ),
+                fields.length - 1
+            )
+            .uniqWith(_.isEqual)
+            .orderBy(fields.map((f) => f.value))
+            .value()
+    }
+
+    /**
+     * Handles creating result rows for createRowsWithNewFields().
+     * @param {object} command command of SELECT command
+     * @param {object[]} existingRows array of row objects
+     */
+    createRowsWithNewFields(command, existingRows) {
+        const fields =
+            command.fields[0].type === 'distinct'
+                ? command.fields[0].value
+                : command.fields
+
+        const createdRows = existingRows.reduce((rowsToReturn, row) => {
+            for (let i = 0; i < command.fields.length; i++) {
+                if (fields[i].type === 'column') {
+                    const valueOfQueriedColumn = row[fields[i].value]
+                    if (!valueOfQueriedColumn) {
+                        row.error = `no such column ${fields[i].value}`
+                    }
+                } else if (
+                    fields[i].type === 'expression' &&
+                    containsAggregateFunction(fields[i].expressionParts)
+                ) {
+                    const evaluated = evaluateAggregateExpression(
+                        fields[i].value,
+                        existingRows
+                    )
+                    row[fields[i].value] = evaluated
+                    return [{ [fields[i].value]: evaluated }]
+                } else if (fields[i].type === 'expression') {
                     const expressionResult = evaluateExpression(
-                        queries[i].value,
+                        fields[i].expressionParts,
                         row,
                         existingRows
                     )
 
-                    newRow[queries[i].stringValue] = expressionResult
-                } else if (queries[i].type === 'stringFunction') {
-                    const functionResult = executeStringFunction(
-                        queries[i],
-                        row
-                    )
-
-                    functionResult.error
-                        ? (newRow.error = functionResult.error)
-                        : (newRow[queries[i].value] = functionResult)
-                } else if (queries[i].type === 'aggregateFunction') {
-                    const functionResult = this.createAggregateFunctionRow(
-                        queries[i],
-                        existingRows
-                    )
-
-                    functionResult.error
-                        ? (newRow.error = functionResult.error)
-                        : (newRow[queries[i].value] =
-                              functionResult[queries[i].value])
+                    row[fields[i].value] = expressionResult
                 }
             }
 
-            rowsToReturn.push(newRow)
-
             return rowsToReturn
-        }, [])
+        }, existingRows)
 
         const errorRows = createdRows.filter((r) => r.error)
         if (errorRows.length > 0) return errorRows[0]

@@ -11,7 +11,7 @@ const { arithmeticExpressionPattern } = require('../helpers/regex')
  */
 const ExpressionSchema = Joi.object({
     type: Joi.string().valid('expression').required(),
-    value: Joi.array()
+    expressionParts: Joi.array()
         .items(
             ArithmeticOperatorSchema.required(),
             ColumnSchema,
@@ -19,7 +19,7 @@ const ExpressionSchema = Joi.object({
             Joi.link('#function')
         )
         .required(),
-    stringValue: Joi.string().pattern(arithmeticExpressionPattern).required(),
+    value: Joi.string().pattern(arithmeticExpressionPattern).required(),
 }).id('expression')
 
 module.exports = ExpressionSchema
