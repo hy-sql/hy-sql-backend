@@ -1,5 +1,6 @@
 const selectParser = require('../../commandParsers/selectParser')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const SQLError = require('../../models/SQLError')
 
 describe.each([
     'SELECT this+5* FROM Taulu;',
@@ -152,3 +153,17 @@ describe.each(['SELECT DISTIN nimi, hinta FROM Tuotteet;'])(
         })
     }
 )
+
+describe('Invalid SELECT query containing OFFSET without LIMIT', () => {
+    test('causes correct error to be thrown during parsing', () => {
+        const command = splitCommandIntoArray(
+            'SELECT nimi, hinta FROM Tuotteet OFFSET 2;'
+        )
+
+        expect(() => selectParser.parseCommand(command)).toThrowError(
+            new SQLError(
+                'Query contains OFFSET keyword without containing LIMIT keyword.'
+            )
+        )
+    })
+})
