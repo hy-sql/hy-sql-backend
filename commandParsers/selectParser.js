@@ -1,4 +1,3 @@
-const util = require('util')
 const Joi = require('@hapi/joi')
 const {
     SelectSchema,
@@ -91,10 +90,6 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
 const parseSelect = (fullCommandAsStringArray) => {
     const parsedBaseCommand = parseBaseCommand(fullCommandAsStringArray)
     delete parsedBaseCommand.indexOfLimit
-
-    console.log(
-        util.inspect(parsedBaseCommand, false, null, true /* enable colors */)
-    )
 
     const validatedCommand = Joi.attempt(parsedBaseCommand, SelectSchema)
 
