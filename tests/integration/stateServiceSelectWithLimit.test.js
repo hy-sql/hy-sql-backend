@@ -42,6 +42,7 @@ describe('selectFrom()', () => {
         'SELECT nimi, hinta FROM Tuotteet LIMIT 1 OFFSET -2;',
         'SELECT nimi, hinta FROM Tuotteet GROUP BY nimi LIMIT 2 OFFSET 1;',
         'SELECT nimi, hinta FROM Tuotteet ORDER BY hinta LIMIT 2 OFFSET 1;',
+        'SELECT nimi, hinta FROM Tuotteet OFFSET 2;',
     ]
 
     test(`returns expected rows for: ${queries[0]}`, () => {
@@ -282,5 +283,15 @@ describe('selectFrom()', () => {
         const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
+    })
+
+    test(`returns expected error for: ${queries[13]}`, () => {
+        const commandArray = splitCommandIntoArray(queries[13])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        expect(() => stateService.updateState(parsedCommand)).toThrowError(
+            new SQLError(
+                'Query contains OFFSET keyword without containing LIMIT keyword.'
+            )
+        )
     })
 })
