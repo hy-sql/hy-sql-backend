@@ -1,3 +1,5 @@
+const util = require('util')
+const Joi = require('@hapi/joi')
 const {
     SelectSchema,
     SelectWhereSchema,
@@ -88,11 +90,15 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
  */
 const parseSelect = (fullCommandAsStringArray) => {
     const parsedBaseCommand = parseBaseCommand(fullCommandAsStringArray)
-    delete parseBaseCommand.indexOfLimit
+    delete parsedBaseCommand.indexOfLimit
 
-    const validationResult = SelectSchema.validate(parsedBaseCommand)
+    console.log(
+        util.inspect(parsedBaseCommand, false, null, true /* enable colors */)
+    )
 
-    return validationResult
+    const validatedCommand = Joi.attempt(parsedBaseCommand, SelectSchema)
+
+    return validatedCommand
 }
 
 /**
@@ -116,10 +122,11 @@ const parseSelectWhere = (fullCommandAsStringArray) => {
         )
     )
 
-    delete parseBaseCommand.indexOfLimit
-    const validationResult = SelectWhereSchema.validate(parsedCommand)
+    delete parsedCommand.indexOfLimit
 
-    return validationResult
+    const validatedCommand = Joi.attempt(parsedCommand, SelectWhereSchema)
+
+    return validatedCommand
 }
 
 const parseSelectGroupBy = (fullCommandAsStringArray) => {
@@ -138,10 +145,11 @@ const parseSelectGroupBy = (fullCommandAsStringArray) => {
         )
     )
 
-    delete parseBaseCommand.indexOfLimit
-    const validationResult = SelectGroupBySchema.validate(parsedCommand)
+    delete parsedCommand.indexOfLimit
 
-    return validationResult
+    const validatedCommand = Joi.attempt(parsedCommand, SelectGroupBySchema)
+
+    return validatedCommand
 }
 
 /**
@@ -165,10 +173,11 @@ const parseSelectOrderBy = (fullCommandAsStringArray) => {
         )
     )
 
-    delete parseBaseCommand.indexOfLimit
-    const validationResult = SelectOrderBySchema.validate(parsedCommand)
+    delete parsedCommand.indexOfLimit
 
-    return validationResult
+    const validatedCommand = Joi.attempt(parsedCommand, SelectOrderBySchema)
+
+    return validatedCommand
 }
 
 const parseSelectWhereGroupBy = (fullCommandAsStringArray) => {
@@ -195,10 +204,14 @@ const parseSelectWhereGroupBy = (fullCommandAsStringArray) => {
         )
     )
 
-    delete parseBaseCommand.indexOfLimit
-    const validationResult = SelectWhereGroupBySchema.validate(parsedCommand)
+    delete parsedCommand.indexOfLimit
 
-    return validationResult
+    const validatedCommand = Joi.attempt(
+        parsedCommand,
+        SelectWhereGroupBySchema
+    )
+
+    return validatedCommand
 }
 
 /**
@@ -230,10 +243,14 @@ const parseSelectWhereOrderBy = (fullCommandAsStringArray) => {
         )
     )
 
-    delete parseBaseCommand.indexOfLimit
-    const validationResult = SelectWhereOrderBySchema.validate(parsedCommand)
+    delete parsedCommand.indexOfLimit
 
-    return validationResult
+    const validatedCommand = Joi.attempt(
+        parsedCommand,
+        SelectWhereOrderBySchema
+    )
+
+    return validatedCommand
 }
 
 const parseSelectGroupByOrderBy = (fullCommandAsStringArray) => {
@@ -260,10 +277,14 @@ const parseSelectGroupByOrderBy = (fullCommandAsStringArray) => {
         )
     )
 
-    delete parseBaseCommand.indexOfLimit
-    const validationResult = SelectGroupByOrderBySchema.validate(parsedCommand)
+    delete parsedCommand.indexOfLimit
 
-    return validationResult
+    const validatedCommand = Joi.attempt(
+        parsedCommand,
+        SelectGroupByOrderBySchema
+    )
+
+    return validatedCommand
 }
 
 const parseSelectWhereGroupByOrderBy = (fullCommandAsStringArray) => {
@@ -298,12 +319,14 @@ const parseSelectWhereGroupByOrderBy = (fullCommandAsStringArray) => {
         )
     )
 
-    delete parseBaseCommand.indexOfLimit
-    const validationResult = SelectWhereGroupByOrderBySchema.validate(
-        parsedCommand
+    delete parsedCommand.indexOfLimit
+
+    const validatedCommand = Joi.attempt(
+        parsedCommand,
+        SelectWhereGroupByOrderBySchema
     )
 
-    return validationResult
+    return validatedCommand
 }
 
 module.exports = { parseCommand }

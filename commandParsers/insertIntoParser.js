@@ -1,3 +1,4 @@
+const Joi = require('@hapi/joi')
 const { InsertIntoSchema } = require('../schemas/InsertIntoSchema')
 const { parseColumnNames } = require('./parserTools/parseColumnNames')
 
@@ -124,11 +125,13 @@ const parseCommand = (fullCommandAsStringArray) => {
         )
     }
 
-    const palautettava = InsertIntoSchema.validate(parsedCommand)
+    const palautettava = Joi.attempt(parsedCommand, InsertIntoSchema)
+
     if (!palautettava.error && parseErrors.length > 0) {
         palautettava.error = { details: [] }
         parseErrors.map((pe) => palautettava.error.details.push(pe))
     }
+
     return palautettava
 }
 
