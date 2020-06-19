@@ -1,4 +1,3 @@
-const commandService = require('../services/commandService')
 const CommandArraySchema = require('../schemas/CommandArraySchema')
 const splitCommandIntoArray = require('../commandParsers/parserTools/splitCommandIntoArray')
 
@@ -8,7 +7,7 @@ const splitCommandIntoArray = require('../commandParsers/parserTools/splitComman
  * request.body.commandArray and at places the array of command objects
  * into request.parsedCommands.
  */
-const parser = (request, response, next) => {
+const splitCommands = (request, response, next) => {
     const commandArray = request.body.commandArray
 
     if (!commandArray) {
@@ -25,17 +24,13 @@ const parser = (request, response, next) => {
         })
     }
 
-    const splitCommandArray = commandArray.map((input) =>
+    const splitCommands = commandArray.map((input) =>
         splitCommandIntoArray(input)
     )
 
-    const parsedCommands = splitCommandArray.map((c) =>
-        commandService.parseCommand(c)
-    )
-
-    request.parsedCommands = parsedCommands
+    request.splitCommands = splitCommands
 
     next()
 }
 
-module.exports = parser
+module.exports = splitCommands
