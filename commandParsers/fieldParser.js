@@ -8,6 +8,7 @@ const {
     containsFunctionPattern,
     modifiedArithmeticOperator,
     sortOrderKeywordPattern,
+    distinctKeywordPattern,
     stringFunctionPattern,
     stringFunctionsNamePattern,
     textInputPattern,
@@ -108,6 +109,10 @@ const parseExpression = (expression) => {
  * @param {string[]} fieldArray array containing the field information
  */
 const parseSelectFields = (fieldArray) => {
+    if (distinctKeywordPattern.test(fieldArray[0])) {
+        return parseParametersFromDistinct(fieldArray.slice(1))
+    }
+
     const selectFields = fieldArray
         .join('')
         .split(',')
@@ -120,6 +125,20 @@ const parseSelectFields = (fieldArray) => {
 }
 
 /**
+ * Returns fieldArray with distinct columns parsed in format
+ * { type: 'distinct', value: [ { type: 'column', value: ... }, { type: 'column', value: ... } ] }
+ * @param {*} fieldArray array without DISTINCT keyword, containing only columns separated with comma (,)
+ */
+const parseParametersFromDistinct = (fieldArray) => {
+    return [
+        {
+            type: 'distinct',
+            value: parseSelectFields(fieldArray),
+        },
+    ]
+}
+
+/*
  * Handles parsing of fields in ORDER BY.
  * @param {string[]} fieldArray array containing the field information
  */

@@ -2,6 +2,7 @@ const _ = require('lodash')
 const {
     executeStringFunction,
     executeAggregateFunction,
+    executeSelectDistinct,
 } = require('./components/functions')
 const {
     evaluateExpression,
@@ -126,9 +127,21 @@ class StateService {
 
         if (selectedRows.error) return { error: selectedRows.error }
 
-        const result = `SELECT ${command.fields
-            .map((c) => c.value)
-            .join(', ')} FROM ${command.tableName} -query executed successfully`
+        let result
+
+        if (command.fields[0].type === 'distinct') {
+            result = `SELECT DISTINCT ${command.fields[0].value
+                .map((c) => c.value)
+                .join(', ')} FROM ${
+                command.tableName
+            } -query executed successfully`
+        } else {
+            result = `SELECT ${command.fields
+                .map((c) => c.value)
+                .join(', ')} FROM ${
+                command.tableName
+            } -query executed successfully`
+        }
 
         return {
             result,
@@ -342,27 +355,29 @@ class StateService {
     }
 
     createFunctionRows(command, existingRows) {
+        const fields =
+            command.fields[0].type === 'distinct'
+                ? command.fields[0].value
+                : command.fields
+
         const createdRows = existingRows.reduce((rowsToReturn, row) => {
             for (let i = 0; i < command.fields.length; i++) {
-                if (command.fields[i].type === 'stringFunction') {
-                    const functionResult = executeStringFunction(
-                        command.fields[i],
-                        row
-                    )
+                if (fields[i].type === 'stringFunction') {
+                    const functionResult = executeStringFunction(fields[i], row)
 
                     functionResult.error
                         ? (row.error = functionResult.error)
-                        : (row[command.fields[i].value] = functionResult)
-                } else if (command.fields[i].type === 'aggregateFunction') {
+                        : (row[fields[i].value] = functionResult)
+                } else if (fields[i].type === 'aggregateFunction') {
                     const functionResult = this.createAggregateFunctionRow(
-                        command.fields[i],
+                        fields[i],
                         existingRows
                     )
 
                     functionResult.error
                         ? (row.error = functionResult.error)
-                        : (row[command.fields[i].value] =
-                              functionResult[command.fields[i].value])
+                        : (row[fields[i].value] =
+                              functionResult[fields[i].value])
                 }
             }
 
@@ -404,7 +419,10 @@ class StateService {
                   ]
         }
 
-        const fieldsToReturn = command.fields.map((f) => f.value)
+        const fieldsToReturn =
+            command.fields[0].type === 'distinct'
+                ? command.fields[0].value.map((f) => f.value)
+                : command.fields.map((f) => f.value)
 
         const rowsWithNewFields = this.createRowsWithNewFields(
             command,
@@ -439,14 +457,19 @@ class StateService {
             _.pick(row, fieldsToReturn)
         )
 
+        const distinctRows =
+            command.fields[0].type === 'distinct'
+                ? executeSelectDistinct(selectedRows)
+                : selectedRows
+
         return command.groupBy
             ? command.orderBy
                 ? this.orderRowsBy(
                       command.orderBy.fields,
-                      this.groupRowsBy(selectedRows, command.groupBy.fields)
+                      this.groupRowsBy(distinctRows, command.groupBy.fields)
                   )
-                : this.groupRowsBy(selectedRows, command.groupBy.fields)
-            : selectedRows
+                : this.groupRowsBy(distinctRows, command.groupBy.fields)
+            : distinctRows
     }
 
     /**
@@ -484,31 +507,36 @@ class StateService {
      * @param {object[]} existingRows array of row objects
      */
     createRowsWithNewFields(command, existingRows) {
+        const fields =
+            command.fields[0].type === 'distinct'
+                ? command.fields[0].value
+                : command.fields
+
         const createdRows = existingRows.reduce((rowsToReturn, row) => {
             for (let i = 0; i < command.fields.length; i++) {
-                if (command.fields[i].type === 'column') {
-                    const valueOfQueriedColumn = row[command.fields[i].value]
+                if (fields[i].type === 'column') {
+                    const valueOfQueriedColumn = row[fields[i].value]
                     if (!valueOfQueriedColumn) {
-                        row.error = `no such column ${command.fields[i].value}`
+                        row.error = `no such column ${fields[i].value}`
                     }
                 } else if (
-                    command.fields[i].type === 'expression' &&
-                    containsAggregateFunction(command.fields[i].expressionParts)
+                    fields[i].type === 'expression' &&
+                    containsAggregateFunction(fields[i].expressionParts)
                 ) {
                     const evaluated = evaluateAggregateExpression(
-                        command.fields[i].value,
+                        fields[i].value,
                         existingRows
                     )
-                    row[command.fields[i].value] = evaluated
-                    return [{ [command.fields[i].value]: evaluated }]
-                } else if (command.fields[i].type === 'expression') {
+                    row[fields[i].value] = evaluated
+                    return [{ [fields[i].value]: evaluated }]
+                } else if (fields[i].type === 'expression') {
                     const expressionResult = evaluateExpression(
-                        command.fields[i].expressionParts,
+                        fields[i].expressionParts,
                         row,
                         existingRows
                     )
 
-                    row[command.fields[i].value] = expressionResult
+                    row[fields[i].value] = expressionResult
                 }
             }
 

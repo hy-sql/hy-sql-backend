@@ -28,7 +28,6 @@ const parseCommand = (fullCommandAsStringArray) => {
         case 'DELETE':
             return deleteParser.parseCommand(fullCommandAsStringArray)
         default:
-            console.log('sth went wrong')
             return null
     }
 }
