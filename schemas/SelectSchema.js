@@ -9,6 +9,7 @@ const {
     IntegerSchema,
 } = require('./FieldSchemas')
 const { ExpressionSchema } = require('./ExpressionSchema')
+const DistinctSchema = require('./DistinctSchema')
 const FunctionSchema = require('./FunctionSchema')
 const LimitSchema = require('./LimitSchema')
 
@@ -28,7 +29,8 @@ const SelectSchema = Joi.object({
             TextSchema,
             IntegerSchema,
             ExpressionSchema.shared(FunctionSchema),
-            FunctionSchema.shared(ExpressionSchema)
+            FunctionSchema.shared(ExpressionSchema),
+            DistinctSchema
         )
         .min(1)
         .required(),

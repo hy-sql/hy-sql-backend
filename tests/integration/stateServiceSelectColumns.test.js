@@ -663,3 +663,189 @@ describe('selectFrom() with command.where and command.orderBy', () => {
         expect(result.rows).toEqual(expectedRows)
     })
 })
+
+describe('selectFrom() with DISTINCT keyword', () => {
+    let stateService
+
+    beforeEach(() => {
+        const state = new State(new Map())
+        stateService = new StateService(state)
+
+        const commands = [
+            'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',5);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris',4);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri',4);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',3);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',3);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',2);",
+            "INSERT INTO Tuotteet (nimi,hinta) VALUES ('olut',2);",
+        ]
+
+        const splitCommandArray = commands.map((input) =>
+            splitCommandIntoArray(input)
+        )
+
+        const parsedCommands = splitCommandArray.map((c) =>
+            commandService.parseCommand(c)
+        )
+
+        parsedCommands.forEach((c) => stateService.updateState(c.value))
+    })
+
+    test('and one column returns correct columns', () => {
+        const expectedRows = [
+            {
+                nimi: 'retiisi',
+            },
+            {
+                nimi: 'nauris',
+            },
+            {
+                nimi: 'selleri',
+            },
+            {
+                nimi: 'olut',
+            },
+        ]
+        const selectParser = 'SELECT DISTINCT nimi FROM Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectParser)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual(expectedRows)
+    })
+
+    test('and two columns returns correct columns', () => {
+        const expectedRows = [
+            {
+                nimi: 'retiisi',
+                hinta: 7,
+            },
+            {
+                nimi: 'nauris',
+                hinta: 5,
+            },
+            {
+                nimi: 'nauris',
+                hinta: 4,
+            },
+            {
+                nimi: 'selleri',
+                hinta: 4,
+            },
+            {
+                nimi: 'olut',
+                hinta: 3,
+            },
+            {
+                nimi: 'olut',
+                hinta: 2,
+            },
+        ]
+
+        const selectParser = 'SELECT DISTINCT nimi, hinta FROM Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectParser)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual(expectedRows)
+    })
+
+    test('and WHERE keyword returns correct columns', () => {
+        const expectedRows = [
+            {
+                hinta: 3,
+            },
+            {
+                hinta: 2,
+            },
+        ]
+        const selectParser =
+            "SELECT DISTINCT hinta FROM Tuotteet WHERE nimi='olut';"
+        const commandArray = splitCommandIntoArray(selectParser)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual(expectedRows)
+    })
+
+    test('and WHERE + ORDER BY keyword returns correct columns', () => {
+        const expectedRows = [
+            {
+                hinta: 2,
+            },
+            {
+                hinta: 3,
+            },
+        ]
+
+        const selectParser =
+            "SELECT DISTINCT hinta FROM Tuotteet WHERE nimi='olut' ORDER BY hinta ASC;"
+        const commandArray = splitCommandIntoArray(selectParser)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual(expectedRows)
+    })
+
+    test('invalid DISTINCT returns error', () => {
+        const selectParser =
+            "SELECT DISTIn hinta FROM Tuotteet WHERE nimi='olut' ORDER BY hinta ASC;"
+        const commandArray = splitCommandIntoArray(selectParser)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.error).toBeDefined()
+    })
+
+    test('length()-function returns correct columns', () => {
+        const expectedRows = [
+            {
+                'length(nimi)': 7,
+            },
+            {
+                'length(nimi)': 6,
+            },
+            {
+                'length(nimi)': 4,
+            },
+        ]
+
+        const selectParser = 'SELECT DISTINCT length(nimi) FROM Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectParser)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual(expectedRows)
+    })
+
+    test('aritmetic function returns correct columns', () => {
+        const expectedRows = [
+            {
+                'hinta+1': 8,
+            },
+            {
+                'hinta+1': 6,
+            },
+            {
+                'hinta+1': 5,
+            },
+            {
+                'hinta+1': 4,
+            },
+            {
+                'hinta+1': 3,
+            },
+        ]
+
+        const selectParser = 'SELECT DISTINCT hinta+1 FROM Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectParser)
+        const parsedCommand = commandService.parseCommand(commandArray)
+
+        const result = stateService.updateState(parsedCommand.value)
+        expect(result.rows).toEqual(expectedRows)
+    })
+})

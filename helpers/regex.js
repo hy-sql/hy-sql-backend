@@ -115,6 +115,8 @@ const textInputPattern = new RegExp("^'.+'$")
 
 const sortOrderKeywordPattern = new RegExp('^(ASC|DESC)$', 'i')
 
+const distinctKeywordPattern = new RegExp('^[Dd][Ii][Ss][Tt][Ii][Nn][Cc][Tt]$')
+
 /**
  * Regular expressions for use in the application.
  * @exports RegExp
@@ -137,6 +139,7 @@ module.exports = {
     logicalOperatorsNamePattern,
     modifiedArithmeticOperator,
     sortOrderKeywordPattern,
+    distinctKeywordPattern,
     stringFunctionPattern,
     stringFunctionsNamePattern,
     textInputPattern,

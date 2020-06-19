@@ -234,7 +234,6 @@ describe('selectFrom()', () => {
         const commandArray = splitCommandIntoArray(queries[8])
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand.value)
-        console.log(parsedCommand.value.where)
         expect(result.error).toBeUndefined()
         expect(result.rows).toEqual(expectedRows)
     })

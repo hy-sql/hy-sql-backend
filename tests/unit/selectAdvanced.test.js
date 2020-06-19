@@ -132,3 +132,44 @@ describe.each([
         })
     }
 )
+
+describe.each([
+    'SELECT DISTINCT nimi, hinta FROM Tuotteet;',
+    'SELECT DISTINCT nimi FROM Tuotteet;',
+    'select distinct nimi from Tuotteet;',
+    'select dIstINcT nimi from Tuotteet;',
+])('SELECT query with DISTINCT keyword', (validCommand) => {
+    describe(`parsed command ${validCommand}`, () => {
+        const command = splitCommandIntoArray(validCommand)
+
+        test('contains "fields" field', () => {
+            expect(selectParser.parseCommand(command).value).toBeDefined()
+            expect(
+                selectParser.parseCommand(command).value.fields
+            ).toBeDefined()
+            expect(selectParser.parseCommand(command).error).not.toBeDefined()
+        })
+
+        test('"fields" contains correct type', () => {
+            const parsed = selectParser.parseCommand(command).value
+            expect(parsed.fields[0].type).toBe('distinct')
+            expect(parsed.fields[0].value).toBeDefined()
+        })
+    })
+})
+
+describe.each(['SELECT DISTIN nimi, hinta FROM Tuotteet;'])(
+    'INVALID SELECT query with DISTINCT keyword',
+    (invalidCommand) => {
+        describe(`Invalid command ${invalidCommand}`, () => {
+            const command = splitCommandIntoArray(invalidCommand)
+
+            test('contains "fields" but field type is not "distinct"', () => {
+                const parsed = selectParser.parseCommand(command).value
+                expect(parsed.fields).toBeDefined()
+                expect(parsed.fields[0].type).not.toBe('distinct')
+                // expect(selectParser.parseCommand(command).error).toBeDefined()
+            })
+        })
+    }
+)

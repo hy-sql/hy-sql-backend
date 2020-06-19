@@ -92,4 +92,18 @@ const executeAggregateFunction = (functionDetails, rows) => {
     }
 }
 
-module.exports = { executeStringFunction, executeAggregateFunction }
+/**
+ * Executes SELECT DISTINCT command for given rows. Expects rows containing only
+ * queried columns as input and filters out possible duplicate data. Returns only
+ * unique rows.
+ * @param {*} rows Rows containing queried columns.
+ */
+const executeSelectDistinct = (rows) => {
+    return _.uniqWith(rows, _.isEqual)
+}
+
+module.exports = {
+    executeStringFunction,
+    executeAggregateFunction,
+    executeSelectDistinct,
+}

@@ -32,6 +32,6 @@ const SimplerExpressionSchema = Joi.object({
         .items(ArithmeticOperatorSchema.required(), IntegerSchema)
         .required(),
     value: Joi.string().pattern(arithmeticExpressionPattern).required(),
-}).id('expression')
+})
 
 module.exports = { ExpressionSchema, SimplerExpressionSchema }
