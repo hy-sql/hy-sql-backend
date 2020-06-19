@@ -1,6 +1,7 @@
 const insertIntoParser = require('../../commandParsers/insertIntoParser')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const SQLError = require('../../models/SQLError')
 
 describe.each([
     "INSERT INTO Tuotteet (id, nimi, hinta) VALUES (1, 'nauris', 3);",
@@ -66,11 +67,13 @@ describe.each(["INSERT INTO Tuotteet (id, nimi, hinta) (1, 'nauris', 3);"])(
         const fullCommandAsStringArray = splitCommandIntoArray(command)
 
         test('missing VALUES keyword returns an error', () => {
-            const parsedCommand = insertIntoParser.parseCommand(
-                fullCommandAsStringArray
+            expect(() =>
+                insertIntoParser.parseCommand(fullCommandAsStringArray)
+            ).toThrowError(
+                new SQLError(
+                    'INSERT INTO needs a VALUES keyword before the actual values to be inserted'
+                )
             )
-
-            expect(parsedCommand.error).toBeDefined()
         })
     }
 )
