@@ -23,9 +23,9 @@ const execute = (request, response, next) => {
 
             results = results.concat(stateService.updateState(command))
         } catch (error) {
-            if (error.type === 'ValidationError') {
+            if (error.name === 'ValidationError') {
                 results = results.concat({ error: error.details[0].message })
-            } else if (error.type === 'SQLError') {
+            } else if (error.name === 'SQLError') {
                 results = results.concat({ error: error.message })
             }
 
