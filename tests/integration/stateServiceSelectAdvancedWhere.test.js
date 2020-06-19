@@ -26,7 +26,7 @@ describe('selectFrom()', () => {
         const parsedCommands = splitCommandArray.map((c) =>
             commandService.parseCommand(c)
         )
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
     })
 
     const queries = [
@@ -75,7 +75,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[0])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -89,7 +89,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[1])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -103,7 +103,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[2])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -111,7 +111,7 @@ describe('selectFrom()', () => {
     test(`returns expected rows for: ${queries[3]}`, () => {
         const commandArray = splitCommandIntoArray(queries[3])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual([{ 'COUNT(*)': 2 }])
     })
@@ -119,7 +119,7 @@ describe('selectFrom()', () => {
     test(`returns expected rows for: ${queries[4]}`, () => {
         const commandArray = splitCommandIntoArray(queries[4])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual([{ 'COUNT(*)': 6 }])
     })
@@ -142,7 +142,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[5])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -156,7 +156,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[6])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -171,7 +171,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[7])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -194,7 +194,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[8])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -213,7 +213,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[9])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -236,7 +236,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[10])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -244,7 +244,7 @@ describe('selectFrom()', () => {
     test(`returns expected rows for: ${queries[11]}`, () => {
         const commandArray = splitCommandIntoArray(queries[11])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual([])
     })
@@ -259,7 +259,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[12])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -267,7 +267,7 @@ describe('selectFrom()', () => {
     test(`returns expected rows for: ${queries[13]}`, () => {
         const commandArray = splitCommandIntoArray(queries[13])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual([])
     })
@@ -288,7 +288,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[14])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -296,7 +296,7 @@ describe('selectFrom()', () => {
     test(`returns expected rows for: ${queries[15]}`, () => {
         const commandArray = splitCommandIntoArray(queries[15])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toHaveLength(2)
         expect(result.rows).toContainEqual({
@@ -312,7 +312,7 @@ describe('selectFrom()', () => {
     test(`returns expected rows for: ${queries[16]}`, () => {
         const commandArray = splitCommandIntoArray(queries[16])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toHaveLength(2)
         expect(result.rows).toContainEqual({
@@ -328,7 +328,7 @@ describe('selectFrom()', () => {
     test(`returns expected rows for: ${queries[17]}`, () => {
         const commandArray = splitCommandIntoArray(queries[17])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toHaveLength(2)
         expect(result.rows).toContainEqual({
@@ -344,7 +344,7 @@ describe('selectFrom()', () => {
     test(`returns expected rows for: ${queries[18]}`, () => {
         const commandArray = splitCommandIntoArray(queries[18])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual([])
     })
@@ -352,7 +352,7 @@ describe('selectFrom()', () => {
     test(`returns expected rows for: ${queries[19]}`, () => {
         const commandArray = splitCommandIntoArray(queries[19])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toHaveLength(2)
         expect(result.rows).toContainEqual({
@@ -368,7 +368,7 @@ describe('selectFrom()', () => {
     test(`returns expected rows for: ${queries[20]}`, () => {
         const commandArray = splitCommandIntoArray(queries[20])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual([{ 'COUNT(nimi)': 3 }])
     })
@@ -376,56 +376,56 @@ describe('selectFrom()', () => {
     test(`returns expected rows for: ${queries[21]}`, () => {
         const commandArray = splitCommandIntoArray(queries[21])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'MAX(hinta)': 7 }])
     })
 
     test(`returns expected rows for: ${queries[22]}`, () => {
         const commandArray = splitCommandIntoArray(queries[22])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'MAX(nimi)': 'retiisi' }])
     })
 
     test(`returns expected rows for: ${queries[23]}`, () => {
         const commandArray = splitCommandIntoArray(queries[23])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'MIN(lkm)': 30 }])
     })
 
     test(`returns expected rows for: ${queries[24]}`, () => {
         const commandArray = splitCommandIntoArray(queries[24])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'MIN(nimi)': 'nauris' }])
     })
 
     test(`returns expected rows for: ${queries[25]}`, () => {
         const commandArray = splitCommandIntoArray(queries[25])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'SUM(hinta)': 12 }])
     })
 
     test(`returns expected rows for: ${queries[26]}`, () => {
         const commandArray = splitCommandIntoArray(queries[26])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'SUM(nimi)': 0 }])
     })
 
     test(`returns expected rows for: ${queries[27]}`, () => {
         const commandArray = splitCommandIntoArray(queries[27])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'AVG(hinta)': 5 }])
     })
 
     test(`returns expected rows for: ${queries[28]}`, () => {
         const commandArray = splitCommandIntoArray(queries[28])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'AVG(nimi)': 0 }])
     })
 })

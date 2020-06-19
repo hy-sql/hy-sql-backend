@@ -19,8 +19,8 @@ describe.each([
         describe(validCommand, () => {
             test('is valid and parsed', () => {
                 const parsedCommand = selectParser.parseCommand(command)
-                expect(parsedCommand.value).toBeDefined()
-                expect(parsedCommand.value.fields).toBeDefined()
+                expect(parsedCommand).toBeDefined()
+                expect(parsedCommand.fields).toBeDefined()
                 expect(parsedCommand.error).not.toBeDefined()
             })
         })
@@ -42,8 +42,7 @@ describe.each([
 
         describe(invalidCommand, () => {
             test('fails validation', () => {
-                const parsedCommand = selectParser.parseCommand(command)
-                expect(parsedCommand.error).toBeDefined()
+                expect(() => selectParser.parseCommand(command)).toThrowError()
             })
         })
     }
@@ -66,8 +65,8 @@ describe.each([
         describe(validCommand, () => {
             test('is valid and parsed', () => {
                 const parsedCommand = selectParser.parseCommand(command)
-                expect(parsedCommand.value).toBeDefined()
-                expect(parsedCommand.value.fields).toBeDefined()
+                expect(parsedCommand).toBeDefined()
+                expect(parsedCommand.fields).toBeDefined()
                 expect(parsedCommand.error).not.toBeDefined()
             })
         })
@@ -90,8 +89,7 @@ describe.each([
 
         describe(invalidCommand, () => {
             test('fails validation', () => {
-                const parsedCommand = selectParser.parseCommand(command)
-                expect(parsedCommand.error).toBeDefined()
+                expect(() => selectParser.parseCommand(command)).toThrowError()
             })
         })
     }
@@ -114,8 +112,8 @@ describe.each([
         describe(validCommand, () => {
             test('is valid and parsed', () => {
                 const parsedCommand = selectParser.parseCommand(command)
-                expect(parsedCommand.value).toBeDefined()
-                expect(parsedCommand.value.fields).toBeDefined()
+                expect(parsedCommand).toBeDefined()
+                expect(parsedCommand.fields).toBeDefined()
                 expect(parsedCommand.error).not.toBeDefined()
             })
         })
@@ -138,8 +136,7 @@ describe.each([
 
         describe(invalidCommand, () => {
             test('fails validation', () => {
-                const parsedCommand = selectParser.parseCommand(command)
-                expect(parsedCommand.error).toBeDefined()
+                expect(() => selectParser.parseCommand(command)).toThrowError()
             })
         })
     }

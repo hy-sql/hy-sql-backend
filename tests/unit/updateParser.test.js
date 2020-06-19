@@ -22,13 +22,11 @@ describe.each([
                 fullCommandAsStringArray
             )
 
-            expect(parsedCommand.value).toBeDefined()
-            expect(parsedCommand.value).toHaveProperty('name')
-            expect(parsedCommand.value).toHaveProperty('tableName')
-            expect(parsedCommand.value).toHaveProperty('set')
-            expect(parsedCommand.value).toHaveProperty('finalSemicolon')
-
-            expect(parsedCommand.error).not.toBeDefined()
+            expect(parsedCommand).toBeDefined()
+            expect(parsedCommand).toHaveProperty('name')
+            expect(parsedCommand).toHaveProperty('tableName')
+            expect(parsedCommand).toHaveProperty('set')
+            expect(parsedCommand).toHaveProperty('finalSemicolon')
         })
     })
 })
@@ -45,18 +43,10 @@ describe.each([
     describe(command, () => {
         const fullCommandAsStringArray = splitCommandIntoArray(command)
 
-        test('is recognized as UPDATE command', () => {
-            const result = commandService.parseCommand(fullCommandAsStringArray)
-
-            expect(result).toBeTruthy()
-        })
-
         test('fails validation after parsed to command object', () => {
-            const parsedCommand = commandService.parseCommand(
-                fullCommandAsStringArray
-            )
-
-            expect(parsedCommand.error).toBeDefined()
+            expect(() => {
+                updateParser.parseCommand(fullCommandAsStringArray)
+            }).toThrow()
         })
     })
 })

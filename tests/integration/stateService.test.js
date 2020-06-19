@@ -2,6 +2,7 @@ const State = require('../../models/State')
 const StateService = require('../../services/StateService')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const SQLError = require('../../models/SQLError')
 
 describe('createTable()', () => {
     test('creates new table to list', () => {
@@ -51,8 +52,9 @@ describe('createTable()', () => {
             finalSemicolon: ';',
         }
 
-        const result = stateService.createTable(command)
-        expect(result.error).toBe('Table Tuotteet already exists')
+        expect(() => stateService.createTable(command)).toThrowError(
+            new SQLError('Table Tuotteet already exists')
+        )
     })
 
     test('returns error when trying to create duplicate columns', () => {
@@ -70,9 +72,10 @@ describe('createTable()', () => {
             closingBracket: ')',
             finalSemicolon: ';',
         }
-        const result = stateService.createTable(command)
-        expect(result.error.length).toBe(1)
-        expect(result.error[0]).toBe('duplicate column nimi: nimi')
+
+        expect(() => stateService.createTable(command)).toThrowError(
+            new SQLError('duplicate column nimi: nimi')
+        )
     })
 })
 
@@ -104,8 +107,10 @@ describe('insertIntoTable()', () => {
                 },
             ],
         }
-        const result = stateService.insertIntoTable(insertCommand)
-        expect(result.error).toBe('No such table Tuotteet')
+
+        expect(() => stateService.insertIntoTable(insertCommand)).toThrowError(
+            new SQLError('No such table Tuotteet')
+        )
     })
 
     test('creates new row succesfully', () => {
@@ -177,9 +182,8 @@ describe('insertIntoTable()', () => {
         const splitCommand = splitCommandIntoArray(insertCommand)
         const parsedCommand = commandService.parseCommand(splitCommand)
 
-        const result = stateService.insertIntoTable(parsedCommand.value)
-        expect(result.error).toBe(
-            'Wrong datatype: expected TEXT but was INTEGER'
+        expect(() => stateService.insertIntoTable(parsedCommand)).toThrowError(
+            new SQLError('Wrong datatype: expected TEXT but was INTEGER')
         )
     })
 })

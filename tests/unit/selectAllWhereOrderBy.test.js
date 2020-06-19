@@ -12,14 +12,13 @@ describe.each([
 
         test('does not contain where field', () => {
             const parsedCommand = parseCommand(command)
-            expect(parsedCommand.value).not.toHaveProperty('where')
+            expect(parsedCommand).not.toHaveProperty('where')
         })
     })
 })
 
 describe.each([
     'SELECT * FROM Taulu WHERE this="that";',
-    'SELECT * FROM Taulu WHERE this=4;',
     'SELECT * FROM Taulu WHERE BY ORDER;',
     'SELECT * FROM WHERE Taulu BY that ORDER;',
 ])(
@@ -28,9 +27,8 @@ describe.each([
         describe(wrongCommand, () => {
             const command = splitCommandIntoArray(wrongCommand)
 
-            test('does not contain orderBy field or format invalid', () => {
-                const parsedCommand = parseCommand(command)
-                expect(parsedCommand.value).not.toHaveProperty('orderBy')
+            test('fails validation after parsed to command object', () => {
+                expect(() => parseCommand(command)).toThrowError()
             })
         })
     }
@@ -48,17 +46,8 @@ describe.each([
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
 
-        const parsedCommand = parseCommand(command)
-
-        test('is recognised as a command', () => {
-            expect(parsedCommand).toBeTruthy()
-        })
-
         test('fails validation after parsed to command object', () => {
-            const parsedCommand = parseCommand(command)
-            expect(parsedCommand.value).toHaveProperty('where')
-            expect(parsedCommand.value).toHaveProperty('orderBy')
-            expect(parsedCommand.error).toBeDefined()
+            expect(() => parseCommand(command)).toThrowError()
         })
     })
 })
@@ -81,11 +70,9 @@ describe.each([
         test('is parsed and validated succesfully', () => {
             const parsedCommand = parseCommand(command)
 
-            expect(parsedCommand.value).toBeDefined()
-            expect(parsedCommand.value).toHaveProperty('where')
-            expect(parsedCommand.value).toHaveProperty('orderBy')
-
-            expect(parseCommand(command).error).toBeUndefined()
+            expect(parsedCommand).toBeDefined()
+            expect(parsedCommand).toHaveProperty('where')
+            expect(parsedCommand).toHaveProperty('orderBy')
         })
     })
 })

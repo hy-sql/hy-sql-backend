@@ -1,3 +1,4 @@
+const Joi = require('@hapi/joi')
 const { parseGroupBy } = require('../../commandParsers/groupByParser')
 const {
     queryContainsGroupByKeywords,
@@ -26,12 +27,14 @@ describe.each([
         })
 
         test('is parsed and validated succesfully', () => {
-            const parsedCommand = GroupBySchema.validate(parseGroupBy(command))
+            const parsedCommand = Joi.attempt(
+                parseGroupBy(command),
+                GroupBySchema
+            )
 
-            expect(parsedCommand.value).toHaveProperty('keyword')
-            expect(parsedCommand.value).toHaveProperty('fields')
-            expect(parsedCommand.value.keyword).toBe('GROUP BY')
-            expect(parsedCommand.error).toBeUndefined()
+            expect(parsedCommand).toHaveProperty('keyword')
+            expect(parsedCommand).toHaveProperty('fields')
+            expect(parsedCommand.keyword).toBe('GROUP BY')
         })
     })
 })
@@ -53,12 +56,11 @@ describe.each([
         const parsedCommand = parseCommand(command)
 
         test('is parsed and validated succesfully', () => {
-            expect(parsedCommand.value).toHaveProperty('where')
-            expect(parsedCommand.value).toHaveProperty('groupBy')
-            expect(parsedCommand.value.groupBy).toHaveProperty('keyword')
-            expect(parsedCommand.value.groupBy).toHaveProperty('fields')
-            expect(parsedCommand.value.groupBy.keyword).toBe('GROUP BY')
-            expect(parsedCommand.error).toBeUndefined()
+            expect(parsedCommand).toHaveProperty('where')
+            expect(parsedCommand).toHaveProperty('groupBy')
+            expect(parsedCommand.groupBy).toHaveProperty('keyword')
+            expect(parsedCommand.groupBy).toHaveProperty('fields')
+            expect(parsedCommand.groupBy.keyword).toBe('GROUP BY')
         })
     })
 })
@@ -80,12 +82,11 @@ describe.each([
         const parsedCommand = parseCommand(command)
 
         test('is parsed and validated succesfully', () => {
-            expect(parsedCommand.value).toHaveProperty('groupBy')
-            expect(parsedCommand.value).toHaveProperty('orderBy')
-            expect(parsedCommand.value.groupBy).toHaveProperty('keyword')
-            expect(parsedCommand.value.groupBy).toHaveProperty('fields')
-            expect(parsedCommand.value.groupBy.keyword).toBe('GROUP BY')
-            expect(parsedCommand.error).toBeUndefined()
+            expect(parsedCommand).toHaveProperty('groupBy')
+            expect(parsedCommand).toHaveProperty('orderBy')
+            expect(parsedCommand.groupBy).toHaveProperty('keyword')
+            expect(parsedCommand.groupBy).toHaveProperty('fields')
+            expect(parsedCommand.groupBy.keyword).toBe('GROUP BY')
         })
     })
 })
@@ -109,12 +110,11 @@ describe.each([
         const parsedCommand = parseCommand(command)
 
         test('is parsed and validated succesfully', () => {
-            expect(parsedCommand.value).toHaveProperty('groupBy')
-            expect(parsedCommand.value).toHaveProperty('orderBy')
-            expect(parsedCommand.value.groupBy).toHaveProperty('keyword')
-            expect(parsedCommand.value.groupBy).toHaveProperty('fields')
-            expect(parsedCommand.value.groupBy.keyword).toBe('GROUP BY')
-            expect(parsedCommand.error).toBeUndefined()
+            expect(parsedCommand).toHaveProperty('groupBy')
+            expect(parsedCommand).toHaveProperty('orderBy')
+            expect(parsedCommand.groupBy).toHaveProperty('keyword')
+            expect(parsedCommand.groupBy).toHaveProperty('fields')
+            expect(parsedCommand.groupBy.keyword).toBe('GROUP BY')
         })
     })
 })
@@ -129,10 +129,10 @@ describe.each([
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
 
-        const parsedCommand = parseCommand(command)
-
-        test('is parsed and validated succesfully', () => {
-            expect(parsedCommand.error).toBeDefined()
+        test('fails validation after parsed to command object', () => {
+            expect(() => {
+                parseCommand(command)
+            }).toThrow()
         })
     })
 })

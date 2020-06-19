@@ -2,6 +2,7 @@ const State = require('../../models/State')
 const StateService = require('../../services/StateService')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const SQLError = require('../../models/SQLError')
 
 describe('selectFrom()', () => {
     let stateService
@@ -24,7 +25,7 @@ describe('selectFrom()', () => {
         const parsedCommands = splitCommandArray.map((c) =>
             commandService.parseCommand(c)
         )
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
     })
 
     const queries = [
@@ -57,9 +58,8 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[0])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
-        expect(result.error).toBeUndefined()
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -81,9 +81,8 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[1])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
-        expect(result.error).toBeUndefined()
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -109,9 +108,8 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[2])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
-        expect(result.error).toBeUndefined()
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -141,9 +139,8 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[3])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
-        expect(result.error).toBeUndefined()
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -161,22 +158,19 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[4])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
-        expect(result.error).toBeUndefined()
         expect(result.rows).toEqual(expectedRows)
     })
 
     test(`returns expected error for: ${queries[5]}`, () => {
         const commandArray = splitCommandIntoArray(queries[5])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
-
-        expect(result.rows).toBeUndefined()
-        expect(result).toEqual({
-            error:
-                'No rows left to return. Try changing value given to LIMIT or OFFSET.',
-        })
+        expect(() => stateService.updateState(parsedCommand)).toThrowError(
+            new SQLError(
+                'No rows left to return. Try changing value given to LIMIT or OFFSET.'
+            )
+        )
     })
 
     test(`returns expected rows for: ${queries[6]}`, () => {
@@ -193,9 +187,8 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[6])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
-        expect(result.error).toBeUndefined()
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -213,9 +206,8 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[7])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
-        expect(result.error).toBeUndefined()
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -233,31 +225,25 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[8])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
-        expect(result.error).toBeUndefined()
+        const result = stateService.updateState(parsedCommand)
+
         expect(result.rows).toEqual(expectedRows)
     })
 
     test(`returns expected error for: ${queries[9]}`, () => {
         const commandArray = splitCommandIntoArray(queries[9])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
-
-        expect(result.rows).toBeUndefined()
-        expect(result).toEqual({
-            error: 'Value given to LIMIT or OFFSET is negative.',
-        })
+        expect(() => stateService.updateState(parsedCommand)).toThrowError(
+            new SQLError('Value given to LIMIT or OFFSET is negative.')
+        )
     })
 
     test(`returns expected error for: ${queries[10]}`, () => {
         const commandArray = splitCommandIntoArray(queries[10])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
-
-        expect(result.rows).toBeUndefined()
-        expect(result).toEqual({
-            error: 'Value given to LIMIT or OFFSET is negative.',
-        })
+        expect(() => stateService.updateState(parsedCommand)).toThrowError(
+            new SQLError('Value given to LIMIT or OFFSET is negative.')
+        )
     })
 
     test(`returns expected rows for: ${queries[11]}`, () => {
@@ -274,9 +260,8 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[11])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
-        expect(result.error).toBeUndefined()
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -294,9 +279,8 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(queries[12])
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
-        expect(result.error).toBeUndefined()
         expect(result.rows).toEqual(expectedRows)
     })
 })

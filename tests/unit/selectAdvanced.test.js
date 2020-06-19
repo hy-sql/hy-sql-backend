@@ -13,10 +13,7 @@ describe.each([
         const command = splitCommandIntoArray(invalidCommand)
 
         test('does not contain expression type in fields', () => {
-            expect(selectParser.parseCommand(command).value).toBeDefined()
-            expect(
-                selectParser.parseCommand(command).value.fields[0].type
-            ).not.toEqual('expression')
+            expect(() => selectParser.parseCommand(command)).toThrowError()
         })
     })
 })
@@ -32,11 +29,10 @@ describe.each([
         const command = splitCommandIntoArray(validCommand)
 
         test('contains "fields" field and its type is expression', () => {
-            expect(selectParser.parseCommand(command).value).toBeDefined()
-            expect(
-                selectParser.parseCommand(command).value.fields[0].type
-            ).toBe('expression')
-            expect(selectParser.parseCommand(command).error).not.toBeDefined()
+            expect(selectParser.parseCommand(command)).toBeDefined()
+            expect(selectParser.parseCommand(command).fields[0].type).toBe(
+                'expression'
+            )
         })
     })
 })
@@ -51,16 +47,7 @@ describe.each([
         const command = splitCommandIntoArray(invalidCommand)
 
         test('contains "fields" field but does not contain field type function and has errors', () => {
-            expect(
-                selectParser.parseCommand(command).value.fields[0]
-            ).toBeDefined()
-            expect(
-                selectParser.parseCommand(command).value.fields[0].type
-            ).not.toBe('function')
-            expect(
-                selectParser.parseCommand(command).value.fields[0].type
-            ).toEqual('column')
-            expect(selectParser.parseCommand(command).error).toBeDefined()
+            expect(() => selectParser.parseCommand(command)).toThrowError()
         })
     })
 })
@@ -74,10 +61,8 @@ describe.each([
         const command = splitCommandIntoArray(validCommand)
 
         test('contains "fields" field', () => {
-            expect(selectParser.parseCommand(command).value).toBeDefined()
-            expect(
-                selectParser.parseCommand(command).value.fields
-            ).toBeDefined()
+            expect(selectParser.parseCommand(command)).toBeDefined()
+            expect(selectParser.parseCommand(command).fields).toBeDefined()
             expect(selectParser.parseCommand(command).error).not.toBeDefined()
         })
     })
@@ -96,10 +81,8 @@ describe.each([
             const command = splitCommandIntoArray(validCommand)
 
             test('contains "fields" field', () => {
-                expect(selectParser.parseCommand(command).value).toBeDefined()
-                expect(
-                    selectParser.parseCommand(command).value.fields
-                ).toBeDefined()
+                expect(selectParser.parseCommand(command)).toBeDefined()
+                expect(selectParser.parseCommand(command).fields).toBeDefined()
                 expect(
                     selectParser.parseCommand(command).error
                 ).not.toBeDefined()
@@ -121,10 +104,8 @@ describe.each([
             const command = splitCommandIntoArray(validCommand)
 
             test('contains "fields" field', () => {
-                expect(selectParser.parseCommand(command).value).toBeDefined()
-                expect(
-                    selectParser.parseCommand(command).value.fields
-                ).toBeDefined()
+                expect(selectParser.parseCommand(command)).toBeDefined()
+                expect(selectParser.parseCommand(command).fields).toBeDefined()
                 expect(
                     selectParser.parseCommand(command).error
                 ).not.toBeDefined()
@@ -143,17 +124,15 @@ describe.each([
         const command = splitCommandIntoArray(validCommand)
 
         test('contains "fields" field', () => {
-            expect(selectParser.parseCommand(command).value).toBeDefined()
-            expect(
-                selectParser.parseCommand(command).value.fields
-            ).toBeDefined()
+            expect(selectParser.parseCommand(command)).toBeDefined()
+            expect(selectParser.parseCommand(command).fields).toBeDefined()
             expect(selectParser.parseCommand(command).error).not.toBeDefined()
         })
 
         test('"fields" contains correct type', () => {
-            const parsed = selectParser.parseCommand(command).value
+            const parsed = selectParser.parseCommand(command)
             expect(parsed.fields[0].type).toBe('distinct')
-            expect(parsed.fields[0].value).toBeDefined()
+            expect(parsed.fields[0]).toBeDefined()
         })
     })
 })
@@ -165,7 +144,7 @@ describe.each(['SELECT DISTIN nimi, hinta FROM Tuotteet;'])(
             const command = splitCommandIntoArray(invalidCommand)
 
             test('contains "fields" but field type is not "distinct"', () => {
-                const parsed = selectParser.parseCommand(command).value
+                const parsed = selectParser.parseCommand(command)
                 expect(parsed.fields).toBeDefined()
                 expect(parsed.fields[0].type).not.toBe('distinct')
                 // expect(selectParser.parseCommand(command).error).toBeDefined()
