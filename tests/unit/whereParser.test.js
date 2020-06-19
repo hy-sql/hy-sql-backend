@@ -43,11 +43,11 @@ describe.each([
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
 
-        test('is recognised as a Where-command', () => {
+        test('is recognised to contain a WHERE keyword', () => {
             expect(queryContainsWhereKeyword(command)).toBeTruthy()
         })
 
-        test('fails validation after parsed to command object', () => {
+        test('fails validation after parsing', () => {
             const parsedCommand = WhereSchema.validate(parseWhere(command))
 
             expect(parsedCommand.value).toBeDefined()
@@ -62,11 +62,11 @@ describe.each(['WHEE price=7', 'price=7'])(
         describe(validCommand, () => {
             const command = splitCommandIntoArray(validCommand)
 
-            test('is not recognised as a Where-command', () => {
+            test('is recognised to contain a WHERE keyword', () => {
                 expect(queryContainsWhereKeyword(command)).toBeFalsy()
             })
 
-            test('fails validation after parsed to command object', () => {
+            test('fails validation after parsing', () => {
                 const parsedCommand = WhereSchema.validate(parseWhere(command))
                 expect(parsedCommand.value).toBeDefined()
                 expect(parsedCommand.error).toBeDefined()

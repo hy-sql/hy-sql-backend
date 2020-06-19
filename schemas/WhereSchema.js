@@ -1,6 +1,6 @@
 const Joi = require('@hapi/joi')
 const { ColumnSchema, IntegerSchema, TextSchema } = require('./FieldSchemas')
-const ExpressionSchema = require('./ExpressionSchema')
+const { ExpressionSchema } = require('./ExpressionSchema')
 const FunctionSchema = require('./FunctionSchema')
 const { comparisonOperatorPattern } = require('../helpers/regex')
 

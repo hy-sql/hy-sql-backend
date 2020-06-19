@@ -1,7 +1,9 @@
 const { DeleteSchema, DeleteWhereSchema } = require('../schemas/DeleteSchema')
 const { parseWhere } = require('./whereParser')
 const { queryContainsWhereKeyword } = require('./parserTools/queryContains')
-const checkForAdditionalAtEnd = require('./parserTools/checkForAdditional')
+const {
+    checkForAdditionalAtEnd,
+} = require('./parserTools/addErrorToValidationResult')
 
 /**
  * Parses and validates a DELETE command object from the given string array.

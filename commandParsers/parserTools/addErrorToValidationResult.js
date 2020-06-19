@@ -29,4 +29,4 @@ const checkForAdditionalAtEnd = (
     return validationResult
 }
 
-module.exports = checkForAdditionalAtEnd
+module.exports = { checkForAdditionalAtEnd }

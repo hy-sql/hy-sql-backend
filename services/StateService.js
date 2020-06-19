@@ -123,9 +123,14 @@ class StateService {
         const table = this.findTable(command.tableName)
         const existingRows = table.rows
 
-        const selectedRows = this.selectRows(command, existingRows)
+        let selectedRows = this.selectRows(command, existingRows)
 
         if (selectedRows.error) return { error: selectedRows.error }
+
+        if (command.limit) {
+            selectedRows = this.limitRows(command.limit, selectedRows)
+            if (selectedRows.error) return { error: selectedRows.error }
+        }
 
         let result
 
@@ -241,6 +246,54 @@ class StateService {
         return {
             result,
         }
+    }
+
+    /**
+     * Handles narrowing down the amount of rows to be returned according to the values
+     * given to LIMIT ... OFFSET in a query.
+     * @param {object} limitObject .limit of a command object
+     * @param {object[]} rows rows to limit
+     */
+    limitRows(limitObject, rows) {
+        let limitedRows = rows
+
+        let offset = undefined
+        if (limitObject.offset) {
+            offset =
+                limitObject.offset.field.type === 'expression'
+                    ? evaluateExpression(
+                          limitObject.offset.field.expressionParts,
+                          {},
+                          limitedRows
+                      )
+                    : limitObject.offset.field.value
+
+            limitedRows = _.drop(limitedRows, offset)
+        }
+
+        const limit =
+            limitObject.field.type === 'expression'
+                ? evaluateExpression(
+                      limitObject.field.expressionParts,
+                      {},
+                      limitedRows
+                  )
+                : limitObject.field.value
+
+        if (limit >= 0) limitedRows = _.take(limitedRows, limit)
+
+        if (limit < 0 || offset < 0) {
+            return { error: 'Value given to LIMIT or OFFSET is negative.' }
+        }
+
+        if (limitedRows.length === 0) {
+            return {
+                error:
+                    'No rows left to return. Try changing value given to LIMIT or OFFSET.',
+            }
+        }
+
+        return limitedRows
     }
 
     /**

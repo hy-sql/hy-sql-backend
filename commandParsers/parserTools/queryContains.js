@@ -5,9 +5,7 @@
  * @returns {Boolean} WHERE was found true/false
  */
 const queryContainsWhereKeyword = (fullCommandAsStringArray) => {
-    return fullCommandAsStringArray.some(
-        (string) => string.toUpperCase() === 'WHERE'
-    )
+    return fullCommandAsStringArray.some((s) => s.toUpperCase() === 'WHERE')
 }
 
 const queryContainsGroupByKeywords = (fullCommandAsStringArray) => {
@@ -148,6 +146,16 @@ const queryContainsWhereGroupByOrderByKeywords = (fullCommandAsStringArray) => {
     )
 }
 
+/**
+ * Checks whether a command contains the keyword LIMIT. Check is
+ * case-insensitive. Returns true or false.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {Boolean} LIMIT was found true/false
+ */
+const queryContainsLimitKeyword = (fullCommandAsStringArray) => {
+    return fullCommandAsStringArray.some((s) => s.toUpperCase() === 'LIMIT')
+}
+
 module.exports = {
     queryContainsWhereKeyword,
     queryContainsGroupByKeywords,
@@ -156,4 +164,5 @@ module.exports = {
     queryContainsWhereOrderByKeywords,
     queryContainsGroupByOrderByKeywords,
     queryContainsWhereGroupByOrderByKeywords,
+    queryContainsLimitKeyword,
 }
