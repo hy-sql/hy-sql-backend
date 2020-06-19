@@ -287,8 +287,8 @@ describe('selectFrom()', () => {
 
     test(`returns expected error for: ${queries[13]}`, () => {
         const commandArray = splitCommandIntoArray(queries[13])
-        const parsedCommand = commandService.parseCommand(commandArray)
-        expect(() => stateService.updateState(parsedCommand)).toThrowError(
+
+        expect(() => commandService.parseCommand(commandArray)).toThrowError(
             new SQLError(
                 'Query contains OFFSET keyword without containing LIMIT keyword.'
             )
