@@ -4,7 +4,7 @@ const { checkLimitPosition } = require('./parserTools/checkCorrectPosition')
 /**
  * Handles parsing of the LIMIT part of a command into an LIMIT object
  * from the given string array.
- * @param {sting[]} fullCommandAsStringArray the LIMIT part of a command as string array
+ * @param {sting[]} fullCommandAsStringArray command as string array
  */
 const parseLimit = (fullCommandAsStringArray) => {
     const limit = {}

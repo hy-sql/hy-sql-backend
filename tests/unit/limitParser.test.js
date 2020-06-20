@@ -64,7 +64,7 @@ describe.each([
     'SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET column;',
     "SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET '24';",
     'SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET 2a*2;',
-])('Inalid query containing LIMIT or LIMIT OFFSET', (invalidCommand) => {
+])('Invalid query containing LIMIT or LIMIT OFFSET', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
 

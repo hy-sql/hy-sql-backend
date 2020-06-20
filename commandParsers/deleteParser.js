@@ -2,9 +2,8 @@ const Joi = require('@hapi/joi')
 const { DeleteSchema, DeleteWhereSchema } = require('../schemas/DeleteSchema')
 const { parseWhere } = require('./whereParser')
 const { queryContainsWhereKeyword } = require('./parserTools/queryContains')
-const {
-    checkForAdditionalAtEnd,
-} = require('./parserTools/addErrorToValidationResult')
+const { checkForAdditionalAtEnd } = require('./parserTools/checkForAdditional')
+const SQLError = require('../models/SQLError')
 
 /**
  * Parses and validates a DELETE command object from the given string array.
@@ -47,11 +46,7 @@ const parseDelete = (fullCommandAsStringArray) => {
 
     let validatedCommand = Joi.attempt(parsedCommand, DeleteSchema)
 
-    validatedCommand = checkForAdditionalAtEnd(
-        fullCommandAsStringArray,
-        validatedCommand,
-        4
-    )
+    checkForAdditionalAtEnd(fullCommandAsStringArray, 4)
 
     return validatedCommand
 }
@@ -75,13 +70,11 @@ const parseDeleteWhere = (fullCommandAsStringArray) => {
         )
     )
 
-    let validatedCommand = Joi.attempt(parsedCommand, DeleteWhereSchema)
-
     if (whereIndex !== 3) {
-        throw new Error({
-            message: 'WHERE should be directly after the table name',
-        })
+        throw new SQLError('WHERE should be directly after the table name')
     }
+
+    let validatedCommand = Joi.attempt(parsedCommand, DeleteWhereSchema)
 
     return validatedCommand
 }

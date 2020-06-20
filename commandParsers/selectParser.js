@@ -24,6 +24,7 @@ const { parseOrderBy } = require('./orderByParser')
 const { parseSelectFields } = require('./fieldParser')
 const { parseGroupBy } = require('./groupByParser')
 const { parseLimit } = require('./limitParser')
+const SQLError = require('../models/SQLError')
 
 /**
  * Parses and validates a SELECT command object from the given string array.
@@ -76,6 +77,12 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
         parsedCommand.limit = parseLimit(fullCommandAsStringArray)
         parsedCommand.indexOfLimit = fullCommandAsStringArray.findIndex(
             (s) => s.toUpperCase() === 'LIMIT'
+        )
+    } else if (
+        fullCommandAsStringArray.some((s) => s.toUpperCase() === 'OFFSET')
+    ) {
+        throw new SQLError(
+            'Query contains OFFSET keyword without containing LIMIT keyword.'
         )
     }
 
