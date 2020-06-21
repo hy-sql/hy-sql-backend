@@ -5,44 +5,40 @@ const {
 const { LimitSchema } = require('../../schemas/LimitSchema')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
 
+describe.each(['LIMIT 2', 'LIMIT 20', 'LIMIT 2 + 2', 'LIMIT 2*5+3'])(
+    'Valid LIMIT part of a valid query',
+    (validCommand) => {
+        describe(validCommand, () => {
+            const command = splitCommandIntoArray(validCommand)
+
+            test('is recognised to contain a LIMIT keyword', () => {
+                expect(queryContainsLimitKeyword(command)).toBeTruthy()
+            })
+
+            test('is parsed and validated succesfully', () => {
+                const parsedCommand = LimitSchema.validate(parseLimit(command))
+
+                expect(parsedCommand.value).toHaveProperty('keyword')
+                expect(parsedCommand.value).toHaveProperty('field')
+                expect(parsedCommand.value).not.toHaveProperty('offset')
+                expect(parsedCommand.error).toBeUndefined()
+            })
+        })
+    }
+)
+
 describe.each([
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 20;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 + 2;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2*5+3;',
-])('Valid query containing LIMIT', (validCommand) => {
+    'LIMIT 2 OFFSET 2',
+    'LIMIT 2 OFFSET 30',
+    'LIMIT 2 OFFSET 2 + 2',
+    'LIMIT 2 OFFSET 2*5+3',
+])('Valid LIMIT OFFSET part of a valid query', (validCommand) => {
     describe(validCommand, () => {
         const command = splitCommandIntoArray(validCommand)
-
-        test('is recognised to contain a LIMIT keyword', () => {
-            expect(queryContainsLimitKeyword(command)).toBeTruthy()
-        })
 
         test('is parsed and validated succesfully', () => {
             const parsedCommand = LimitSchema.validate(parseLimit(command))
 
-            expect(parsedCommand.value).toHaveProperty('correctlyPositioned')
-            expect(parsedCommand.value).toHaveProperty('keyword')
-            expect(parsedCommand.value).toHaveProperty('field')
-            expect(parsedCommand.value).not.toHaveProperty('offset')
-            expect(parsedCommand.error).toBeUndefined()
-        })
-    })
-})
-
-describe.each([
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET 2;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET 30;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET 2 + 2;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET 2*5+3;',
-])('Valid query containing LIMIT OFFSET', (validCommand) => {
-    describe(validCommand, () => {
-        const command = splitCommandIntoArray(validCommand)
-
-        test('is parsed and validated succesfully', () => {
-            const parsedCommand = LimitSchema.validate(parseLimit(command))
-
-            expect(parsedCommand.value).toHaveProperty('correctlyPositioned')
             expect(parsedCommand.value).toHaveProperty('keyword')
             expect(parsedCommand.value).toHaveProperty('field')
             expect(parsedCommand.value).toHaveProperty('offset')
@@ -54,17 +50,13 @@ describe.each([
 })
 
 describe.each([
-    'SELECT nimi, hinta FROM Tuotteet LIMIT column;',
-    "SELECT nimi, hinta FROM Tuotteet LIMIT '24';",
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2a+2;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 WHERE hinta=2;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 ORDER BY hinta;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 GROUP BY hinta;',
-    'SELECT nimi, hinta FROM Tuotteet OFFSET 2 LIMIT 2;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET column;',
-    "SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET '24';",
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET 2a*2;',
-])('Invalid query containing LIMIT or LIMIT OFFSET', (invalidCommand) => {
+    'LIMIT column',
+    "LIMIT '24'",
+    'LIMIT 2a+2',
+    'LIMIT 2 OFFSET column',
+    "LIMIT 2 OFFSET '24'",
+    'LIMIT 2 OFFSET 2a*2',
+])('Invalid LIMIT or LIMIT OFFSET part of a query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
 
