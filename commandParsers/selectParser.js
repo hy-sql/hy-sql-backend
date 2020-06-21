@@ -25,6 +25,7 @@ const { parseSelectFields } = require('./fieldParser')
 const { parseGroupBy } = require('./groupByParser')
 const { parseLimit } = require('./limitParser')
 const SQLError = require('../models/SQLError')
+const { checkLimitPosition } = require('./parserTools/checkCorrectPosition')
 
 /**
  * Parses and validates a SELECT command object from the given string array.
@@ -74,6 +75,7 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
     }
 
     if (queryContainsLimitKeyword(fullCommandAsStringArray)) {
+        checkLimitPosition(fullCommandAsStringArray)
         parsedCommand.limit = parseLimit(fullCommandAsStringArray)
         parsedCommand.indexOfLimit = fullCommandAsStringArray.findIndex(
             (s) => s.toUpperCase() === 'LIMIT'

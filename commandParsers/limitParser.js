@@ -1,5 +1,4 @@
 const { parseField } = require('./fieldParser')
-const { checkLimitPosition } = require('./parserTools/checkCorrectPosition')
 
 /**
  * Handles parsing of the LIMIT part of a command into an LIMIT object
@@ -8,8 +7,6 @@ const { checkLimitPosition } = require('./parserTools/checkCorrectPosition')
  */
 const parseLimit = (fullCommandAsStringArray) => {
     const limit = {}
-
-    limit.correctlyPositioned = checkLimitPosition(fullCommandAsStringArray)
 
     const indexOfLimit = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'LIMIT'

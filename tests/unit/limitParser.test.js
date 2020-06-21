@@ -21,7 +21,6 @@ describe.each([
         test('is parsed and validated succesfully', () => {
             const parsedCommand = LimitSchema.validate(parseLimit(command))
 
-            expect(parsedCommand.value).toHaveProperty('correctlyPositioned')
             expect(parsedCommand.value).toHaveProperty('keyword')
             expect(parsedCommand.value).toHaveProperty('field')
             expect(parsedCommand.value).not.toHaveProperty('offset')
@@ -42,7 +41,6 @@ describe.each([
         test('is parsed and validated succesfully', () => {
             const parsedCommand = LimitSchema.validate(parseLimit(command))
 
-            expect(parsedCommand.value).toHaveProperty('correctlyPositioned')
             expect(parsedCommand.value).toHaveProperty('keyword')
             expect(parsedCommand.value).toHaveProperty('field')
             expect(parsedCommand.value).toHaveProperty('offset')
@@ -57,10 +55,6 @@ describe.each([
     'SELECT nimi, hinta FROM Tuotteet LIMIT column;',
     "SELECT nimi, hinta FROM Tuotteet LIMIT '24';",
     'SELECT nimi, hinta FROM Tuotteet LIMIT 2a+2;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 WHERE hinta=2;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 ORDER BY hinta;',
-    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 GROUP BY hinta;',
-    'SELECT nimi, hinta FROM Tuotteet OFFSET 2 LIMIT 2;',
     'SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET column;',
     "SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET '24';",
     'SELECT nimi, hinta FROM Tuotteet LIMIT 2 OFFSET 2a*2;',
