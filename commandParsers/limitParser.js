@@ -3,18 +3,10 @@ const { parseField } = require('./fieldParser')
 /**
  * Handles parsing of the LIMIT part of a command into an LIMIT object
  * from the given string array.
- * @param {sting[]} fullCommandAsStringArray command as string array
+ * @param {sting[]} slicedCommandAsStringArray the LIMIT part of a command as string array
  */
-const parseLimit = (fullCommandAsStringArray) => {
+const parseLimit = (slicedCommandAsStringArray) => {
     const limit = {}
-
-    const indexOfLimit = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'LIMIT'
-    )
-    const slicedCommandAsStringArray = fullCommandAsStringArray.slice(
-        indexOfLimit,
-        fullCommandAsStringArray.length - 1
-    )
 
     limit.keyword = slicedCommandAsStringArray[0].toUpperCase()
 

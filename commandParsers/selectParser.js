@@ -75,11 +75,11 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
     }
 
     if (queryContainsLimitKeyword(fullCommandAsStringArray)) {
-        checkLimitPosition(fullCommandAsStringArray)
-        parsedCommand.limit = parseLimit(fullCommandAsStringArray)
-        parsedCommand.indexOfLimit = fullCommandAsStringArray.findIndex(
-            (s) => s.toUpperCase() === 'LIMIT'
+        const { limit, indexOfLimit } = handleLimitParsing(
+            fullCommandAsStringArray
         )
+        parsedCommand.limit = limit
+        parsedCommand.indexOfLimit = indexOfLimit
     } else if (
         fullCommandAsStringArray.some((s) => s.toUpperCase() === 'OFFSET')
     ) {
@@ -331,6 +331,29 @@ const parseSelectWhereGroupByOrderBy = (fullCommandAsStringArray) => {
     )
 
     return validatedCommand
+}
+
+/**
+ * Handles calling parseLimit with correct parameter and checks correct positioning
+ * of LIMIT and OFFSET.
+ * @param {object} parsedCommand parsed SELECT command object
+ * @param {string[]} fullCommandAsStringArray command as string array
+ */
+const handleLimitParsing = (fullCommandAsStringArray) => {
+    checkLimitPosition(fullCommandAsStringArray)
+
+    const indexOfLimit = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'LIMIT'
+    )
+
+    const limit = parseLimit(
+        fullCommandAsStringArray.slice(
+            indexOfLimit,
+            fullCommandAsStringArray.length - 1
+        )
+    )
+
+    return { limit, indexOfLimit }
 }
 
 module.exports = { parseCommand }
