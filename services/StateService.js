@@ -182,11 +182,15 @@ class StateService {
                 rowsToUpdate
             )
             let notChangedRows = _.difference(table.rows, rowsToUpdate)
-            notChangedRows.forEach((row) => newRows.push(row))
+            notChangedRows.forEach((row) => {
+                newRows = newRows.concat(row)
+            })
         }
 
         rowsToUpdate.forEach((row) => {
-            newRows.push(this.updateRow(row, command.columns, table.columns))
+            newRows = newRows.concat(
+                this.updateRow(row, command.columns, table.columns)
+            )
         })
 
         newRows = _.sortBy(newRows, 'id')

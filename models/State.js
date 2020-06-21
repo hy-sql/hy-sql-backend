@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 class State {
     /**
      * Constructor for state. Sets the given Map as value of tables.
@@ -28,7 +30,7 @@ class State {
      * @param {String} tableName name of the wanted table
      */
     getTableByName(tableName) {
-        return this._tables.get(tableName)
+        return _.cloneDeep(this._tables.get(tableName))
     }
 
     /**
@@ -46,7 +48,13 @@ class State {
      * @param {object} newRow the row object to be added
      */
     insertIntoTable(tableName, newRow) {
-        this._tables.get(tableName).rows.push(newRow)
+        const table = this.getTableByName(tableName)
+        const rows = table.rows
+
+        const newRows = rows.concat(newRow)
+        const newTable = { ...table, rows: newRows }
+
+        this._tables.set(newTable.name, newTable)
     }
 
     /**
@@ -55,7 +63,10 @@ class State {
      * @param {*} newRows
      */
     replaceRows(tableName, newRows) {
-        this._tables.get(tableName).rows = newRows
+        const table = this.getTableByName(tableName)
+        const newTable = { ...table, rows: newRows }
+
+        this._tables.set(newTable.name, newTable)
     }
 }
 

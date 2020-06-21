@@ -24,7 +24,7 @@ describe('createTable()', () => {
 
         const table = state.getTableByName(command.tableName)
         expect(table.name).toBe('Tuotteet')
-        expect(table.columns).toBe(command.columns)
+        expect(table.columns).toStrictEqual(command.columns)
     })
 
     test('returns error when table already exists', () => {
