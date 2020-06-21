@@ -1,9 +1,10 @@
+const SQLError = require('../../models/SQLError')
+
 /**
  * Checks whether the LIMIT keyword is correctly positioned in regards to other currently
  * existing keywords (so after WHERE, GROUP BY and ORDER BY). Also checks that the keyword
- * OFFSET is not found before keyword LIMIT.
+ * OFFSET is not found before keyword LIMIT. Throws an error if not correctly positioned.
  * @param {string[]} fullCommandAsStringArray command as string array
- * @returns {Boolean} true/false: LIMIT keyword is correctly positioned
  */
 const checkLimitPosition = (fullCommandAsStringArray) => {
     const indexOfLimit = fullCommandAsStringArray.findIndex(
@@ -13,12 +14,15 @@ const checkLimitPosition = (fullCommandAsStringArray) => {
     const indexOfOffset = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'OFFSET'
     )
-    if (indexOfOffset !== -1 && indexOfOffset < indexOfLimit) return false
+    let correctlyPositioned =
+        indexOfOffset !== -1 && indexOfOffset < indexOfLimit ? false : true
 
     const indexOfWhere = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'WHERE'
     )
-    if (indexOfLimit < indexOfWhere) return false
+    if (indexOfLimit < indexOfWhere) {
+        correctlyPositioned = false
+    }
 
     const indexOfGroup = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'GROUP'
@@ -28,7 +32,7 @@ const checkLimitPosition = (fullCommandAsStringArray) => {
         fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY' &&
         indexOfLimit < indexOfGroup
     ) {
-        return false
+        correctlyPositioned = false
     }
 
     const indexOfOrder = fullCommandAsStringArray.findIndex(
@@ -39,10 +43,14 @@ const checkLimitPosition = (fullCommandAsStringArray) => {
         fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() === 'BY' &&
         indexOfLimit < indexOfOrder
     ) {
-        return false
+        correctlyPositioned = false
     }
 
-    return true
+    if (!correctlyPositioned) {
+        throw new SQLError(
+            'OFFSET must always be after LIMIT and LIMIT can not be before WHERE, GROUP BY or ORDER BY'
+        )
+    }
 }
 
 module.exports = { checkLimitPosition }

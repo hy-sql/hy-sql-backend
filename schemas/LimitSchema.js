@@ -25,11 +25,6 @@ const OffsetSchema = Joi.object({
  * Joi schema for validating LIMIT objects.
  */
 const LimitSchema = Joi.object({
-    correctlyPositioned: Joi.boolean().valid(true).required().messages({
-        'any.only':
-            'OFFSET must always be after LIMIT and LIMIT can not be before WHERE, GROUP BY or ORDER BY',
-    }),
-
     keyword: Joi.string()
         .pattern(/^LIMIT$/i)
         .required(),
