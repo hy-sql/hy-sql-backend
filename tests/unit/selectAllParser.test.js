@@ -8,8 +8,8 @@ describe.each(['SELEC * FROM Taulu;', 'SELECT FROM Taulu;'])(
         describe(wrongCommand, () => {
             const command = splitCommandIntoArray(wrongCommand)
 
-            test('does not pass validation', () => {
-                expect(selectParser.parseCommand(command).error).toBeDefined()
+            test('fails validation after parsed to command object', () => {
+                expect(() => selectParser.parseCommand(command)).toThrowError()
             })
         })
     }
@@ -31,13 +31,11 @@ describe.each([
         test('is parsed and validated succesfully', () => {
             const parsedCommand = selectParser.parseCommand(command)
 
-            expect(parsedCommand.value).toBeDefined()
-            expect(parsedCommand.value).toHaveProperty('name')
-            expect(parsedCommand.value).toHaveProperty('from')
-            expect(parsedCommand.value).toHaveProperty('tableName')
-            expect(parsedCommand.value).toHaveProperty('finalSemicolon')
-
-            expect(parsedCommand.error).toBeUndefined()
+            expect(parsedCommand).toBeDefined()
+            expect(parsedCommand).toHaveProperty('name')
+            expect(parsedCommand).toHaveProperty('from')
+            expect(parsedCommand).toHaveProperty('tableName')
+            expect(parsedCommand).toHaveProperty('finalSemicolon')
         })
     })
 })
@@ -54,12 +52,8 @@ describe.each([
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
 
-        test('is recognised as a command', () => {
-            expect(commandService.parseCommand(command)).toBeTruthy()
-        })
-
         test('fails validation after parsed to command object', () => {
-            expect(selectParser.parseCommand(command).error).toBeDefined()
+            expect(() => selectParser.parseCommand(command)).toThrowError()
         })
     })
 })
@@ -84,9 +78,8 @@ describe.each([
         test('is parsed and validated succesfully', () => {
             const parsedCommand = selectParser.parseCommand(command)
 
-            expect(parsedCommand.value).toBeDefined()
-            expect(parsedCommand.value).toHaveProperty('where')
-            expect(parsedCommand.error).toBeUndefined()
+            expect(parsedCommand).toBeDefined()
+            expect(parsedCommand).toHaveProperty('where')
         })
     })
 })
@@ -104,16 +97,8 @@ describe.each([
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
 
-        test('is recognised as a command', () => {
-            expect(commandService.parseCommand(command)).toBeTruthy()
-        })
-
         test('fails validation after parsed to command object', () => {
-            const parsedCommand = selectParser.parseCommand(command)
-
-            expect(parsedCommand.value).toBeDefined()
-            expect(parsedCommand.value).toHaveProperty('where')
-            expect(parsedCommand.error).toBeDefined()
+            expect(() => selectParser.parseCommand(command)).toThrowError()
         })
     })
 })
@@ -135,9 +120,9 @@ describe.each([
             test('fails validation after parsed to command object', () => {
                 const parsedCommand = selectParser.parseCommand(command)
 
-                expect(parsedCommand.value).toBeDefined()
-                expect(parsedCommand.value).not.toHaveProperty('where')
-                expect(parsedCommand.error).toBeDefined()
+                expect(parsedCommand).toBeDefined()
+                expect(parsedCommand).not.toHaveProperty('where')
+                expect(parsedCommand).toThrow()
             })
         })
     }

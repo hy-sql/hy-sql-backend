@@ -11,6 +11,7 @@ const {
 } = require('./components/expressionTools')
 const { createFilter } = require('./components/filterTools')
 const groupByMultipleProps = require('../utils/groupByMultipleProps')
+const SQLError = require('../models/SQLError')
 
 class StateService {
     constructor(state) {
@@ -22,7 +23,7 @@ class StateService {
      * Returns:
      *   - if the update was successful either a result object of form { result: result } or
      *      { result: result, rows: [] } for SELECT commands
-     *   - id the commans is not executable successfully an error object of form { error: error }
+     *   - if the command is not executed successfully an error is thrown
      *     is returned
      * @param {object} command command object
      */
@@ -51,8 +52,7 @@ class StateService {
      * @param {object} command CREATE TABLE command object
      */
     createTable(command) {
-        let error = this.checkCreateTableErrors(command)
-        if (error) return { error: error }
+        this.checkCreateTableErrors(command)
 
         const newTable = {
             name: command.tableName,
@@ -73,8 +73,7 @@ class StateService {
      * @param {object} command INSERT INTO command object
      */
     insertIntoTable(command) {
-        const error = this.checkIfTableExists(command.tableName)
-        if (error) return { error: error }
+        this.checkIfTableExists(command.tableName)
 
         const table = this.findTable(command.tableName)
 
@@ -94,9 +93,9 @@ class StateService {
             const columnType = table.columns[columnIndex].type
 
             if (columnType !== value.type)
-                return {
-                    error: `Wrong datatype: expected ${columnType} but was ${value.type}`,
-                }
+                throw new SQLError(
+                    `Wrong datatype: expected ${columnType} but was ${value.type}`
+                )
 
             newRow[columnName] = value.value
         }
@@ -117,19 +116,15 @@ class StateService {
      * @param {object} command SELECT command object
      */
     selectFrom(command) {
-        const error = this.checkIfTableExists(command.tableName)
-        if (error) return { error: error }
+        this.checkIfTableExists(command.tableName)
 
         const table = this.findTable(command.tableName)
         const existingRows = table.rows
 
         let selectedRows = this.selectRows(command, existingRows)
 
-        if (selectedRows.error) return { error: selectedRows.error }
-
         if (command.limit) {
             selectedRows = this.limitRows(command.limit, selectedRows)
-            if (selectedRows.error) return { error: selectedRows.error }
         }
 
         let result
@@ -162,8 +157,7 @@ class StateService {
      * @param {object} command UPDATE command object
      */
     updateTable(command) {
-        let error = this.checkIfTableExists(command.tableName)
-        if (error) return { error: error }
+        this.checkIfTableExists(command.tableName)
 
         const table = this.findTable(command.tableName)
 
@@ -171,9 +165,10 @@ class StateService {
         command.columns.forEach((pair) => {
             const column = _.find(table.columns, { name: pair.columnName })
             if (column.type !== pair.valueType)
-                error = `Wrong datatype: expected ${column.type} but was ${pair.valueType}`
+                throw new SQLError(
+                    `Wrong datatype: expected ${column.type} but was ${pair.valueType}`
+                )
         })
-        if (error) return { error: error }
 
         let newRows = []
         let rowsToUpdate = table.rows
@@ -224,8 +219,7 @@ class StateService {
      * @param {object} command DELETE command object
      */
     deleteFromTable(command) {
-        const error = this.checkIfTableExists(command.tableName)
-        if (error) return { error: error }
+        this.checkIfTableExists(command.tableName)
 
         const table = this.findTable(command.tableName)
         let rows = table.rows
@@ -283,14 +277,13 @@ class StateService {
         if (limit >= 0) limitedRows = _.take(limitedRows, limit)
 
         if (limit < 0 || offset < 0) {
-            return { error: 'Value given to LIMIT or OFFSET is negative.' }
+            throw new SQLError('Value given to LIMIT or OFFSET is negative.')
         }
 
         if (limitedRows.length === 0) {
-            return {
-                error:
-                    'No rows left to return. Try changing value given to LIMIT or OFFSET.',
-            }
+            throw new SQLError(
+                'No rows left to return. Try changing value given to LIMIT or OFFSET.'
+            )
         }
 
         return limitedRows
@@ -336,12 +329,6 @@ class StateService {
 
         return orderedRows
     }
-
-    /**
-     * Handles creating result rows for SELECT command.
-     * @param {object} command SELECT command object
-     * @param {object[]} existingRows array of row objects
-     */
 
     /**
      * Handles filtering of the given rows according to the given conditions
@@ -407,6 +394,11 @@ class StateService {
         return filteredRows
     }
 
+    /**
+     * Handles creating result rows for selectRows().
+     * @param {object} command command of SELECT command
+     * @param {object[]} existingRows array of row objects
+     */
     createFunctionRows(command, existingRows) {
         const fields =
             command.fields[0].type === 'distinct'
@@ -418,31 +410,28 @@ class StateService {
                 if (fields[i].type === 'stringFunction') {
                     const functionResult = executeStringFunction(fields[i], row)
 
-                    functionResult.error
-                        ? (row.error = functionResult.error)
-                        : (row[fields[i].value] = functionResult)
-                } else if (fields[i].type === 'aggregateFunction') {
+                    row[fields[i].value] = functionResult
+                } else if (command.fields[i].type === 'aggregateFunction') {
                     const functionResult = this.createAggregateFunctionRow(
                         fields[i],
                         existingRows
                     )
 
-                    functionResult.error
-                        ? (row.error = functionResult.error)
-                        : (row[fields[i].value] =
-                              functionResult[fields[i].value])
+                    row[fields[i].value] = functionResult[fields[i].value]
                 }
             }
 
             return rowsToReturn
         }, existingRows)
 
-        const errorRows = createdRows.filter((r) => r.error)
-        if (errorRows.length > 0) return errorRows[0]
-
         return createdRows
     }
 
+    /**
+     * Goes through all possible select command options and returns selected fields
+     * @param {Object} command
+     * @param {Array} existingRows
+     */
     selectRows(command, existingRows) {
         const filteredRows = command.where
             ? this.filterRows(command.where.conditions, existingRows)
@@ -458,18 +447,12 @@ class StateService {
             command.fields[0].type === 'aggregateFunction' &&
             command.fields.length === 1
         ) {
-            const functionResult = this.createAggregateFunctionRow(
-                command.fields[0],
-                filteredRows
-            )
-            return functionResult.error
-                ? functionResult
-                : [
-                      this.createAggregateFunctionRow(
-                          command.fields[0],
-                          filteredRows
-                      ),
-                  ]
+            return [
+                this.createAggregateFunctionRow(
+                    command.fields[0],
+                    filteredRows
+                ),
+            ]
         }
 
         const fieldsToReturn =
@@ -495,9 +478,6 @@ class StateService {
             : initialGroupedRows.length > 1
             ? this.createFunctionRows(command, initialGroupedRows)
             : initialGroupedRows
-
-        if (rowsWithNewFieldsAndFunctions.error)
-            return rowsWithNewFieldsAndFunctions
 
         const orderedRows = command.orderBy
             ? this.orderRowsBy(
@@ -540,6 +520,11 @@ class StateService {
         )
     }
 
+    /**
+     * Groups rows for select command
+     * @param {Array} rows
+     * @param {Array} fields
+     */
     groupRowsBy(rows, fields) {
         return _.chain(rows)
             .flattenDepth(
@@ -555,7 +540,7 @@ class StateService {
     }
 
     /**
-     * Handles creating result rows for createRowsWithNewFields().
+     * Handles creating result rows for selectRows().
      * @param {object} command command of SELECT command
      * @param {object[]} existingRows array of row objects
      */
@@ -570,7 +555,9 @@ class StateService {
                 if (fields[i].type === 'column') {
                     const valueOfQueriedColumn = row[fields[i].value]
                     if (!valueOfQueriedColumn) {
-                        row.error = `no such column ${fields[i].value}`
+                        throw new SQLError(
+                            `no such column ${command.fields[i].value}`
+                        )
                     }
                 } else if (
                     fields[i].type === 'expression' &&
@@ -596,9 +583,6 @@ class StateService {
             return rowsToReturn
         }, existingRows)
 
-        const errorRows = createdRows.filter((r) => r.error)
-        if (errorRows.length > 0) return errorRows[0]
-
         return createdRows
     }
 
@@ -612,9 +596,8 @@ class StateService {
             functionField,
             existingRows
         )
-        return executedFunction.error
-            ? executedFunction
-            : { [functionField.value]: executedFunction }
+
+        return { [functionField.value]: executedFunction }
     }
 
     /**
@@ -624,26 +607,27 @@ class StateService {
      * @param {object} command CREATE TABLE command object
      */
     checkCreateTableErrors(command) {
-        if (this.state.tableExists(command.tableName)) {
-            return `Table ${command.tableName} already exists`
-        }
+        if (this.state.tableExists(command.tableName))
+            throw new SQLError(`Table ${command.tableName} already exists`)
 
         const nameArray = command.columns.map((e) => e.name)
 
         const duplicates = this.findDuplicates(nameArray)
 
         if (duplicates.length !== 0)
-            return duplicates.map((e) => `duplicate column ${e}: ${e}`)
+            throw new SQLError(
+                `duplicate column ${duplicates[0]}: ${duplicates[0]}`
+            )
     }
 
     /**
      * Checks whether a table by the given name already exists.
-     * Returns either an error message or nothing.
+     * Throws an error message or returns nothing.
      * @param {String} tableName name to be searched for
      */
     checkIfTableExists(tableName) {
         if (!this.state.tableExists(tableName))
-            return `No such table ${tableName}`
+            throw new SQLError(`No such table ${tableName}`)
     }
 
     /**

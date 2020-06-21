@@ -3,7 +3,7 @@ const app = express()
 const cors = require('cors')
 const morgan = require('morgan')
 
-const parser = require('./middleware/parser')
+const splitter = require('./middleware/splitter')
 const executer = require('./middleware/executer')
 
 morgan.token('body', function (req) {
@@ -18,7 +18,7 @@ app.use(
     )
 )
 
-app.use('/api/query', parser)
+app.use('/api/query', splitter)
 app.use('/api/query', executer)
 
 const unknownEndpoint = (req, res) => {

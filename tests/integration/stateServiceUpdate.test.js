@@ -2,6 +2,7 @@ const State = require('../../models/State')
 const StateService = require('../../services/StateService')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const SQLError = require('../../models/SQLError')
 
 describe.each([
     "UPDATE Tuotteet SET hinta=6, nimi='nauris';",
@@ -56,10 +57,9 @@ describe.each([
         )
 
         test('returns correct result message from stateService', () => {
-            const result = stateService.updateState(parsedCommand.value)
+            const result = stateService.updateState(parsedCommand)
 
             expect(result.result).toBe('Rows in table Tuotteet updated')
-            expect(result.error).not.toBeDefined()
         })
 
         test('updates the correct values from the row', () => {
@@ -90,10 +90,9 @@ describe.each([
         )
 
         test('returns error message from stateService', () => {
-            const result = stateService.updateState(parsedCommand.value)
-
-            expect(result.result).not.toBeDefined()
-            expect(result.error).toBe('No such table Tuotteet')
+            expect(() => stateService.updateState(parsedCommand)).toThrowError(
+                new SQLError('No such table Tuotteet')
+            )
         })
     })
 })
@@ -148,11 +147,12 @@ describe.each(['UPDATE Tuotteet SET nimi=6;'])(
             )
 
             test('returns error message from stateService', () => {
-                const result = stateService.updateState(parsedCommand.value)
-
-                expect(result.result).not.toBeDefined()
-                expect(result.error).toBe(
-                    'Wrong datatype: expected TEXT but was INTEGER'
+                expect(() =>
+                    stateService.updateState(parsedCommand)
+                ).toThrowError(
+                    new SQLError(
+                        'Wrong datatype: expected TEXT but was INTEGER'
+                    )
                 )
             })
         })

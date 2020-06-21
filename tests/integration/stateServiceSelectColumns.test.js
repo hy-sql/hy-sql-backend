@@ -2,6 +2,7 @@ const State = require('../../models/State')
 const StateService = require('../../services/StateService')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const SQLError = require('../../models/SQLError')
 
 describe('selectFromTable()', () => {
     test('returns error when table does not exist', () => {
@@ -13,8 +14,9 @@ describe('selectFromTable()', () => {
             tableName: 'products',
         }
 
-        const result = stateService.selectFrom(command)
-        expect(result.error).toBe('No such table products')
+        expect(() => stateService.selectFrom(command)).toThrowError(
+            new SQLError('No such table products')
+        )
     })
 
     test('returns column nimi for SELECT nimi FROM Tuotteet;', () => {
@@ -34,13 +36,13 @@ describe('selectFromTable()', () => {
             commandService.parseCommand(c)
         )
 
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
 
         const selectParser = 'SELECT nimi from Tuotteet;'
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectFrom(parsedCommand.value)
+        const result = stateService.selectFrom(parsedCommand)
         expect(result.rows.length).toBe(1)
         expect(result.rows[0]['nimi']).toBe('tuote')
     })
@@ -62,14 +64,15 @@ describe('selectFromTable()', () => {
             commandService.parseCommand(c)
         )
 
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
 
         const selectParser = 'SELECT invalid from Tuotteet;'
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.selectFrom(parsedCommand.value)
-        expect(result.rows).not.toBeDefined()
-        expect(result.error).toBe('no such column invalid')
+
+        expect(() => stateService.selectFrom(parsedCommand)).toThrowError(
+            new SQLError('no such column invalid')
+        )
     })
 })
 
@@ -94,7 +97,7 @@ describe('selectFrom() with command.where', () => {
             commandService.parseCommand(c)
         )
 
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
     })
 
     test('returns filtered rows when where is defined', () => {
@@ -102,7 +105,7 @@ describe('selectFrom() with command.where', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectFrom(parsedCommand.value)
+        const result = stateService.selectFrom(parsedCommand)
 
         expect(result.rows.length).toBe(1)
         expect(result.rows[0].nimi).toBe('tuote')
@@ -114,7 +117,7 @@ describe('selectFrom() with command.where', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectFrom(parsedCommand.value)
+        const result = stateService.selectFrom(parsedCommand)
 
         expect(result.rows.length).toBe(2)
         expect(result.rows[0].nimi).toBe('tuote')
@@ -126,7 +129,7 @@ describe('selectFrom() with command.where', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectFrom(parsedCommand.value)
+        const result = stateService.selectFrom(parsedCommand)
 
         expect(result.rows.length).toBe(1)
         expect(result.rows[0].nimi).toBe('testituote')
@@ -138,7 +141,7 @@ describe('selectFrom() with command.where', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectFrom(parsedCommand.value)
+        const result = stateService.selectFrom(parsedCommand)
 
         expect(result.rows.length).toBe(1)
         expect(result.rows[0].nimi).toBe('tuote')
@@ -150,7 +153,7 @@ describe('selectFrom() with command.where', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.selectFrom(parsedCommand.value)
+        const result = stateService.selectFrom(parsedCommand)
 
         expect(result.rows.length).toBe(1)
         expect(result.rows[0].nimi).toBe('tuote')
@@ -213,7 +216,7 @@ describe('selectFrom() with ORDER BY -command', () => {
             commandService.parseCommand(c)
         )
 
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
 
         const selectAllOrderByCommand =
             'SELECT nimi, hinta FROM Tuotteet ORDER BY hinta;'
@@ -226,9 +229,7 @@ describe('selectFrom() with ORDER BY -command', () => {
             splitSelectAllOrderByCommand
         )
 
-        const result = stateService.updateState(
-            parsedSelectAllOrderByCommand.value
-        )
+        const result = stateService.updateState(parsedSelectAllOrderByCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -289,7 +290,7 @@ describe('selectFrom() with ORDER BY DESC -command (numbers)', () => {
             commandService.parseCommand(c)
         )
 
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
 
         const selectAllOrderByCommand =
             'SELECT nimi, hinta FROM Tuotteet ORDER BY hinta DESC;'
@@ -302,9 +303,7 @@ describe('selectFrom() with ORDER BY DESC -command (numbers)', () => {
             splitSelectAllOrderByCommand
         )
 
-        const result = stateService.updateState(
-            parsedSelectAllOrderByCommand.value
-        )
+        const result = stateService.updateState(parsedSelectAllOrderByCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -365,7 +364,7 @@ describe('selectFrom() with ORDER BY ASC -command', () => {
             commandService.parseCommand(c)
         )
 
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
 
         const selectAllOrderByCommand =
             'SELECT nimi, hinta FROM Tuotteet ORDER BY nimi ASC;'
@@ -378,9 +377,7 @@ describe('selectFrom() with ORDER BY ASC -command', () => {
             splitSelectAllOrderByCommand
         )
 
-        const result = stateService.updateState(
-            parsedSelectAllOrderByCommand.value
-        )
+        const result = stateService.updateState(parsedSelectAllOrderByCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -441,7 +438,7 @@ describe('selectFrom() with ORDER BY DESC -command (text)', () => {
             commandService.parseCommand(c)
         )
 
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
 
         const selectAllOrderByCommand =
             'SELECT nimi, hinta FROM Tuotteet ORDER BY nimi DESC;'
@@ -454,9 +451,7 @@ describe('selectFrom() with ORDER BY DESC -command (text)', () => {
             splitSelectAllOrderByCommand
         )
 
-        const result = stateService.updateState(
-            parsedSelectAllOrderByCommand.value
-        )
+        const result = stateService.updateState(parsedSelectAllOrderByCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -491,7 +486,7 @@ describe('selectFrom() with command.where and command.orderBy', () => {
             commandService.parseCommand(c)
         )
 
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
     })
 
     test('returns filtered rows when where and orderBy is defined', () => {
@@ -525,7 +520,7 @@ describe('selectFrom() with command.where and command.orderBy', () => {
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -555,7 +550,7 @@ describe('selectFrom() with command.where and command.orderBy', () => {
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -595,7 +590,7 @@ describe('selectFrom() with command.where and command.orderBy', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -635,7 +630,7 @@ describe('selectFrom() with command.where and command.orderBy', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -659,7 +654,7 @@ describe('selectFrom() with command.where and command.orderBy', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 })
@@ -692,7 +687,7 @@ describe('selectFrom() with DISTINCT keyword', () => {
             commandService.parseCommand(c)
         )
 
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
     })
 
     test('and one column returns correct columns', () => {
@@ -714,7 +709,7 @@ describe('selectFrom() with DISTINCT keyword', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -750,7 +745,7 @@ describe('selectFrom() with DISTINCT keyword', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -768,7 +763,7 @@ describe('selectFrom() with DISTINCT keyword', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -787,7 +782,7 @@ describe('selectFrom() with DISTINCT keyword', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -797,8 +792,7 @@ describe('selectFrom() with DISTINCT keyword', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
-        expect(result.error).toBeDefined()
+        expect(() => stateService.updateState(parsedCommand)).toThrowError()
     })
 
     test('length()-function returns correct columns', () => {
@@ -818,7 +812,7 @@ describe('selectFrom() with DISTINCT keyword', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -845,7 +839,7 @@ describe('selectFrom() with DISTINCT keyword', () => {
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 })

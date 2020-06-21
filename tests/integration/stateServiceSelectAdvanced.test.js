@@ -2,6 +2,7 @@ const State = require('../../models/State')
 const StateService = require('../../services/StateService')
 const commandService = require('../../services/commandService')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const SQLError = require('../../models/SQLError')
 
 describe('selectFrom()', () => {
     let stateService
@@ -28,7 +29,7 @@ describe('selectFrom()', () => {
             commandService.parseCommand(c)
         )
 
-        parsedCommands.forEach((c) => stateService.updateState(c.value))
+        parsedCommands.forEach((c) => stateService.updateState(c))
     })
 
     test('returns rows asked by select arithmetic expression', () => {
@@ -62,7 +63,7 @@ describe('selectFrom()', () => {
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -97,7 +98,7 @@ describe('selectFrom()', () => {
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -139,7 +140,7 @@ describe('selectFrom()', () => {
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -181,7 +182,7 @@ describe('selectFrom()', () => {
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -231,7 +232,7 @@ describe('selectFrom()', () => {
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -248,7 +249,7 @@ describe('selectFrom()', () => {
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 
@@ -263,7 +264,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -297,7 +298,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -314,7 +315,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
@@ -348,81 +349,83 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
 
         expect(result.rows).toEqual(expectedRows)
     })
     */
 
     test('returns expected error for LENGTH-function in select', () => {
-        const selectParser = 'SELECT LENGTH(nonexistent) FROM Tuotteet;'
+        const selectCommand = 'SELECT LENGTH(nonexistent) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
-        expect(result.error).toBeDefined()
-        expect(result.error).toBe(
-            'Column name given to LENGTH as parameter does not match any existing column'
+
+        expect(() => stateService.updateState(parsedCommand)).toThrowError(
+            new SQLError(
+                'Column name given to LENGTH as parameter does not match any existing column'
+            )
         )
     })
 
     test('returns row asked by MAX-function in select', () => {
-        const selectParser = 'SELECT MAX(hinta) FROM Tuotteet;'
+        const selectCommand = 'SELECT MAX(hinta) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'MAX(hinta)': 8 }])
     })
 
     test('returns row asked by MAX-function in select', () => {
-        const selectParser = 'SELECT MAX(nimi) FROM Tuotteet;'
+        const selectCommand = 'SELECT MAX(nimi) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'MAX(nimi)': 'selleri' }])
     })
 
     test('returns expected error for MAX-function in select', () => {
-        const selectParser = 'SELECT MAX(nonexistent) FROM Tuotteet;'
+        const selectCommand = 'SELECT MAX(nonexistent) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
-        expect(result.error).toBeDefined()
-        expect(result.error).toBe(
-            'Parameter given to MAX does not match any existing column'
+
+        expect(() => stateService.updateState(parsedCommand)).toThrowError(
+            new SQLError(
+                'Parameter given to MAX does not match any existing column'
+            )
         )
     })
 
     test('returns row asked by MIN-function in select', () => {
-        const selectParser = 'SELECT MIN(hinta) FROM Tuotteet;'
+        const selectCommand = 'SELECT MIN(hinta) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'MIN(hinta)': 4 }])
     })
 
     test('returns row asked by MIN-function in select', () => {
-        const selectParser = 'SELECT MIN(nimi) FROM Tuotteet;'
+        const selectCommand = 'SELECT MIN(nimi) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'MIN(nimi)': 'lanttu' }])
     })
 
     test('returns expected error for MIN-function in select', () => {
-        const selectParser = 'SELECT MIN(nonexistent) FROM Tuotteet;'
+        const selectCommand = 'SELECT MIN(nonexistent) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
-        expect(result.error).toBeDefined()
-        expect(result.error).toBe(
-            'Parameter given to MIN does not match any existing column'
+        expect(() => stateService.updateState(parsedCommand)).toThrowError(
+            new SQLError(
+                'Parameter given to MIN does not match any existing column'
+            )
         )
     })
 
@@ -431,7 +434,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'SUM(hinta)': 40 }])
     })
 
@@ -440,7 +443,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'SUM(nimi)': 0 }])
     })
 
@@ -449,10 +452,10 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
-        expect(result.error).toBeDefined()
-        expect(result.error).toBe(
-            'Parameter given to SUM does not match any existing column'
+        expect(() => stateService.updateState(parsedCommand)).toThrowError(
+            new SQLError(
+                'Parameter given to SUM does not match any existing column'
+            )
         )
     })
 
@@ -461,7 +464,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'AVG(hinta)': 5.714285714285714 }])
     })
 
@@ -470,7 +473,7 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'AVG(nimi)': 0 }])
     })
 
@@ -479,10 +482,10 @@ describe('selectFrom()', () => {
 
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
-        const result = stateService.updateState(parsedCommand.value)
-        expect(result.error).toBeDefined()
-        expect(result.error).toBe(
-            'Parameter given to AVG does not match any existing column'
+        expect(() => stateService.updateState(parsedCommand)).toThrowError(
+            new SQLError(
+                'Parameter given to AVG does not match any existing column'
+            )
         )
     })
 
@@ -539,7 +542,7 @@ describe('selectFrom()', () => {
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
-        const result = stateService.updateState(parsedCommand.value)
+        const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
 })

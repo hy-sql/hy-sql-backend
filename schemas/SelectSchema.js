@@ -12,7 +12,7 @@ const {
 const { ExpressionSchema } = require('./ExpressionSchema')
 const DistinctSchema = require('./DistinctSchema')
 const FunctionSchema = require('./FunctionSchema')
-const LimitSchema = require('./LimitSchema')
+const { LimitSchema } = require('./LimitSchema')
 
 /**
  * Joi schema for validating SELECT commands not containing WHERE or ORDER BY.

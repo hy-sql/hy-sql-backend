@@ -3,7 +3,6 @@ const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCom
 
 describe.each([
     'SELEC * FROM Taulu;',
-    'SELECT a FROM Taulu BY;',
     'SELECT FROM Taulu ORDER;',
     'SELECT FROM Taulu BY ORDER;',
 ])('SELECT * query not containing ORDER BY', (wrongCommand) => {
@@ -11,8 +10,7 @@ describe.each([
         const command = splitCommandIntoArray(wrongCommand)
 
         test('does not contain orderBy field', () => {
-            expect(parseCommand(command).value).toBeDefined()
-            expect(parseCommand(command).value.orderBy).not.toBeDefined()
+            expect(() => parseCommand(command)).toThrowError()
         })
     })
 })
@@ -35,14 +33,12 @@ describe.each([
         test('is parsed and validated succesfully', () => {
             const parsedCommand = parseCommand(command)
 
-            expect(parsedCommand.value).toBeDefined()
-            expect(parsedCommand.value).toHaveProperty('name')
-            expect(parsedCommand.value).toHaveProperty('from')
-            expect(parsedCommand.value).toHaveProperty('tableName')
-            expect(parsedCommand.value).toHaveProperty('finalSemicolon')
-            expect(parsedCommand.value).toHaveProperty('orderBy')
-
-            expect(parseCommand(command).error).toBeUndefined()
+            expect(parsedCommand).toBeDefined()
+            expect(parsedCommand).toHaveProperty('name')
+            expect(parsedCommand).toHaveProperty('from')
+            expect(parsedCommand).toHaveProperty('tableName')
+            expect(parsedCommand).toHaveProperty('finalSemicolon')
+            expect(parsedCommand).toHaveProperty('orderBy')
         })
     })
 })
@@ -60,14 +56,8 @@ describe.each([
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
 
-        const parsedCommand = parseCommand(command)
-
-        test('is recognised as a command', () => {
-            expect(parsedCommand).toBeTruthy()
-        })
-
         test('fails validation after parsed to command object', () => {
-            expect(parsedCommand.error).toBeDefined()
+            expect(() => parseCommand(command)).toThrowError()
         })
     })
 })

@@ -1,3 +1,4 @@
+const Joi = require('@hapi/joi')
 const { CreateTableSchema } = require('../schemas/CreateTableSchema')
 const { constraintsNamePatternForSplit } = require('../helpers/regex')
 
@@ -26,7 +27,7 @@ const parseCommand = (fullCommandAsStringArray) => {
                 : undefined,
     }
 
-    return CreateTableSchema.validate(parsedCommand)
+    return Joi.attempt(parsedCommand, CreateTableSchema)
 }
 
 /**

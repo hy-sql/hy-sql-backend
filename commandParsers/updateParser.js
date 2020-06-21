@@ -1,3 +1,4 @@
+const Joi = require('@hapi/joi')
 const {
     UpdateSchema,
     UpdateColumnsWhereSchema,
@@ -64,7 +65,9 @@ const parseUpdateWithoutWhere = (fullCommandAsStringList) => {
 
     updateCommand.columns = parseUpdatedColumns(columnsAndValuesAsStringList)
 
-    return UpdateSchema.validate(updateCommand)
+    const validatedCommand = Joi.attempt(updateCommand, UpdateSchema)
+
+    return validatedCommand
 }
 
 /**
@@ -93,7 +96,12 @@ const parseUpdateWithWhere = (fullCommandAsStringList) => {
 
     updateCommand.where = parseWhere(wherePartAsArray)
 
-    return UpdateColumnsWhereSchema.validate(updateCommand)
+    const validatedCommand = Joi.attempt(
+        updateCommand,
+        UpdateColumnsWhereSchema
+    )
+
+    return validatedCommand
 }
 
 /**
