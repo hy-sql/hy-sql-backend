@@ -22,11 +22,6 @@ const modifiedArithmeticOperator = new RegExp('^(\\+|-|\\/|\\*\\*|\\%)$')
 
 const containsArithmeticOperatorPattern = new RegExp('([\\+|\\-|*|/|%])', 'g')
 
-// Have to think more about this one
-const arithmeticExpressionPattern = new RegExp(
-    '^(?!\\+|-|\\/|\\*\\*|\\%)\\w+(([+|\\-|*|/|%])\\w+)+(?!\\+|-|\\/|\\*\\*|\\%)$'
-)
-
 const comparisonOperators = ['>=', '<=', '<>', '=', '>', '<']
 
 const comparisonOperatorPattern = RegExp('(>=|<=|<>|=|>|<)')
@@ -109,6 +104,18 @@ const containsFunctionPatternWithWhiteSpaces = new RegExp(
         '|'
     )})\\s*\\(\\s*('?\\w+'?|\\*)\\s*\\))`,
     'gi'
+)
+
+const arithmeticExpressionPattern = new RegExp(
+    `^(?!\\+|-|\\/|\\*\\*|\\%)(\\w+|(${stringFunctions.join(
+        '|'
+    )}|${aggregateFunctions.join(
+        '|'
+    )})\\(('?\\w+'?|\\*)\\))(([+|\\-|*|/|%])(\\w+|(${stringFunctions.join(
+        '|'
+    )}|${aggregateFunctions.join(
+        '|'
+    )})\\(('?\\w+'?|\\*)\\)))+(?!\\+|-|\\/|\\*\\*|\\%)$`
 )
 
 const textInputPattern = new RegExp("^'.+'$")
