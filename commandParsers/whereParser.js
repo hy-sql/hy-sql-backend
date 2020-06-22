@@ -1,4 +1,5 @@
 const { parseConditions } = require('./fieldParser')
+const SQLError = require('../models/SQLError')
 
 /**
  * Parses the WHERE part of a command into a WHERE object from the given string array.
@@ -19,6 +20,13 @@ const parseWhere = (slicedCommandAsStringArray) => {
                     : slicedCommandAsStringArray.length
             )
         ),
+    }
+
+    if (
+        parsedWherePart.conditions.AND.length === 0 &&
+        parsedWherePart.conditions.OR.length === 0
+    ) {
+        throw new SQLError('WHERE clause must contain at least one condition')
     }
 
     return parsedWherePart

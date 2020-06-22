@@ -1,6 +1,6 @@
 /*eslint-disable no-unused-vars*/
-const selectParser = require('../../commandParsers/selectParser')
-const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const selectParser = require('../../../commandParsers/selectParser')
+const splitCommandIntoArray = require('../../../commandParsers/parserTools/splitCommandIntoArray')
 
 /**
  * SELECT ... WHERE ... with aritmetic expression

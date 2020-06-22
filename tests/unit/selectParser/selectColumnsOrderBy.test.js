@@ -1,6 +1,6 @@
-const selectParser = require('../../commandParsers/selectParser')
-const commandService = require('../../services/commandService')
-const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const selectParser = require('../../../commandParsers/selectParser')
+const commandService = require('../../../services/commandService')
+const splitCommandIntoArray = require('../../../commandParsers/parserTools/splitCommandIntoArray')
 
 describe.each([
     "SELECT id, nimi, hinta FROM Tuotteet WHERE this='that';",
