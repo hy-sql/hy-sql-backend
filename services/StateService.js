@@ -437,6 +437,10 @@ class StateService {
             ? this.filterRows(command.where.conditions, existingRows)
             : existingRows
 
+        const havingRows = command.having
+            ? this.filterRows(command.having.conditions, filteredRows)
+            : filteredRows
+
         if (command.fields[0].type === 'all') {
             return command.orderBy
                 ? this.orderRowsBy(command.orderBy.fields, filteredRows)
@@ -462,7 +466,7 @@ class StateService {
 
         const rowsWithNewFields = this.createRowsWithNewFields(
             command,
-            filteredRows
+            havingRows
         )
 
         const initialGroupedRows = command.groupBy

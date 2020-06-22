@@ -27,7 +27,7 @@ Content-Type: application/json
             "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
             "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 5);",
             "INSERT INTO Tuotteet (nimi, hinta) VALUES ('plop', 8);",
-            "SELECT id nimi, hinta FROM Tuotteet;"
+            "SELECT LENGTH(nimi), hinta FROM Tuotteet GROUP BY LENGTH(nimi) HAVING LENGTH(nimi)>4;"
         ]
 }
 
