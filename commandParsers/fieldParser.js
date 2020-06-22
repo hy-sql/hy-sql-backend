@@ -3,9 +3,7 @@ const {
     aggregateFunctionPattern,
     aggregateFunctionsNamePattern,
     arithmeticExpressionPattern,
-    containsArithmeticOperatorPattern,
     comparisonOperatorPattern,
-    containsFunctionPattern,
     modifiedArithmeticOperator,
     sortOrderKeywordPattern,
     distinctKeywordPattern,
@@ -18,6 +16,7 @@ const {
     transformSplitConditionsIntoConditionsArray,
     transformOrderByInputArrayIntoOrderByFieldsArray,
 } = require('./parserTools/arrayTransformationTools')
+const splitExpressionIntoArray = require('./parserTools/splitExpressionIntoArray')
 
 /**
  * Handles parsing of conditions from the given array.
@@ -83,21 +82,11 @@ const parseConditions = (slicedCommandArray) => {
 
 /**
  * Handles parsing of an expression from the given string.
+ * Switches multiply sign from * to ** because of conflict with all * sign (e.g. select *)
  * @param {String} expression expression as string
  */
 const parseExpression = (expression) => {
-    const splitExpression = _.flatten(
-        expression
-            .replace(containsFunctionPattern, ' $1 ')
-            .split(' ')
-            .filter(Boolean)
-            .map((e) =>
-                containsFunctionPattern.test(e)
-                    ? e
-                    : e.split(containsArithmeticOperatorPattern).filter(Boolean)
-            )
-            .filter(Boolean)
-    )
+    const splitExpression = splitExpressionIntoArray(expression)
 
     return splitExpression.map((e) =>
         e === '*' ? parseField('**') : parseField(e)
