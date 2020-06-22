@@ -1,7 +1,29 @@
 const {
+    fieldsSplitByCommaPattern,
     containsFunctionPatternWithWhiteSpaces,
     comparisonOperatorPatternWithWhiteSpace,
+    arithmeticOperatorPatternWithWhiteSpace,
 } = require('../../helpers/regex')
+const SQLError = require('../../models/SQLError')
+
+const transformSelectInputArrayIntoFieldsArray = (selectInputArray) => {
+    const selectFieldsAsString = selectInputArray
+        .join(' ')
+        .replace(containsFunctionPatternWithWhiteSpaces, (m) =>
+            m.replace(/\s+/g, '')
+        )
+        .replace(arithmeticOperatorPatternWithWhiteSpace, (m) =>
+            m.replace(/\s+/g, '')
+        )
+        .replace(/\s+,/g, (m) => m.replace(/\s+/g, ''))
+        .trim()
+
+    if (!fieldsSplitByCommaPattern.test(selectFieldsAsString)) {
+        throw new SQLError('fields must be split by comma (,)')
+    }
+
+    return selectFieldsAsString.split(', ').filter(Boolean)
+}
 
 /**
  * Transforms conditions part of command split by splitCommandIntoArray into array of individual conditions
@@ -18,10 +40,8 @@ const {
  * const output = transformSplitConditionsIntoConditionsArray(slicedConditionsPartOfCommand)
  * output is [ 'LENGTH(nimi)=5', 'OR', '(', 'LENGTH(nimi)<7', 'AND', 'hinta=4', ')' ]
  */
-const transformSplitConditionsIntoConditionsArray = (
-    slicedConditionsPartOfCommand
-) => {
-    const conditionsArray = slicedConditionsPartOfCommand
+const transformSplitConditionsIntoConditionsArray = (conditionsInputArray) => {
+    const conditionsArray = conditionsInputArray
         .join(' ')
         .replace(containsFunctionPatternWithWhiteSpaces, (m) =>
             m.replace(/\s+/g, '')
@@ -62,6 +82,7 @@ const transformOrderByInputArrayIntoOrderByFieldsArray = (
 }
 
 module.exports = {
+    transformSelectInputArrayIntoFieldsArray,
     transformSplitConditionsIntoConditionsArray,
     transformOrderByInputArrayIntoOrderByFieldsArray,
 }

@@ -127,7 +127,6 @@ describe.each([
         test('contains "fields" field', () => {
             expect(selectParser.parseCommand(command)).toBeDefined()
             expect(selectParser.parseCommand(command).fields).toBeDefined()
-            expect(selectParser.parseCommand(command).error).not.toBeDefined()
         })
 
         test('"fields" contains correct type', () => {
@@ -144,11 +143,10 @@ describe.each(['SELECT DISTIN nimi, hinta FROM Tuotteet;'])(
         describe(`Invalid command ${invalidCommand}`, () => {
             const command = splitCommandIntoArray(invalidCommand)
 
-            test('contains "fields" but field type is not "distinct"', () => {
-                const parsed = selectParser.parseCommand(command)
-                expect(parsed.fields).toBeDefined()
-                expect(parsed.fields[0].type).not.toBe('distinct')
-                // expect(selectParser.parseCommand(command).error).toBeDefined()
+            test('throws error because fields are not separated by comma', () => {
+                expect(() => selectParser.parseCommand(command)).toThrowError(
+                    new SQLError('fields must be split by comma (,)')
+                )
             })
         })
     }
