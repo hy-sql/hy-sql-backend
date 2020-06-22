@@ -479,9 +479,7 @@ class StateService {
                       this.createFunctionRows(command, rowGroup)
                   )
               )
-            : initialGroupedRows.length > 1
-            ? this.createFunctionRows(command, initialGroupedRows)
-            : initialGroupedRows
+            : this.createFunctionRows(command, initialGroupedRows)
 
         const orderedRows = command.orderBy
             ? this.orderRowsBy(
