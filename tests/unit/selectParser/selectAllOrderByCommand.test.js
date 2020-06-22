@@ -1,5 +1,5 @@
-const { parseCommand } = require('../../commandParsers/selectParser')
-const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const { parseCommand } = require('../../../commandParsers/selectParser')
+const splitCommandIntoArray = require('../../../commandParsers/parserTools/splitCommandIntoArray')
 
 describe.each([
     'SELEC * FROM Taulu;',
