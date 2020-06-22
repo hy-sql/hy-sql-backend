@@ -26,6 +26,11 @@ const comparisonOperators = ['>=', '<=', '<>', '=', '>', '<']
 
 const comparisonOperatorPattern = RegExp('(>=|<=|<>|=|>|<)')
 
+const arithmeticOperatorPatternWithWhiteSpace = RegExp(
+    '\\s*([\\+|\\-|*|/|%])\\s*',
+    'g'
+)
+
 const comparisonOperatorPatternWithWhiteSpace = RegExp(
     '\\s*(>=|<=|<>|=|>|<)\\s*',
     'g'
@@ -118,11 +123,26 @@ const arithmeticExpressionPattern = new RegExp(
     )})\\(('?\\w+'?|\\*)\\)))+(?!\\+|-|\\/|\\*\\*|\\%)$`
 )
 
+const containsArithmeticExpressionPattern = new RegExp(
+    `(?!\\+|-|\\/|\\*\\*|\\%)(\\w+|(${stringFunctions.join(
+        '|'
+    )}|${aggregateFunctions.join(
+        '|'
+    )})\\(('?\\w+'?|\\*)\\))(([+|\\-|*|/|%])(\\w+|(${stringFunctions.join(
+        '|'
+    )}|${aggregateFunctions.join(
+        '|'
+    )})\\(('?\\w+'?|\\*)\\)))+(?!\\+|-|\\/|\\*\\*|\\%)`,
+    'gi'
+)
+
 const textInputPattern = new RegExp("^'.+'$")
 
 const sortOrderKeywordPattern = new RegExp('^(ASC|DESC)$', 'i')
 
 const distinctKeywordPattern = new RegExp('^[Dd][Ii][Ss][Tt][Ii][Nn][Cc][Tt]$')
+
+const fieldsSplitByCommaPattern = new RegExp('^\\*$|(^(\\S+,\\s)*\\S+$)', 'i')
 
 /**
  * Regular expressions for use in the application.
@@ -153,4 +173,7 @@ module.exports = {
     comparisonOperatorPatternWithWhiteSpace,
     conditionPattern,
     containsFunctionPatternWithWhiteSpaces,
+    fieldsSplitByCommaPattern,
+    containsArithmeticExpressionPattern,
+    arithmeticOperatorPatternWithWhiteSpace,
 }
