@@ -1,7 +1,7 @@
-const selectParser = require('../../commandParsers/selectParser')
-const commandService = require('../../services/commandService')
-const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
-const SQLError = require('../../models/SQLError')
+const selectParser = require('../../../commandParsers/selectParser')
+const commandService = require('../../../services/commandService')
+const splitCommandIntoArray = require('../../../commandParsers/parserTools/splitCommandIntoArray')
+const SQLError = require('../../../models/SQLError')
 
 describe.each([
     'SELECT id,nimi,hinta FROM Tuotteet;',
