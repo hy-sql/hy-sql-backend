@@ -1,3 +1,5 @@
+const { checkLimitPosition } = require('../parserTools/checkCorrectPosition')
+
 /**
  * Checks whether a command contains the keyword WHERE. Check is
  * case-insensitive. Returns true or false.
@@ -153,7 +155,13 @@ const queryContainsWhereGroupByOrderByKeywords = (fullCommandAsStringArray) => {
  * @returns {Boolean} LIMIT was found true/false
  */
 const queryContainsLimitKeyword = (fullCommandAsStringArray) => {
-    return fullCommandAsStringArray.some((s) => s.toUpperCase() === 'LIMIT')
+    const indexOfLimit = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'LIMIT'
+    )
+
+    if (indexOfLimit !== -1) checkLimitPosition(fullCommandAsStringArray)
+
+    return indexOfLimit !== -1
 }
 
 module.exports = {

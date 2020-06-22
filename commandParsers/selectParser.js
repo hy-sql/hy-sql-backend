@@ -25,7 +25,6 @@ const { parseSelectFields } = require('./fieldParser')
 const { parseGroupBy } = require('./groupByParser')
 const { parseLimit } = require('./limitParser')
 const SQLError = require('../models/SQLError')
-const { checkLimitPosition } = require('./parserTools/checkCorrectPosition')
 
 /**
  * Parses and validates a SELECT command object from the given string array.
@@ -75,11 +74,15 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
     }
 
     if (queryContainsLimitKeyword(fullCommandAsStringArray)) {
-        const { limit, indexOfLimit } = handleLimitParsing(
-            fullCommandAsStringArray
+        parsedCommand.indexOfLimit = fullCommandAsStringArray.findIndex(
+            (s) => s.toUpperCase() === 'LIMIT'
         )
-        parsedCommand.limit = limit
-        parsedCommand.indexOfLimit = indexOfLimit
+        parsedCommand.limit = parseLimit(
+            fullCommandAsStringArray.slice(
+                parsedCommand.indexOfLimit,
+                fullCommandAsStringArray.length - 1
+            )
+        )
     } else if (
         fullCommandAsStringArray.some((s) => s.toUpperCase() === 'OFFSET')
     ) {
@@ -331,29 +334,6 @@ const parseSelectWhereGroupByOrderBy = (fullCommandAsStringArray) => {
     )
 
     return validatedCommand
-}
-
-/**
- * Handles calling parseLimit with correct parameter and checks correct positioning
- * of LIMIT and OFFSET.
- * @param {object} parsedCommand parsed SELECT command object
- * @param {string[]} fullCommandAsStringArray command as string array
- */
-const handleLimitParsing = (fullCommandAsStringArray) => {
-    checkLimitPosition(fullCommandAsStringArray)
-
-    const indexOfLimit = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'LIMIT'
-    )
-
-    const limit = parseLimit(
-        fullCommandAsStringArray.slice(
-            indexOfLimit,
-            fullCommandAsStringArray.length - 1
-        )
-    )
-
-    return { limit, indexOfLimit }
 }
 
 module.exports = { parseCommand }
