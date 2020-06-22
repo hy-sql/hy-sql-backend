@@ -43,7 +43,7 @@ const parseConditions = (slicedCommandArray) => {
                     i
                 )
 
-                conditions[AndOrSwitch].push(
+                conditions[AndOrSwitch] = conditions[AndOrSwitch].concat(
                     parseConditions(
                         conditionArray.slice(i + 1, indexOfClosingBracket)
                     )
@@ -70,9 +70,13 @@ const parseConditions = (slicedCommandArray) => {
                         operator: splitExpression[1],
                         right: parseField(splitExpression[2]),
                     }
-                    conditions[AndOrSwitch].push(condition)
+                    conditions[AndOrSwitch] = conditions[AndOrSwitch].concat(
+                        condition
+                    )
                 } else {
-                    conditions[AndOrSwitch].push(conditionArray[i])
+                    conditions[AndOrSwitch] = conditions[AndOrSwitch].concat(
+                        conditionArray[i]
+                    )
                 }
             }
         }

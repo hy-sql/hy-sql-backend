@@ -83,7 +83,7 @@ const parseCommand = (fullCommandAsStringArray) => {
                     throw new SQLError('Too many closing brackets in values')
                 }
             default:
-                block.push(fullCommandAsStringArray[index])
+                block = block.concat(fullCommandAsStringArray[index])
         }
     }
     if (block.length !== 0) {
