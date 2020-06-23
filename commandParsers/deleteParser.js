@@ -24,7 +24,7 @@ const parseCommand = (fullCommandAsStringArray) => {
  * @param {string[]} fullCommandAsStringArray command as string array
  */
 const parseBaseCommand = (fullCommandAsStringArray) => {
-    return {
+    const parsedBaseCommand = {
         name: fullCommandAsStringArray[0],
         from: fullCommandAsStringArray[1],
         tableName: fullCommandAsStringArray[2],
@@ -34,6 +34,8 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
                 ? ';'
                 : undefined,
     }
+
+    return parsedBaseCommand
 }
 
 /**
@@ -44,7 +46,7 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
 const parseDelete = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
 
-    let validatedCommand = Joi.attempt(parsedCommand, DeleteSchema)
+    const validatedCommand = Joi.attempt(parsedCommand, DeleteSchema)
 
     checkForAdditionalAtEnd(fullCommandAsStringArray, 4)
 
@@ -74,7 +76,7 @@ const parseDeleteWhere = (fullCommandAsStringArray) => {
         throw new SQLError('WHERE should be directly after the table name')
     }
 
-    let validatedCommand = Joi.attempt(parsedCommand, DeleteWhereSchema)
+    const validatedCommand = Joi.attempt(parsedCommand, DeleteWhereSchema)
 
     return validatedCommand
 }
