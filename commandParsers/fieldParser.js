@@ -3,9 +3,7 @@ const {
     aggregateFunctionPattern,
     aggregateFunctionsNamePattern,
     arithmeticExpressionPattern,
-    containsArithmeticOperatorPattern,
     comparisonOperatorPattern,
-    containsFunctionPattern,
     modifiedArithmeticOperator,
     sortOrderKeywordPattern,
     distinctKeywordPattern,
@@ -15,9 +13,11 @@ const {
 } = require('../helpers/regex')
 const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBracket')
 const {
+    transformSelectInputArrayIntoFieldsArray,
     transformSplitConditionsIntoConditionsArray,
     transformOrderByInputArrayIntoOrderByFieldsArray,
 } = require('./parserTools/arrayTransformationTools')
+const splitExpressionIntoArray = require('./parserTools/splitExpressionIntoArray')
 
 /**
  * Handles parsing of conditions from the given array.
@@ -43,7 +43,7 @@ const parseConditions = (slicedCommandArray) => {
                     i
                 )
 
-                conditions[AndOrSwitch].push(
+                conditions[AndOrSwitch] = conditions[AndOrSwitch].concat(
                     parseConditions(
                         conditionArray.slice(i + 1, indexOfClosingBracket)
                     )
@@ -70,9 +70,13 @@ const parseConditions = (slicedCommandArray) => {
                         operator: splitExpression[1],
                         right: parseField(splitExpression[2]),
                     }
-                    conditions[AndOrSwitch].push(condition)
+                    conditions[AndOrSwitch] = conditions[AndOrSwitch].concat(
+                        condition
+                    )
                 } else {
-                    conditions[AndOrSwitch].push(conditionArray[i])
+                    conditions[AndOrSwitch] = conditions[AndOrSwitch].concat(
+                        conditionArray[i]
+                    )
                 }
             }
         }
@@ -83,21 +87,11 @@ const parseConditions = (slicedCommandArray) => {
 
 /**
  * Handles parsing of an expression from the given string.
+ * Switches multiply sign from * to ** because of conflict with all * sign (e.g. select *)
  * @param {String} expression expression as string
  */
 const parseExpression = (expression) => {
-    const splitExpression = _.flatten(
-        expression
-            .replace(containsFunctionPattern, ' $1 ')
-            .split(' ')
-            .filter(Boolean)
-            .map((e) =>
-                containsFunctionPattern.test(e)
-                    ? e
-                    : e.split(containsArithmeticOperatorPattern).filter(Boolean)
-            )
-            .filter(Boolean)
-    )
+    const splitExpression = splitExpressionIntoArray(expression)
 
     return splitExpression.map((e) =>
         e === '*' ? parseField('**') : parseField(e)
@@ -108,20 +102,20 @@ const parseExpression = (expression) => {
  * Handles parsing of fields in SELECT.
  * @param {string[]} fieldArray array containing the field information
  */
-const parseSelectFields = (fieldArray) => {
-    if (distinctKeywordPattern.test(fieldArray[0])) {
-        return parseParametersFromDistinct(fieldArray.slice(1))
+const parseSelectFields = (selectInputArray) => {
+    if (distinctKeywordPattern.test(selectInputArray[0])) {
+        return parseParametersFromDistinct(selectInputArray.slice(1))
     }
 
-    const selectFields = fieldArray
-        .join('')
-        .split(',')
-        .filter(Boolean)
-        .map((f) => {
-            return parseField(f)
-        })
+    const fieldsArray = transformSelectInputArrayIntoFieldsArray(
+        selectInputArray
+    )
 
-    return selectFields
+    const parsedFields = fieldsArray.map((f) => {
+        return parseField(f)
+    })
+
+    return parsedFields
 }
 
 /**
@@ -129,11 +123,11 @@ const parseSelectFields = (fieldArray) => {
  * { type: 'distinct', value: [ { type: 'column', value: ... }, { type: 'column', value: ... } ] }
  * @param {*} fieldArray array without DISTINCT keyword, containing only columns separated with comma (,)
  */
-const parseParametersFromDistinct = (fieldArray) => {
+const parseParametersFromDistinct = (selectInputArray) => {
     return [
         {
             type: 'distinct',
-            value: parseSelectFields(fieldArray),
+            value: parseSelectFields(selectInputArray),
         },
     ]
 }

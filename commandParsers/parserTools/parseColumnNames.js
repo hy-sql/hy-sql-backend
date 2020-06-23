@@ -11,7 +11,7 @@ const { namify, cleanStringArray } = require('./smallTools')
 const parseColumnNames = (stringArray, parserCounter) => {
     let laskuri = parserCounter
     let columnsOpenBrackets = 0
-    const columns = []
+    let columns = []
     loop1: for (; laskuri < stringArray.length; laskuri++) {
         const element = stringArray[laskuri]
         switch (element.toUpperCase()) {
@@ -41,7 +41,7 @@ const parseColumnNames = (stringArray, parserCounter) => {
                 break loop1
             default:
                 if (columnsOpenBrackets > 0) continue loop1
-                columns.push(element)
+                columns = columns.concat(element)
         }
     }
 
