@@ -1,7 +1,7 @@
 const Joi = require('@hapi/joi')
 const {
     allFunctionsNamePattern,
-    arithmeticOperator,
+    arithmeticOperatorPattern,
     sortOrderKeywordPattern,
 } = require('../helpers/regex')
 
@@ -51,7 +51,7 @@ const IntegerSchema = Joi.object({
  */
 const ArithmeticOperatorSchema = Joi.object({
     type: Joi.string().valid('operator').required(),
-    value: Joi.string().pattern(arithmeticOperator).required(),
+    value: Joi.string().pattern(arithmeticOperatorPattern).required(),
 })
 
 /**

@@ -1,10 +1,27 @@
 const {
+    containsAggregateFunctionPattern,
+    containsArithmeticExpressionPattern,
     containsArithmeticOperatorPattern,
-    comparisonOperatorPattern,
+    containsArithmeticOperatorWithWhiteSpacePattern,
+    containsComparisonOperatorPattern,
+    containsComparisonOperatorWithWhiteSpacePattern,
+    containsFunctionPattern,
+    containsFunctionWithWhiteSpacesPattern,
+    containsStringFunctionPattern,
     logicalOperatorsNamePattern,
-    stringFunctionsNamePattern,
-    aggregateFunctionsNamePattern,
 } = require('../helpers/regex')
+
+/**
+ * Tests whether a string contains an aggregate function.
+ * @param {String} input string to test
+ */
+const containsAggregateFunction = (input) => {
+    return containsAggregateFunctionPattern.test(input)
+}
+
+const containsArithmeticExpression = (input) => {
+    return containsArithmeticExpressionPattern.test(input)
+}
 
 /**
  * Tests whether a string contains an arithmetic operator.
@@ -14,63 +31,56 @@ const containsArithmeticOperator = (input) => {
     return containsArithmeticOperatorPattern.test(input)
 }
 
+const containsArithmeticOperatorWithWhiteSpace = (input) => {
+    return containsArithmeticOperatorWithWhiteSpacePattern.test(input)
+}
+
 /**
  * Tests whether a string contains a comparison operator.
  * @param {String} input string to test
  */
 const containsComparisonOperator = (input) => {
-    return comparisonOperatorPattern.test(input)
+    return containsComparisonOperatorPattern.test(input)
 }
 
-/**
- * Tests whether a string contains a logical operator.
- * @param {String} input string to test
- */
-const containsLogicalOperator = (input) => {
-    return logicalOperatorsNamePattern.test(input)
+const containsComparisonOperatorWithWhiteSpace = (input) => {
+    return containsComparisonOperatorWithWhiteSpacePattern.test(input)
+}
+
+const containsFunction = (input) => {
+    containsFunctionPattern.test(input)
+}
+
+const containsFunctionWithWhiteSpaces = (input) => {
+    return containsFunctionWithWhiteSpacesPattern.test(input)
 }
 
 /**
  * Tests whether a string contains a string function.
  * @param {String} input string to test
  */
-const containsStringFunctionsPattern = (input) => {
-    return stringFunctionsNamePattern.test(input)
+const containsStringFunction = (input) => {
+    return containsStringFunctionPattern.test(input)
 }
 
 /**
- * Tests whether a string contains an aggregate function.
+ * Tests whether a string contains a logical operator.
+ * Not in use
  * @param {String} input string to test
  */
-const containsAggregateFunctionsPattern = (input) => {
-    return aggregateFunctionsNamePattern.test(input)
+const containsLogicalOperator = (input) => {
+    return logicalOperatorsNamePattern.test(input)
 }
-
-/** Tests whether a string contains at least one of the following:
- *    - arithmetic operator
- *    - comparison operator
- *    - logical operator
- *    - string function
- *    - aggregate function
- * @param {String} input string to test
- */
-const containsOperator = (input) => {
-    return containsFunctions.some((f) => f(input))
-}
-
-const containsFunctions = [
-    containsArithmeticOperator,
-    containsComparisonOperator,
-    containsLogicalOperator,
-    containsStringFunctionsPattern,
-    containsAggregateFunctionsPattern,
-]
 
 module.exports = {
+    containsAggregateFunction,
+    containsArithmeticExpression,
     containsArithmeticOperator,
+    containsArithmeticOperatorWithWhiteSpace,
     containsComparisonOperator,
+    containsComparisonOperatorWithWhiteSpace,
+    containsFunction,
+    containsFunctionWithWhiteSpaces,
+    containsStringFunction,
     containsLogicalOperator,
-    containsStringFunctionsPattern,
-    containsAggregateFunctionsPattern,
-    containsOperator,
 }

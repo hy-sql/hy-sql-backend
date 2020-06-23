@@ -1,5 +1,6 @@
 const _ = require('lodash')
-const { comparisonOperatorPattern } = require('../helpers/regex')
+const { containsComparisonOperatorPattern } = require('../helpers/regex')
+const { containsComparisonOperator } = require('../helpers/containsRegexTools')
 const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBracket')
 const {
     transformSplitConditionsIntoConditionsArray,
@@ -35,6 +36,7 @@ const parseConditions = (slicedCommandArray) => {
                         conditionArray.slice(i + 1, indexOfClosingBracket)
                     )
                 )
+
                 i = indexOfClosingBracket
                 break
             }
@@ -47,9 +49,9 @@ const parseConditions = (slicedCommandArray) => {
                 AndOrSwitch = 'OR'
                 break
             default: {
-                if (comparisonOperatorPattern.test(conditionArray[i])) {
+                if (containsComparisonOperator(conditionArray[i])) {
                     const splitExpression = conditionArray[i].split(
-                        comparisonOperatorPattern
+                        containsComparisonOperatorPattern
                     )
 
                     const condition = {
@@ -57,6 +59,7 @@ const parseConditions = (slicedCommandArray) => {
                         operator: splitExpression[1],
                         right: parseField(splitExpression[2]),
                     }
+
                     conditions[AndOrSwitch] = conditions[AndOrSwitch].concat(
                         condition
                     )
