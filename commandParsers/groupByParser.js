@@ -1,4 +1,4 @@
-const { parseSelectFields } = require('./fieldParser')
+const { parseSelectFields } = require('./fieldsParser')
 
 const parseGroupBy = (slicedCommandAsStringArray) => {
     const parsedGroupByPart =

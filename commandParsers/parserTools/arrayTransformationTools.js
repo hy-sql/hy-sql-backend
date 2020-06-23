@@ -6,6 +6,16 @@ const {
 const { fieldsSplitByComma } = require('../../helpers/isRegexTools')
 const SQLError = require('../../models/SQLError')
 
+/**
+ * Transforms select command split with splitCommandIntoArray into individual select fields
+ * If fields are not divided by comma, error is thrown
+ * @param {Array} selectInputArray
+ *
+ * const input = [ 'name,', 'price,', 'LENGTH', '(', 'name', ')', '*2+price' ]
+ *
+ * const output = transformSelectInputArrayIntoFieldsArray(input)
+ * output is [ 'name', 'price', 'LENGTH(name)*2+price' ]
+ */
 const transformSelectInputArrayIntoFieldsArray = (selectInputArray) => {
     const selectFieldsAsString = selectInputArray
         .join(' ')
@@ -22,7 +32,9 @@ const transformSelectInputArrayIntoFieldsArray = (selectInputArray) => {
         throw new SQLError('fields must be split by comma (,)')
     }
 
-    return selectFieldsAsString.split(', ').filter(Boolean)
+    const selectFieldsArray = selectFieldsAsString.split(', ').filter(Boolean)
+
+    return selectFieldsArray
 }
 
 /**

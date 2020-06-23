@@ -1,4 +1,4 @@
-const { parseField } = require('./fieldParser')
+const { parseField } = require('./fieldsParser')
 
 /**
  * Handles parsing of the LIMIT part of a command into an LIMIT object
