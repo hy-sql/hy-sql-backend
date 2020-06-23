@@ -21,7 +21,7 @@ const {
     queryContainsLimitKeyword,
 } = require('./parserTools/queryContains')
 const { parseOrderBy } = require('./orderByParser')
-const { parseSelectFields } = require('./fieldParser')
+const { parseSelectFields } = require('./fieldsParser')
 const { parseGroupBy } = require('./groupByParser')
 const { parseLimit } = require('./limitParser')
 const SQLError = require('../models/SQLError')

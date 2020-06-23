@@ -1,4 +1,4 @@
-const { parseConditions } = require('./fieldParser')
+const { parseConditions } = require('./conditionsParser')
 const SQLError = require('../models/SQLError')
 
 /**

@@ -14,12 +14,14 @@ const checkLimitPosition = (fullCommandAsStringArray) => {
     const indexOfOffset = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'OFFSET'
     )
+
     let correctlyPositioned =
         indexOfOffset !== -1 && indexOfOffset < indexOfLimit ? false : true
 
     const indexOfWhere = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'WHERE'
     )
+
     if (indexOfLimit < indexOfWhere) {
         correctlyPositioned = false
     }
@@ -27,6 +29,7 @@ const checkLimitPosition = (fullCommandAsStringArray) => {
     const indexOfGroup = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'GROUP'
     )
+
     if (
         indexOfGroup !== -1 &&
         fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY' &&
@@ -38,6 +41,7 @@ const checkLimitPosition = (fullCommandAsStringArray) => {
     const indexOfOrder = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'ORDER'
     )
+
     if (
         indexOfOrder !== -1 &&
         fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() === 'BY' &&
