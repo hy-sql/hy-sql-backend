@@ -6,7 +6,7 @@
  * @returns {Number} index of the matching closing bracket
  */
 const findIndexOfClosingBracket = (conditionsArray, IndexOfOpeningBracket) => {
-    let brackets = { opening: 0, closing: 0 }
+    const brackets = { opening: 0, closing: 0 }
 
     for (let i = IndexOfOpeningBracket; i < conditionsArray.length; i++) {
         if (conditionsArray[i] === '(') {

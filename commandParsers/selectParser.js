@@ -29,7 +29,7 @@ const {
     queryContainsLimitKeyword,
 } = require('./parserTools/queryContains')
 const { parseOrderBy } = require('./orderByParser')
-const { parseSelectFields } = require('./fieldParser')
+const { parseSelectFields } = require('./fieldsParser')
 const { parseGroupBy } = require('./groupByParser')
 const { parseHaving } = require('./havingParser')
 const { parseLimit } = require('./limitParser')

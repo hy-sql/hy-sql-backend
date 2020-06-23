@@ -1,28 +1,40 @@
 const {
-    fieldsSplitByCommaPattern,
-    containsFunctionPatternWithWhiteSpaces,
-    comparisonOperatorPatternWithWhiteSpace,
-    arithmeticOperatorPatternWithWhiteSpace,
+    containsFunctionWithWhiteSpacesPattern,
+    containsComparisonOperatorWithWhiteSpacePattern,
+    containsArithmeticOperatorWithWhiteSpacePattern,
 } = require('../../helpers/regex')
+const { fieldsSplitByComma } = require('../../helpers/isRegexTools')
 const SQLError = require('../../models/SQLError')
 
+/**
+ * Transforms select command split with splitCommandIntoArray into individual select fields
+ * If fields are not divided by comma, error is thrown
+ * @param {Array} selectInputArray
+ *
+ * const input = [ 'name,', 'price,', 'LENGTH', '(', 'name', ')', '*2+price' ]
+ *
+ * const output = transformSelectInputArrayIntoFieldsArray(input)
+ * output is [ 'name', 'price', 'LENGTH(name)*2+price' ]
+ */
 const transformSelectInputArrayIntoFieldsArray = (selectInputArray) => {
     const selectFieldsAsString = selectInputArray
         .join(' ')
-        .replace(containsFunctionPatternWithWhiteSpaces, (m) =>
+        .replace(containsFunctionWithWhiteSpacesPattern, (m) =>
             m.replace(/\s+/g, '')
         )
-        .replace(arithmeticOperatorPatternWithWhiteSpace, (m) =>
+        .replace(containsArithmeticOperatorWithWhiteSpacePattern, (m) =>
             m.replace(/\s+/g, '')
         )
         .replace(/\s+,/g, (m) => m.replace(/\s+/g, ''))
         .trim()
 
-    if (!fieldsSplitByCommaPattern.test(selectFieldsAsString)) {
+    if (!fieldsSplitByComma(selectFieldsAsString)) {
         throw new SQLError('fields must be split by comma (,)')
     }
 
-    return selectFieldsAsString.split(', ').filter(Boolean)
+    const selectFieldsArray = selectFieldsAsString.split(', ').filter(Boolean)
+
+    return selectFieldsArray
 }
 
 /**
@@ -43,10 +55,10 @@ const transformSelectInputArrayIntoFieldsArray = (selectInputArray) => {
 const transformSplitConditionsIntoConditionsArray = (conditionsInputArray) => {
     const conditionsArray = conditionsInputArray
         .join(' ')
-        .replace(containsFunctionPatternWithWhiteSpaces, (m) =>
+        .replace(containsFunctionWithWhiteSpacesPattern, (m) =>
             m.replace(/\s+/g, '')
         )
-        .replace(comparisonOperatorPatternWithWhiteSpace, (m) =>
+        .replace(containsComparisonOperatorWithWhiteSpacePattern, (m) =>
             m.replace(/\s+/g, '')
         )
         .replace(/AND/gi, ' AND ')
@@ -71,7 +83,7 @@ const transformOrderByInputArrayIntoOrderByFieldsArray = (
 ) => {
     const orderByFieldsArray = splitOrderByFields
         .join(' ')
-        .replace(containsFunctionPatternWithWhiteSpaces, (m) =>
+        .replace(containsFunctionWithWhiteSpacesPattern, (m) =>
             m.replace(/\s+/g, '')
         )
         .split(',')
