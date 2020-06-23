@@ -25,14 +25,14 @@ const parseCommand = (fullCommandAsStringList) => {
  * @param {string[]} fullCommandAsStringList command as string array
  */
 const parseBaseCommand = (fullCommandAsStringList) => {
-    let tableName = fullCommandAsStringList[1]
+    const tableName = fullCommandAsStringList[1]
         ? fullCommandAsStringList[1]
         : undefined
-    let set =
+    const set =
         fullCommandAsStringList[2].toUpperCase() === 'SET'
             ? fullCommandAsStringList[2]
             : undefined
-    let finalSemicolon =
+    const finalSemicolon =
         fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
             ? ';'
             : undefined
