@@ -37,14 +37,14 @@ const parseBaseCommand = (fullCommandAsStringList) => {
             ? ';'
             : undefined
 
-    const parsedCommand = {
+    const parsedBaseCommand = {
         name: fullCommandAsStringList[0],
         tableName,
         set,
         finalSemicolon,
     }
 
-    return parsedCommand
+    return parsedBaseCommand
 }
 
 /**
@@ -112,22 +112,20 @@ const parseUpdateWithWhere = (fullCommandAsStringList) => {
 const parseUpdatedColumns = (columnsAndValuesAsStringList) => {
     if (!columnsAndValuesAsStringList) return undefined
 
-    let parsedUpdatedColumns = []
     /*first change array to string and then remove unnecessary commas (,) and change back to array*/
     const separatedColumnsAsList = columnsAndValuesAsStringList
         .join('')
         .split(',')
 
     /*every item of the array is {column=value}, this loop parses them into pairs and removes singlequotes*/
-    separatedColumnsAsList.forEach((element) => {
+    const parsedUpdatedColumns = separatedColumnsAsList.map((element) => {
         if (element.indexOf('=') === -1) {
-            parsedUpdatedColumns = parsedUpdatedColumns.concat({
+            return {
                 columnName: 'equal_sign_missing',
                 sign: false,
                 valueType: undefined,
                 value: 'equal_sign_missing',
-            })
-            return
+            }
         }
 
         const columnValuePairAsList = element.split('=')
@@ -150,7 +148,7 @@ const parseUpdatedColumns = (columnsAndValuesAsStringList) => {
             value: columnValuePairAsList[1],
         }
 
-        parsedUpdatedColumns = parsedUpdatedColumns.concat(columnValuePair)
+        return columnValuePair
     })
 
     return parsedUpdatedColumns
