@@ -1,4 +1,4 @@
-const { parseOrderByFields } = require('./fieldParser')
+const { parseOrderByFields } = require('./fieldsParser')
 
 /**
  * Parses the ORDER BY part of a command into an object from the given string array.

@@ -4,7 +4,7 @@ const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBrack
 const {
     transformSplitConditionsIntoConditionsArray,
 } = require('./parserTools/arrayTransformationTools')
-const { parseField } = require('./fieldParser')
+const { parseField } = require('./fieldsParser')
 
 /**
  * Handles parsing of conditions from the given array.
