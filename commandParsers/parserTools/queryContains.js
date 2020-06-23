@@ -1,4 +1,4 @@
-const { checkLimitPosition } = require('../parserTools/checkCorrectPosition')
+const { checkLimitPosition } = require('../parserTools/checkPosition')
 
 /**
  * Checks whether a command contains the keyword WHERE. Check is
