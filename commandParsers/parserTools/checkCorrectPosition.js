@@ -14,6 +14,7 @@ const checkLimitPosition = (fullCommandAsStringArray) => {
     const indexOfOffset = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'OFFSET'
     )
+
     let correctlyPositioned =
         indexOfOffset !== -1 && indexOfOffset < indexOfLimit ? false : true
 
@@ -41,24 +42,19 @@ const afterWhere = (fullCommandAsStringArray, indexOfKeyword) => {
         (s) => s.toUpperCase() === 'WHERE'
     )
 
-    if (indexOfKeyword < indexOfWhere) return false
-
-    return true
+    return indexOfKeyword < indexOfWhere ? false : true
 }
 
 const afterGroupBy = (fullCommandAsStringArray, indexOfKeyword) => {
     const indexOfGroup = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'GROUP'
     )
-    if (
-        indexOfGroup !== -1 &&
+
+    return indexOfGroup !== -1 &&
         fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY' &&
         indexOfKeyword < indexOfGroup
-    ) {
-        return false
-    }
-
-    return true
+        ? false
+        : true
 }
 
 const afterOrderBy = (fullCommandAsStringArray, indexOfKeyword) => {
@@ -66,15 +62,11 @@ const afterOrderBy = (fullCommandAsStringArray, indexOfKeyword) => {
         (s) => s.toUpperCase() === 'ORDER'
     )
 
-    if (
-        indexOfOrder !== -1 &&
+    return indexOfOrder !== -1 &&
         fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() === 'BY' &&
         indexOfKeyword < indexOfOrder
-    ) {
-        return false
-    }
-
-    return true
+        ? false
+        : true
 }
 
 module.exports = { checkLimitPosition }

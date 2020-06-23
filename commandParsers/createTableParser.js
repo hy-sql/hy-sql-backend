@@ -56,6 +56,7 @@ const parseColumns = (columnsAsStringList) => {
 
 /**
  * Handles parsing of the column constraints contained in the given array.
+ * TODO: Validate only one column to have unique constraints such as PRIMARY KEY
  * @param {string[]} constraintsAsStringArray array containing the column constraints
  */
 const parseColumnConstraints = (constraintsAsStringArray) => {
