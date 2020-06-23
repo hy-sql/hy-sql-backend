@@ -4,6 +4,7 @@ const {
 } = require('../../commandParsers/parserTools/queryContains')
 const WhereSchema = require('../../schemas/WhereSchema')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const SQLError = require('../../models/SQLError')
 
 describe.each([
     'WHERE price=7',
@@ -55,21 +56,30 @@ describe.each([
     })
 })
 
-describe.each(['WHEE price=7', 'price=7'])(
-    'Query part with misspelled or missing WHERE',
-    (validCommand) => {
-        describe(validCommand, () => {
-            const command = splitCommandIntoArray(validCommand)
+describe('Query part with misspelled WHERE', () => {
+    const command = splitCommandIntoArray('WHEE price=7')
 
-            test('is recognised to contain a WHERE keyword', () => {
-                expect(queryContainsWhereKeyword(command)).toBeFalsy()
-            })
+    test('is not recognised to contain a WHERE keyword', () => {
+        expect(queryContainsWhereKeyword(command)).toBeFalsy()
+    })
 
-            test('fails validation after parsing', () => {
-                const parsedCommand = WhereSchema.validate(parseWhere(command))
-                expect(parsedCommand.value).toBeDefined()
-                expect(parsedCommand.error).toBeDefined()
-            })
-        })
-    }
-)
+    test('fails validation after parsing', () => {
+        const parsedCommand = WhereSchema.validate(parseWhere(command))
+        expect(parsedCommand.value).toBeDefined()
+        expect(parsedCommand.error).toBeDefined()
+    })
+})
+
+describe('WHERE clause without any conditions', () => {
+    const command = splitCommandIntoArray('WHERE')
+
+    test('is recognised to contain a WHERE keyword', () => {
+        expect(queryContainsWhereKeyword(command)).toBeTruthy()
+    })
+
+    test('causes correct error to be thrown during parsing', () => {
+        expect(() => parseWhere(command)).toThrowError(
+            new SQLError('WHERE clause must contain at least one condition')
+        )
+    })
+})

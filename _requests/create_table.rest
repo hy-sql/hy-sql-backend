@@ -24,12 +24,13 @@ Content-Type: application/json
 {
   "commandArray": [
             "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
-"INSERT INTO Tuotteet (nimi,hinta) VALUES ('porkkana', 5);",
-"INSERT INTO Tuotteet (nimi,hinta) VALUES ('nauris', 4);",
-"INSERT INTO Tuotteet (nimi,hinta) VALUES ('lanttu', 8);",
-"INSERT INTO Tuotteet (nimi,hinta) VALUES ('selleri', 6);",
-"INSERT INTO Tuotteet (nimi,hinta) VALUES ('maito', 6);",
-"SELECT nimi, hinta FROM Tuotteet LIMIT 2;"
+"INSERT INTO Tuotteet (nimi, hinta) VALUES ('porkkana', 7);",
+"INSERT INTO Tuotteet (nimi, hinta) VALUES ('banaani', 7);",
+"INSERT INTO Tuotteet (nimi, hinta) VALUES ('banaani', 4);",
+"INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
+"INSERT INTO Tuotteet (nimi, hinta) VALUES ('nauris', 4);",
+"INSERT INTO Tuotteet (nimi, hinta) VALUES ('bucket', 0);",
+"SELECT nimi, hinta FROM Tuotteet WHERE hinta=2*hinta;"
         ]
 }
 

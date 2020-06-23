@@ -479,9 +479,7 @@ class StateService {
                       this.createFunctionRows(command, rowGroup)
                   )
               )
-            : initialGroupedRows.length > 1
-            ? this.createFunctionRows(command, initialGroupedRows)
-            : initialGroupedRows
+            : this.createFunctionRows(command, initialGroupedRows)
 
         const orderedRows = command.orderBy
             ? this.orderRowsBy(
@@ -558,7 +556,8 @@ class StateService {
             for (let i = 0; i < command.fields.length; i++) {
                 if (fields[i].type === 'column') {
                     const valueOfQueriedColumn = row[fields[i].value]
-                    if (!valueOfQueriedColumn) {
+                    // eslint-disable-next-line eqeqeq
+                    if (valueOfQueriedColumn == null) {
                         throw new SQLError(
                             `no such column ${command.fields[i].value}`
                         )

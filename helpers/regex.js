@@ -22,14 +22,14 @@ const modifiedArithmeticOperator = new RegExp('^(\\+|-|\\/|\\*\\*|\\%)$')
 
 const containsArithmeticOperatorPattern = new RegExp('([\\+|\\-|*|/|%])', 'g')
 
-// Have to think more about this one
-const arithmeticExpressionPattern = new RegExp(
-    '^(?!\\+|-|\\/|\\*\\*|\\%)\\w+(([+|\\-|*|/|%])\\w+)+(?!\\+|-|\\/|\\*\\*|\\%)$'
-)
-
 const comparisonOperators = ['>=', '<=', '<>', '=', '>', '<']
 
 const comparisonOperatorPattern = RegExp('(>=|<=|<>|=|>|<)')
+
+const arithmeticOperatorPatternWithWhiteSpace = RegExp(
+    '\\s*([\\+|\\-|*|/|%])\\s*',
+    'g'
+)
 
 const comparisonOperatorPatternWithWhiteSpace = RegExp(
     '\\s*(>=|<=|<>|=|>|<)\\s*',
@@ -111,11 +111,38 @@ const containsFunctionPatternWithWhiteSpaces = new RegExp(
     'gi'
 )
 
+const arithmeticExpressionPattern = new RegExp(
+    `^(?!\\+|-|\\/|\\*\\*|\\%)(\\w+|(${stringFunctions.join(
+        '|'
+    )}|${aggregateFunctions.join(
+        '|'
+    )})\\(('?\\w+'?|\\*)\\))(([+|\\-|*|/|%])(\\w+|(${stringFunctions.join(
+        '|'
+    )}|${aggregateFunctions.join(
+        '|'
+    )})\\(('?\\w+'?|\\*)\\)))+(?!\\+|-|\\/|\\*\\*|\\%)$`
+)
+
+const containsArithmeticExpressionPattern = new RegExp(
+    `(?!\\+|-|\\/|\\*\\*|\\%)(\\w+|(${stringFunctions.join(
+        '|'
+    )}|${aggregateFunctions.join(
+        '|'
+    )})\\(('?\\w+'?|\\*)\\))(([+|\\-|*|/|%])(\\w+|(${stringFunctions.join(
+        '|'
+    )}|${aggregateFunctions.join(
+        '|'
+    )})\\(('?\\w+'?|\\*)\\)))+(?!\\+|-|\\/|\\*\\*|\\%)`,
+    'gi'
+)
+
 const textInputPattern = new RegExp("^'.+'$")
 
 const sortOrderKeywordPattern = new RegExp('^(ASC|DESC)$', 'i')
 
 const distinctKeywordPattern = new RegExp('^[Dd][Ii][Ss][Tt][Ii][Nn][Cc][Tt]$')
+
+const fieldsSplitByCommaPattern = new RegExp('^\\*$|(^(\\S+,\\s)*\\S+$)', 'i')
 
 /**
  * Regular expressions for use in the application.
@@ -146,4 +173,7 @@ module.exports = {
     comparisonOperatorPatternWithWhiteSpace,
     conditionPattern,
     containsFunctionPatternWithWhiteSpaces,
+    fieldsSplitByCommaPattern,
+    containsArithmeticExpressionPattern,
+    arithmeticOperatorPatternWithWhiteSpace,
 }
