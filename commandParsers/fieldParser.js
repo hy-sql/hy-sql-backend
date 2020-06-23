@@ -1,16 +1,20 @@
 const _ = require('lodash')
 const {
-    aggregateFunctionPattern,
     aggregateFunctionsNamePattern,
-    arithmeticExpressionPattern,
-    comparisonOperatorPattern,
-    modifiedArithmeticOperator,
-    sortOrderKeywordPattern,
-    distinctKeywordPattern,
-    stringFunctionPattern,
+    containsComparisonOperatorPattern,
     stringFunctionsNamePattern,
-    textInputPattern,
 } = require('../helpers/regex')
+const { containsComparisonOperator } = require('../helpers/containsRegexTools')
+const {
+    isAggregateFunction,
+    isArithmeticExpression,
+    isDistinctKeyword,
+    isModifiedArithmeticOperator,
+    isSortOrderKeyword,
+    isStringFunction,
+    isTextTypeInput,
+    selectAll,
+} = require('../helpers/isRegexTools')
 const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBracket')
 const {
     transformSelectInputArrayIntoFieldsArray,
@@ -60,9 +64,9 @@ const parseConditions = (slicedCommandArray) => {
                 AndOrSwitch = 'OR'
                 break
             default: {
-                if (comparisonOperatorPattern.test(conditionArray[i])) {
+                if (containsComparisonOperator(conditionArray[i])) {
                     const splitExpression = conditionArray[i].split(
-                        comparisonOperatorPattern
+                        containsComparisonOperatorPattern
                     )
 
                     const condition = {
@@ -103,7 +107,7 @@ const parseExpression = (expression) => {
  * @param {string[]} fieldArray array containing the field information
  */
 const parseSelectFields = (selectInputArray) => {
-    if (distinctKeywordPattern.test(selectInputArray[0])) {
+    if (isDistinctKeyword(selectInputArray[0])) {
         return parseParametersFromDistinct(selectInputArray.slice(1))
     }
 
@@ -157,35 +161,45 @@ const parseOrderByFields = (fieldArray) => {
  */
 const parseField = (field) => {
     switch (true) {
-        case stringFunctionPattern.test(field):
+        case selectAll(field):
+            return {
+                type: 'all',
+                value: field,
+            }
+        case isStringFunction(field):
             return {
                 type: 'stringFunction',
                 name: field.split('(')[0].toUpperCase(),
                 value: field,
                 param: parseParameterFromStringFunction(field),
             }
-        case aggregateFunctionPattern.test(field):
+        case isAggregateFunction(field):
             return {
                 type: 'aggregateFunction',
                 name: field.split('(')[0].toUpperCase(),
                 value: field,
                 param: parseParameterFromAggregateFunction(field),
             }
-        case /^\*$/.test(field):
-            return {
-                type: 'all',
-                value: field,
-            }
-        case arithmeticExpressionPattern.test(field):
+        case isArithmeticExpression(field):
             return {
                 type: 'expression',
                 expressionParts: parseExpression(field),
                 value: field,
             }
-        case textInputPattern.test(field):
+        case isTextTypeInput(field):
             return {
                 type: 'text',
                 value: field.replace(/'/g, ''),
+            }
+        case isModifiedArithmeticOperator(field):
+            return {
+                type: 'operator',
+                value: field === '**' ? '*' : field,
+            }
+        case isSortOrderKeyword(field):
+            return {
+                type: 'order',
+                value: field ? field.toLowerCase() : 'asc',
             }
         case !isNaN(field):
             return field
@@ -194,16 +208,6 @@ const parseField = (field) => {
                       value: Number(field),
                   }
                 : null
-        case modifiedArithmeticOperator.test(field):
-            return {
-                type: 'operator',
-                value: field === '**' ? '*' : field,
-            }
-        case sortOrderKeywordPattern.test(field):
-            return {
-                type: 'order',
-                value: field ? field.toLowerCase() : 'asc',
-            }
         default:
             return {
                 type: 'column',

@@ -1,24 +1,24 @@
 const {
-    fieldsSplitByCommaPattern,
-    containsFunctionPatternWithWhiteSpaces,
-    comparisonOperatorPatternWithWhiteSpace,
-    arithmeticOperatorPatternWithWhiteSpace,
+    containsFunctionWithWhiteSpacesPattern,
+    containsComparisonOperatorWithWhiteSpacePattern,
+    containsArithmeticOperatorWithWhiteSpacePattern,
 } = require('../../helpers/regex')
+const { fieldsSplitByComma } = require('../../helpers/isRegexTools')
 const SQLError = require('../../models/SQLError')
 
 const transformSelectInputArrayIntoFieldsArray = (selectInputArray) => {
     const selectFieldsAsString = selectInputArray
         .join(' ')
-        .replace(containsFunctionPatternWithWhiteSpaces, (m) =>
+        .replace(containsFunctionWithWhiteSpacesPattern, (m) =>
             m.replace(/\s+/g, '')
         )
-        .replace(arithmeticOperatorPatternWithWhiteSpace, (m) =>
+        .replace(containsArithmeticOperatorWithWhiteSpacePattern, (m) =>
             m.replace(/\s+/g, '')
         )
         .replace(/\s+,/g, (m) => m.replace(/\s+/g, ''))
         .trim()
 
-    if (!fieldsSplitByCommaPattern.test(selectFieldsAsString)) {
+    if (!fieldsSplitByComma(selectFieldsAsString)) {
         throw new SQLError('fields must be split by comma (,)')
     }
 
@@ -43,10 +43,10 @@ const transformSelectInputArrayIntoFieldsArray = (selectInputArray) => {
 const transformSplitConditionsIntoConditionsArray = (conditionsInputArray) => {
     const conditionsArray = conditionsInputArray
         .join(' ')
-        .replace(containsFunctionPatternWithWhiteSpaces, (m) =>
+        .replace(containsFunctionWithWhiteSpacesPattern, (m) =>
             m.replace(/\s+/g, '')
         )
-        .replace(comparisonOperatorPatternWithWhiteSpace, (m) =>
+        .replace(containsComparisonOperatorWithWhiteSpacePattern, (m) =>
             m.replace(/\s+/g, '')
         )
         .replace(/AND/gi, ' AND ')
@@ -71,7 +71,7 @@ const transformOrderByInputArrayIntoOrderByFieldsArray = (
 ) => {
     const orderByFieldsArray = splitOrderByFields
         .join(' ')
-        .replace(containsFunctionPatternWithWhiteSpaces, (m) =>
+        .replace(containsFunctionWithWhiteSpacesPattern, (m) =>
             m.replace(/\s+/g, '')
         )
         .split(',')
