@@ -1,6 +1,6 @@
-const selectParser = require('../../commandParsers/selectParser')
-const commandService = require('../../services/commandService')
-const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const selectParser = require('../../../commandParsers/selectParser')
+const commandService = require('../../../services/commandService')
+const splitCommandIntoArray = require('../../../commandParsers/parserTools/splitCommandIntoArray')
 
 describe.each([
     "SELECT id, nimi, hinta FROM Tuotteet WHERE this='that';",
@@ -29,12 +29,12 @@ describe.each([
 })
 
 describe.each([
-    'SELECT id nimi, hinta FROM Tuotteet WHERE this=?;', //eka sarakkeiden pilkku puuttuu
-    'SELECT id,nimi,hinta FROM Tuotteet WHERE', //puolipiste lopusta
-    'SELECT id,nimi,hinta FROM  where nothing;', //taulu puuttuu
-    '       seLEct FROM      tuoTTeet  WHERE WHERE;', //sarakkeet puuttuu kokonaan
-    "   selecT id nimi hinta FROM tuoTTeeT WHERE this='that' null;", //sarakkeiden kaikki pilkut puuttuu
-    'SeleCT id,nimi,hinta   Tuotteet WHERE this=that;', //FROM puuttuu
+    'SELECT id nimi, hinta FROM Tuotteet WHERE this=?;',
+    'SELECT id,nimi,hinta FROM Tuotteet WHERE',
+    'SELECT id,nimi,hinta FROM  where nothing;',
+    '       seLEct FROM      tuoTTeet  WHERE WHERE;',
+    "   selecT id nimi hinta FROM tuoTTeeT WHERE this='that' null;",
+    'SeleCT id,nimi,hinta   Tuotteet WHERE this=that;',
 ])(
     'invalid command with the right name (SELECT) and WHERE keyword testing',
     (command) => {

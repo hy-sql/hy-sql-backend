@@ -25,26 +25,26 @@ const parseCommand = (fullCommandAsStringList) => {
  * @param {string[]} fullCommandAsStringList command as string array
  */
 const parseBaseCommand = (fullCommandAsStringList) => {
-    let tableName = fullCommandAsStringList[1]
+    const tableName = fullCommandAsStringList[1]
         ? fullCommandAsStringList[1]
         : undefined
-    let set =
+    const set =
         fullCommandAsStringList[2].toUpperCase() === 'SET'
             ? fullCommandAsStringList[2]
             : undefined
-    let finalSemicolon =
+    const finalSemicolon =
         fullCommandAsStringList[fullCommandAsStringList.length - 1] === ';'
             ? ';'
             : undefined
 
-    const parsedCommand = {
+    const parsedBaseCommand = {
         name: fullCommandAsStringList[0],
         tableName,
         set,
         finalSemicolon,
     }
 
-    return parsedCommand
+    return parsedBaseCommand
 }
 
 /**
@@ -112,22 +112,20 @@ const parseUpdateWithWhere = (fullCommandAsStringList) => {
 const parseUpdatedColumns = (columnsAndValuesAsStringList) => {
     if (!columnsAndValuesAsStringList) return undefined
 
-    const parsedUpdatedColumns = []
     /*first change array to string and then remove unnecessary commas (,) and change back to array*/
     const separatedColumnsAsList = columnsAndValuesAsStringList
         .join('')
         .split(',')
 
     /*every item of the array is {column=value}, this loop parses them into pairs and removes singlequotes*/
-    separatedColumnsAsList.forEach((element) => {
+    const parsedUpdatedColumns = separatedColumnsAsList.map((element) => {
         if (element.indexOf('=') === -1) {
-            parsedUpdatedColumns.push({
+            return {
                 columnName: 'equal_sign_missing',
                 sign: false,
                 valueType: undefined,
                 value: 'equal_sign_missing',
-            })
-            return
+            }
         }
 
         const columnValuePairAsList = element.split('=')
@@ -150,7 +148,7 @@ const parseUpdatedColumns = (columnsAndValuesAsStringList) => {
             value: columnValuePairAsList[1],
         }
 
-        parsedUpdatedColumns.push(columnValuePair)
+        return columnValuePair
     })
 
     return parsedUpdatedColumns

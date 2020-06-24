@@ -9,11 +9,11 @@ const { namify, cleanStringArray } = require('./smallTools')
  * @param {Number} parserCounter current index
  */
 const parseColumnNames = (stringArray, parserCounter) => {
-    let laskuri = parserCounter
+    let counter = parserCounter
     let columnsOpenBrackets = 0
-    const columns = []
-    loop1: for (; laskuri < stringArray.length; laskuri++) {
-        const element = stringArray[laskuri]
+    let columns = []
+    loop1: for (; counter < stringArray.length; counter++) {
+        const element = stringArray[counter]
         switch (element.toUpperCase()) {
             case '(':
                 columnsOpenBrackets++
@@ -41,13 +41,13 @@ const parseColumnNames = (stringArray, parserCounter) => {
                 break loop1
             default:
                 if (columnsOpenBrackets > 0) continue loop1
-                columns.push(element)
+                columns = columns.concat(element)
         }
     }
 
-    if (laskuri !== stringArray.length) {
+    if (counter !== stringArray.length) {
         return {
-            pccolumns: laskuri,
+            pccolumns: counter,
             columns: namify(cleanStringArray(columns)),
         }
     }

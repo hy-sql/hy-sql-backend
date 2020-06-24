@@ -38,8 +38,8 @@ describe('selectFromTable()', () => {
 
         parsedCommands.forEach((c) => stateService.updateState(c))
 
-        const selectParser = 'SELECT nimi from Tuotteet;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const selectCommand = 'SELECT nimi from Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.selectFrom(parsedCommand)
@@ -66,8 +66,8 @@ describe('selectFromTable()', () => {
 
         parsedCommands.forEach((c) => stateService.updateState(c))
 
-        const selectParser = 'SELECT invalid from Tuotteet;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const selectCommand = 'SELECT invalid from Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         expect(() => stateService.selectFrom(parsedCommand)).toThrowError(
@@ -101,8 +101,8 @@ describe('selectFrom() with command.where', () => {
     })
 
     test('returns filtered rows when where is defined', () => {
-        const selectParser = 'SELECT nimi from Tuotteet WHERE hinta=10;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta=10;'
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.selectFrom(parsedCommand)
@@ -113,8 +113,8 @@ describe('selectFrom() with command.where', () => {
     })
 
     test('returns filtered rows when command.where contains >', () => {
-        const selectParser = 'SELECT nimi from Tuotteet WHERE hinta>5;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta>5;'
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.selectFrom(parsedCommand)
@@ -125,8 +125,8 @@ describe('selectFrom() with command.where', () => {
     })
 
     test('returns filtered rows when where-command contains >=', () => {
-        const selectParser = 'SELECT nimi from Tuotteet WHERE hinta>=20;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta>=20;'
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.selectFrom(parsedCommand)
@@ -137,8 +137,8 @@ describe('selectFrom() with command.where', () => {
     })
 
     test('returns filtered rows when where-command contains <', () => {
-        const selectParser = 'SELECT nimi from Tuotteet WHERE hinta<20;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta<20;'
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.selectFrom(parsedCommand)
@@ -149,8 +149,8 @@ describe('selectFrom() with command.where', () => {
     })
 
     test('returns filtered rows when where-command contains <=', () => {
-        const selectParser = 'SELECT nimi from Tuotteet WHERE hinta<=10;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const selectCommand = 'SELECT nimi from Tuotteet WHERE hinta<=10;'
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.selectFrom(parsedCommand)
@@ -513,10 +513,10 @@ describe('selectFrom() with command.where and command.orderBy', () => {
             },
         ]
 
-        const selectParser =
+        const selectCommand =
             "SELECT id, nimi, hinta from Tuotteet WHERE nimi='olut' ORDER BY hinta ASC;"
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
@@ -543,10 +543,10 @@ describe('selectFrom() with command.where and command.orderBy', () => {
                 hinta: 8,
             },
         ]
-        const selectParser =
+        const selectCommand =
             'SELECT id, nimi, hinta FROM Tuotteet WHERE hinta>5 ORDER BY hinta ASC;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
@@ -584,10 +584,10 @@ describe('selectFrom() with command.where and command.orderBy', () => {
             },
         ]
 
-        const selectParser =
+        const selectCommand =
             'SELECT id, nimi, hinta FROM Tuotteet WHERE hinta>=5 ORDER BY hinta ASC;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)
@@ -624,10 +624,10 @@ describe('selectFrom() with command.where and command.orderBy', () => {
             },
         ]
 
-        const selectParser =
+        const selectCommand =
             'SELECT id, nimi, hinta FROM Tuotteet WHERE hinta<5 ORDER BY hinta DESC;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)
@@ -648,10 +648,10 @@ describe('selectFrom() with command.where and command.orderBy', () => {
             },
         ]
 
-        const selectParser =
+        const selectCommand =
             'SELECT id, nimi, hinta FROM Tuotteet WHERE hinta<=3 ORDER BY hinta DESC;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)
@@ -705,8 +705,8 @@ describe('selectFrom() with DISTINCT keyword', () => {
                 nimi: 'olut',
             },
         ]
-        const selectParser = 'SELECT DISTINCT nimi FROM Tuotteet;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const selectCommand = 'SELECT DISTINCT nimi FROM Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)
@@ -741,8 +741,8 @@ describe('selectFrom() with DISTINCT keyword', () => {
             },
         ]
 
-        const selectParser = 'SELECT DISTINCT nimi, hinta FROM Tuotteet;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const selectCommand = 'SELECT DISTINCT nimi, hinta FROM Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)
@@ -758,9 +758,9 @@ describe('selectFrom() with DISTINCT keyword', () => {
                 hinta: 2,
             },
         ]
-        const selectParser =
+        const selectCommand =
             "SELECT DISTINCT hinta FROM Tuotteet WHERE nimi='olut';"
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)
@@ -777,9 +777,9 @@ describe('selectFrom() with DISTINCT keyword', () => {
             },
         ]
 
-        const selectParser =
+        const selectCommand =
             "SELECT DISTINCT hinta FROM Tuotteet WHERE nimi='olut' ORDER BY hinta ASC;"
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)
@@ -787,12 +787,13 @@ describe('selectFrom() with DISTINCT keyword', () => {
     })
 
     test('invalid DISTINCT returns error', () => {
-        const selectParser =
+        const selectCommand =
             "SELECT DISTIn hinta FROM Tuotteet WHERE nimi='olut' ORDER BY hinta ASC;"
-        const commandArray = splitCommandIntoArray(selectParser)
-        const parsedCommand = commandService.parseCommand(commandArray)
+        const commandArray = splitCommandIntoArray(selectCommand)
 
-        expect(() => stateService.updateState(parsedCommand)).toThrowError()
+        expect(() => commandService.parseCommand(commandArray)).toThrowError(
+            new SQLError('fields must be split by comma (,)')
+        )
     })
 
     test('length()-function returns correct columns', () => {
@@ -808,8 +809,8 @@ describe('selectFrom() with DISTINCT keyword', () => {
             },
         ]
 
-        const selectParser = 'SELECT DISTINCT length(nimi) FROM Tuotteet;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const selectCommand = 'SELECT DISTINCT length(nimi) FROM Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)
@@ -835,8 +836,8 @@ describe('selectFrom() with DISTINCT keyword', () => {
             },
         ]
 
-        const selectParser = 'SELECT DISTINCT hinta+1 FROM Tuotteet;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const selectCommand = 'SELECT DISTINCT hinta+1 FROM Tuotteet;'
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)

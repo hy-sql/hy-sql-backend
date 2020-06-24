@@ -16,12 +16,13 @@ const executeStringFunction = (functionFields, row) => {
     switch (functionFields.name) {
         case 'LENGTH':
             if (functionFields.param.type === 'column') {
-                if (!row[functionFields.param.value])
+                const columnValue = row[functionFields.param.value]
+                if (!columnValue && columnValue !== 0)
                     throw new SQLError(
                         'Column name given to LENGTH as parameter does not match any existing column'
                     )
 
-                return row[functionFields.param.value].toString().length
+                return columnValue.toString().length
             }
             return functionFields.param.value.toString().length
         case 'CONCAT':
@@ -61,7 +62,7 @@ const executeAggregateFunction = (functionFields, rows) => {
 
             const result = _.meanBy(rows, paramValue)
 
-            if (!result)
+            if (!result && result !== 0)
                 throw new SQLError(
                     'Parameter given to AVG does not match any existing column'
                 )
@@ -71,11 +72,12 @@ const executeAggregateFunction = (functionFields, rows) => {
         case 'COUNT':
             return functionFields.param.type === 'all'
                 ? rows.length
-                : _.filter(rows, paramValue).filter(Boolean).length
+                : _.map(rows, paramValue).length
+
         case 'MAX': {
             const result = _.get(_.maxBy(rows, paramValue), paramValue)
 
-            if (!result)
+            if (!result && result !== 0)
                 throw new SQLError(
                     'Parameter given to MAX does not match any existing column'
                 )
@@ -84,8 +86,7 @@ const executeAggregateFunction = (functionFields, rows) => {
         }
         case 'MIN': {
             const result = _.get(_.minBy(rows, paramValue), paramValue)
-
-            if (!result)
+            if (!result && result !== 0)
                 throw new SQLError(
                     'Parameter given to MIN does not match any existing column'
                 )
@@ -99,7 +100,7 @@ const executeAggregateFunction = (functionFields, rows) => {
 
             const result = _.sumBy(rows, paramValue)
 
-            if (!result)
+            if (!result && result !== 0)
                 throw new SQLError(
                     'Parameter given to SUM does not match any existing column'
                 )
@@ -109,18 +110,7 @@ const executeAggregateFunction = (functionFields, rows) => {
     }
 }
 
-/**
- * Executes SELECT DISTINCT command for given rows. Expects rows containing only
- * queried columns as input and filters out possible duplicate data. Returns only
- * unique rows.
- * @param {*} rows Rows containing queried columns.
- */
-const executeSelectDistinct = (rows) => {
-    return _.uniqWith(rows, _.isEqual)
-}
-
 module.exports = {
     executeStringFunction,
     executeAggregateFunction,
-    executeSelectDistinct,
 }

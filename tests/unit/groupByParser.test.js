@@ -17,7 +17,7 @@ describe.each([
     'GROUP BY price, amount',
     "GROUP BY LENGTH('test')",
     'GROUP BY SUM(amount)',
-    // 'GROUP BY price*5-LENGTH(name)', FIXME: Implement expressions with functions
+    // 'GROUP BY price*5-LENGTH(name)', FIXME: Joi schema problem
 ])('Valid GROUP BY-part of a query', (validCommand) => {
     describe(validCommand, () => {
         const command = splitCommandIntoArray(validCommand)

@@ -1,6 +1,6 @@
-const selectParser = require('../../commandParsers/selectParser')
-const commandService = require('../../services/commandService')
-const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const selectParser = require('../../../commandParsers/selectParser')
+const commandService = require('../../../services/commandService')
+const splitCommandIntoArray = require('../../../commandParsers/parserTools/splitCommandIntoArray')
 
 describe.each(['SELEC * FROM Taulu;', 'SELECT FROM Taulu;'])(
     'Query beginning with misspelled SELECT *',

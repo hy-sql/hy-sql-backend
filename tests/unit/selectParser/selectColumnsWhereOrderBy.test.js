@@ -1,5 +1,5 @@
-const selectParser = require('../../commandParsers/selectParser')
-const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
+const selectParser = require('../../../commandParsers/selectParser')
+const splitCommandIntoArray = require('../../../commandParsers/parserTools/splitCommandIntoArray')
 
 describe.each([
     'SELECT nimi, hinta FROM Taulu ;',
