@@ -523,12 +523,14 @@ class StateService {
         )
 
         if (lastMinMaxFunction) {
-            return _.filter(rows, {
+            const rowToReturn = _.filter(rows, {
                 [lastMinMaxFunction.param.value]: executeAggregateFunction(
                     lastMinMaxFunction,
                     rows
                 ),
             })
+
+            return rowToReturn
         }
 
         const lastOtherAggregateFunction = _.findLast(
@@ -536,7 +538,11 @@ class StateService {
             (field) => field.type === 'aggregateFunction'
         )
 
-        return lastOtherAggregateFunction ? [rows[0]] : rows
+        if (lastOtherAggregateFunction) {
+            return [rows[0]]
+        }
+
+        return null
     }
 
     /**
@@ -603,7 +609,7 @@ class StateService {
                         existingRows
                     )
                     row[fields[i].value] = evaluated
-                    return [{ [fields[i].value]: evaluated }]
+                    // return [{ [fields[i].value]: evaluated }]
                 } else if (fields[i].type === 'expression') {
                     const expressionResult = evaluateExpression(
                         fields[i].expressionParts,
