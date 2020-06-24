@@ -481,12 +481,19 @@ class StateService {
               )
             : this.createFunctionRows(command, initialGroupedRows)
 
-        const orderedRows = command.orderBy
-            ? this.orderRowsBy(
-                  command.orderBy.fields,
-                  rowsWithNewFieldsAndFunctions
-              )
-            : rowsWithNewFieldsAndFunctions
+        const aggregateFunctionRow = this.pickAggregateFunctionRow(
+            rowsWithNewFieldsAndFunctions,
+            command.fields
+        )
+
+        const orderedRows = !aggregateFunctionRow
+            ? command.orderBy
+                ? this.orderRowsBy(
+                      command.orderBy.fields,
+                      rowsWithNewFieldsAndFunctions
+                  )
+                : rowsWithNewFieldsAndFunctions
+            : aggregateFunctionRow
 
         const selectedRows = orderedRows.map((row) =>
             _.pick(row, fieldsToReturn)
@@ -505,6 +512,31 @@ class StateService {
                   )
                 : this.groupRowsBy(distinctRows, command.groupBy.fields)
             : distinctRows
+    }
+
+    pickAggregateFunctionRow(rows, fields) {
+        const lastMinMaxFunction = _.findLast(
+            fields,
+            (field) =>
+                field.type === 'aggregateFunction' &&
+                (field.name === 'MIN' || field.name === 'MAX')
+        )
+
+        if (lastMinMaxFunction) {
+            return _.filter(rows, {
+                [lastMinMaxFunction.param.value]: executeAggregateFunction(
+                    lastMinMaxFunction,
+                    rows
+                ),
+            })
+        }
+
+        const lastOtherAggregateFunction = _.findLast(
+            fields,
+            (field) => field.type === 'aggregateFunction'
+        )
+
+        return lastOtherAggregateFunction ? [rows[0]] : rows
     }
 
     /**

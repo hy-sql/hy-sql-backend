@@ -30,7 +30,7 @@ Content-Type: application/json
 "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
 "INSERT INTO Tuotteet (nimi, hinta) VALUES ('nauris', 4);",
 "INSERT INTO Tuotteet (nimi, hinta) VALUES ('bucket', 0);",
-"SELECT nimi, hinta FROM Tuotteet WHERE hinta=2*hinta;"
+"SELECT nimi, AVG(hinta), MIN(hinta) FROM Tuotteet WHERE hinta>0;"
         ]
 }
 
