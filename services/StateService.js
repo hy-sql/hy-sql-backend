@@ -458,6 +458,18 @@ class StateService {
             ]
         }
 
+        if (
+            command.fields[0].type === 'expression' &&
+            containsAggregateFunction(command.fields[0].expressionParts)
+        ) {
+            const evaluated = evaluateAggregateExpression(
+                command.fields[0].expressionParts,
+                existingRows
+            )
+
+            return [{ [command.fields[0].value]: evaluated }]
+        }
+
         const fieldsToReturn =
             command.fields[0].type === 'distinct'
                 ? command.fields[0].value.map((f) => f.value)
@@ -497,8 +509,12 @@ class StateService {
                   command.fields
               )
 
-        if (!_.isEmpty(aggregateFunctionRows)) {
-            const aggregateFunctionRowsWithSelectedFields = aggregateFunctionRows.map(
+        const orderedAggregateFunctionRows = command.orderBy
+            ? this.orderRowsBy(command.orderBy.fields, aggregateFunctionRows)
+            : aggregateFunctionRows
+
+        if (!_.isEmpty(orderedAggregateFunctionRows)) {
+            const aggregateFunctionRowsWithSelectedFields = orderedAggregateFunctionRows.map(
                 (row) => _.pick(row, fieldsToReturn)
             )
 
@@ -687,7 +703,6 @@ class StateService {
                         existingRows
                     )
                     row[fields[i].value] = evaluated
-                    // return [{ [fields[i].value]: evaluated }]
                 } else if (fields[i].type === 'expression') {
                     const expressionResult = evaluateExpression(
                         fields[i].expressionParts,
