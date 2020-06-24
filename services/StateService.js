@@ -473,45 +473,88 @@ class StateService {
             ? this.initialGroupRowsBy(rowsWithNewFields, command.groupBy.fields)
             : rowsWithNewFields
 
-        const rowsWithNewFieldsAndFunctions = command.groupBy
-            ? _.flatten(
-                  initialGroupedRows.map((rowGroup) =>
-                      this.createFunctionRows(command, rowGroup)
-                  )
+        console.log('initialGroupedRows', initialGroupedRows)
+
+        const groupedRowsWithNewFieldsAndFunctions = command.groupBy
+            ? initialGroupedRows.map((rowGroup) =>
+                  this.createFunctionRows(command, rowGroup)
               )
             : this.createFunctionRows(command, initialGroupedRows)
 
-        const aggregateFunctionRow = this.pickAggregateFunctionRow(
-            rowsWithNewFieldsAndFunctions,
-            command.fields
-        )
+        // console.log(
+        //     'groupedRowsWithNewFieldsAndFunctions',
+        //     groupedRowsWithNewFieldsAndFunctions
+        // )
 
-        const orderedRows = !aggregateFunctionRow
-            ? command.orderBy
-                ? this.orderRowsBy(
-                      command.orderBy.fields,
-                      rowsWithNewFieldsAndFunctions
+        const aggregateFunctionRows = command.groupBy
+            ? groupedRowsWithNewFieldsAndFunctions.map((rowGroup) => {
+                  //   console.log('rowGroup', rowGroup)
+                  const rows = this.pickAggregateFunctionRow(
+                      rowGroup,
+                      command.fields
                   )
-                : rowsWithNewFieldsAndFunctions
-            : aggregateFunctionRow
+                  console.log('rows', rows)
+                  return rows[0]
+              })
+            : this.pickAggregateFunctionRow(
+                  groupedRowsWithNewFieldsAndFunctions,
+                  command.fields
+              )
 
-        const selectedRows = orderedRows.map((row) =>
-            _.pick(row, fieldsToReturn)
+        console.log('aggregateFunctionRows', aggregateFunctionRows)
+
+        if (aggregateFunctionRows) {
+            const aggregateFunctionRowsWithSelectedFields = aggregateFunctionRows.map(
+                (row) => _.pick(row, fieldsToReturn)
+            )
+            return aggregateFunctionRowsWithSelectedFields
+        }
+
+        const orderedRows = command.orderBy
+            ? this.orderRowsBy(
+                  command.orderBy.fields,
+                  _.flatten(groupedRowsWithNewFieldsAndFunctions)
+              )
+            : _.flatten(groupedRowsWithNewFieldsAndFunctions)
+
+        const rowsWithInitiallySelectedFields = command.groupBy
+            ? orderedRows.map((row) =>
+                  _.pick(
+                      row,
+                      fieldsToReturn.concat(
+                          command.groupBy.fields.map((f) => f.value)
+                      )
+                  )
+              )
+            : orderedRows
+
+        console.log(
+            'rowsWithInitiallySelectedFields',
+            rowsWithInitiallySelectedFields
         )
 
         const distinctRows =
             command.fields[0].type === 'distinct'
-                ? executeSelectDistinct(selectedRows)
-                : selectedRows
+                ? executeSelectDistinct(rowsWithInitiallySelectedFields)
+                : rowsWithInitiallySelectedFields
 
-        return command.groupBy
-            ? command.orderBy
-                ? this.orderRowsBy(
-                      command.orderBy.fields,
-                      this.groupRowsBy(distinctRows, command.groupBy.fields)
-                  )
-                : this.groupRowsBy(distinctRows, command.groupBy.fields)
+        // console.log('distinctRows', distinctRows)
+
+        const groupedRows = command.groupBy
+            ? this.groupRowsBy(distinctRows, command.groupBy.fields)
             : distinctRows
+
+        // console.log('groupedRows', groupedRows)
+
+        const rowsWithSelectedFields = groupedRows.map((row) =>
+            _.pick(row, fieldsToReturn)
+        )
+
+        const finalOrderedRows = command.orderBy
+            ? this.orderRowsBy(command.orderBy.fields, rowsWithSelectedFields)
+            : rowsWithSelectedFields
+
+        return finalOrderedRows
     }
 
     pickAggregateFunctionRow(rows, fields) {
