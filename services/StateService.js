@@ -479,9 +479,14 @@ class StateService {
             : this.createFunctionRows(command, initialGroupedRows)
 
         const aggregateFunctionRows = command.groupBy
-            ? _.compact(
-                  groupedRowsWithNewFieldsAndFunctions.map((rowGroup) =>
-                      this.pickAggregateFunctionRow(rowGroup, command.fields)
+            ? _.flatten(
+                  _.compact(
+                      groupedRowsWithNewFieldsAndFunctions.map((rowGroup) =>
+                          this.pickAggregateFunctionRow(
+                              rowGroup,
+                              command.fields
+                          )
+                      )
                   )
               )
             : this.pickAggregateFunctionRow(
@@ -496,7 +501,7 @@ class StateService {
                 (row) => _.pick(row, fieldsToReturn)
             )
 
-            console.log(aggregateFunctionRowsWithSelectedFields)
+            console.log('hello', aggregateFunctionRowsWithSelectedFields)
 
             return aggregateFunctionRowsWithSelectedFields
         }
