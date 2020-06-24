@@ -567,7 +567,7 @@ class StateService {
                     containsAggregateFunction(fields[i].expressionParts)
                 ) {
                     const evaluated = evaluateAggregateExpression(
-                        fields[i].value,
+                        fields[i].expressionParts,
                         existingRows
                     )
                     row[fields[i].value] = evaluated

@@ -3,6 +3,7 @@ const {
     executeAggregateFunction,
 } = require('./functions')
 const { calculateExpression } = require('../../utils/calculateExpression')
+const SQLError = require('../../models/SQLError')
 
 /**
  * Takes an array of expression fields and maps them using evaluateExpressionPart(expressionPart, row),
@@ -55,6 +56,9 @@ const evaluateExpressionPart = (expressionPart, row) => {
         case 'integer':
             return expressionPart.value
         case 'column':
+            if (!row[expressionPart.value] && row[expressionPart.value] !== 0) {
+                throw new SQLError(`No such column: ${expressionPart.value}`)
+            }
             return row[expressionPart.value]
         case 'operator':
             return expressionPart.value
@@ -86,7 +90,13 @@ const evaluateAggregateExpressionPart = (expressionPart, rows) => {
         case 'aggregateFunction':
             return executeAggregateFunction(expressionPart, rows)
         case 'column':
-            return rows[0].column
+            if (
+                !rows[0][expressionPart.value] &&
+                rows[0][expressionPart.value] !== 0
+            ) {
+                throw new SQLError(`No such column: ${expressionPart.value}`)
+            }
+            return rows[0].expressionPart.value
         default:
             return expressionPart.value
     }
