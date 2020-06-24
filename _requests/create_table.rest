@@ -34,14 +34,19 @@ Content-Type: application/json
 
 {
   "commandArray": [
-            "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
-            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('porkkana', 7);",
-            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('banaani', 7);",
-            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('banaani', 4);",
-            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
-            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('nauris', 4);",
-            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('bucket', 0);",
-            "SELECT MIN(hinta), MAX(hinta), COUNT(hinta), nimi FROM Tuotteet GROUP BY hinta;"
+            "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER, lkm INTEGER);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('retiisi', 7, 20);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('porkkana', 5, 40);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('nauris', 4, 40);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('lanttu', 8, 20);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri', 4, 30);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri', 4, 70);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('maito', 6, 70);",
+            "INSERT INTO Tuotteet (nimi,hinta, lkm) VALUES ('olut',4, 50);",
+            "INSERT INTO Tuotteet (nimi,hinta, lkm) VALUES ('olut',4, 70);",
+            "INSERT INTO Tuotteet (nimi,hinta, lkm) VALUES ('olut',5, 40);",
+            "INSERT INTO Tuotteet (nimi,hinta, lkm) VALUES ('olut',5, 40);",
+            "SELECT nimi, SUM(lkm) FROM Tuotteet GROUP BY nimi;"
         ]
 }
 
