@@ -533,6 +533,39 @@ class StateService {
             return rowToReturn
         }
 
+        const lastExpressionIncludingMinMaxFunction = _.findLast(
+            fields,
+            (field) => {
+                if (field.type === 'expression') {
+                    return _.findLast(
+                        field.expressionParts,
+                        (part) =>
+                            part.type === 'aggregateFunction' &&
+                            (part.name === 'MIN' || part.name === 'MAX')
+                    )
+                }
+            }
+        )
+
+        const lastMinMaxFunctionInExpression = _.findLast(
+            lastExpressionIncludingMinMaxFunction.expressionParts,
+            (field) =>
+                field.type === 'aggregateFunction' &&
+                (field.name === 'MIN' || field.name === 'MAX')
+        )
+
+        if (lastMinMaxFunctionInExpression) {
+            const rowToReturn = _.filter(rows, {
+                [lastMinMaxFunctionInExpression.param
+                    .value]: executeAggregateFunction(
+                    lastMinMaxFunctionInExpression,
+                    rows
+                ),
+            })
+
+            return rowToReturn
+        }
+
         const lastOtherAggregateFunction = _.findLast(
             fields,
             (field) => field.type === 'aggregateFunction'
