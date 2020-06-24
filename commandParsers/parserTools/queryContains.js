@@ -1,16 +1,24 @@
 const {
     checkLimitPosition,
     checkGroupByPosition,
+    checkOrderByPosition,
+    checkWherePosition,
 } = require('../parserTools/checkPosition')
 
 /**
- * Checks whether a command contains the keyword WHERE. Check is
- * case-insensitive. Returns true or false.
+ * Checks whether a command contains the keyword WHERE and in the correct
+ * position. Check is case-insensitive. Returns true or false.
  * @param {string[]} fullCommandAsStringArray command as string array
  * @returns {Boolean} WHERE was found true/false
  */
 const queryContainsWhereKeyword = (fullCommandAsStringArray) => {
-    return fullCommandAsStringArray.some((s) => s.toUpperCase() === 'WHERE')
+    const indexOfWhere = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'WHERE'
+    )
+
+    if (indexOfWhere !== -1) checkWherePosition(fullCommandAsStringArray)
+
+    return indexOfWhere !== -1
 }
 
 /**
@@ -34,8 +42,8 @@ const queryContainsGroupByKeywords = (fullCommandAsStringArray) => {
 }
 
 /**
- * Checks whether a command contains the keywords ORDER and BY and that they
- * are in the correct order. Check is case-insensitive. Returns true or false.
+ * Checks whether a command contains the keyword ORDER BY and in the correct
+ * position. Check is case-insensitive. Returns true or false.
  * @param {string[]} fullCommandAsStringArray command as string array
  * @returns {Boolean} ORDER BY was found true/false
  */
@@ -44,14 +52,13 @@ const queryContainsOrderByKeywords = (fullCommandAsStringArray) => {
         (s) => s.toUpperCase() === 'ORDER'
     )
 
-    if (indexOfOrder < 0) return false
+    if (indexOfOrder !== -1) checkOrderByPosition(fullCommandAsStringArray)
 
-    const hasOrderBy =
-        indexOfOrder >= 0 &&
+    return (
+        indexOfOrder !== -1 &&
         fullCommandAsStringArray[indexOfOrder + 1] &&
         fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() === 'BY'
-
-    return hasOrderBy
+    )
 }
 
 const queryContainsWhereGroupByKeywords = (fullCommandAsStringArray) => {

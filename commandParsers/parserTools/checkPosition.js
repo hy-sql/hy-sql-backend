@@ -29,6 +29,31 @@ const checkLimitPosition = (fullCommandAsStringArray) => {
     }
 }
 
+/**
+ * Checks whether the WHERE keyword is correctly positioned before keywords
+ * GROUP BY and ORDER BY. Throws an error if not correctly positioned.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ */
+const checkWherePosition = (fullCommandAsStringArray) => {
+    const indexOfWhere = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'WHERE'
+    )
+
+    if (
+        !beforeGroupBy(fullCommandAsStringArray, indexOfWhere) ||
+        !beforeOrderBy(fullCommandAsStringArray, indexOfWhere)
+    ) {
+        throw new SQLError(
+            'WHERE must always be positioned before GROUP BY and ORDER BY'
+        )
+    }
+}
+
+/**
+ * Checks whether the GROUP BY keyword is correctly positioned after keyword
+ * WHERE and before ORDER BY. Throws an error if not correctly positioned.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ */
 const checkGroupByPosition = (fullCommandAsStringArray) => {
     const indexOfGroup = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'GROUP'
@@ -51,9 +76,32 @@ const checkGroupByPosition = (fullCommandAsStringArray) => {
     }
 }
 
-/*
+/**
+ * Checks whether the ORDER BY keyword is correctly positioned after keywords
+ * WHERE and GROUP BY. Throws an error if not correctly positioned.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ */
+const checkOrderByPosition = (fullCommandAsStringArray) => {
+    const indexOfOrder = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'ORDER'
+    )
 
-*/
+    if (
+        fullCommandAsStringArray[indexOfOrder + 1] &&
+        fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() !== 'BY'
+    ) {
+        return
+    }
+
+    if (
+        !afterWhere(fullCommandAsStringArray, indexOfOrder) ||
+        !afterGroupBy(fullCommandAsStringArray, indexOfOrder)
+    ) {
+        throw new SQLError(
+            'ORDER BY must always be positioned after WHERE and GROUP BY'
+        )
+    }
+}
 
 const afterWhere = (fullCommandAsStringArray, indexOfKeyword) => {
     const indexOfWhere = fullCommandAsStringArray.findIndex(
@@ -89,6 +137,19 @@ const afterOrderBy = (fullCommandAsStringArray, indexOfKeyword) => {
         : true
 }
 
+const beforeGroupBy = (fullCommandAsStringArray, indexOfKeyword) => {
+    const indexOfGroup = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'GROUP'
+    )
+
+    return indexOfGroup !== -1 &&
+        fullCommandAsStringArray[indexOfGroup + 1] &&
+        fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY' &&
+        indexOfKeyword > indexOfGroup
+        ? false
+        : true
+}
+
 const beforeOrderBy = (fullCommandAsStringArray, indexOfKeyword) => {
     const indexOfOrder = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'ORDER'
@@ -102,4 +163,9 @@ const beforeOrderBy = (fullCommandAsStringArray, indexOfKeyword) => {
         : true
 }
 
-module.exports = { checkLimitPosition, checkGroupByPosition }
+module.exports = {
+    checkLimitPosition,
+    checkGroupByPosition,
+    checkOrderByPosition,
+    checkWherePosition,
+}
