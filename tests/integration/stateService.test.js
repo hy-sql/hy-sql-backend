@@ -187,3 +187,49 @@ describe('insertIntoTable()', () => {
         )
     })
 })
+
+describe('executeSelectDistinct()', () => {
+    const state = new State(new Map())
+    const stateService = new StateService(state)
+    const rows = [
+        {
+            nimi: 'olut',
+            hinta: 3,
+        },
+        {
+            nimi: 'olut',
+            hinta: 3,
+        },
+        {
+            nimi: 'olut',
+            hinta: 2,
+        },
+        {
+            nimi: 'nauris',
+            hinta: 3,
+        },
+        {
+            nimi: 'nauris',
+            hinta: 3,
+        },
+    ]
+
+    test('filters out duplicate rows', () => {
+        const expectedRows = [
+            {
+                nimi: 'olut',
+                hinta: 3,
+            },
+            {
+                nimi: 'olut',
+                hinta: 2,
+            },
+            {
+                nimi: 'nauris',
+                hinta: 3,
+            },
+        ]
+        const result = stateService.selectDistinct(rows)
+        expect(result).toEqual(expectedRows)
+    })
+})
