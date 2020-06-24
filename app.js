@@ -26,7 +26,9 @@ const unknownEndpoint = (req, res) => {
 }
 
 app.get('/', (req, res) => {
-    res.send('<h1>Hello World!</h1>')
+    res.send(
+        '<h1>Welcome to HYSQL-API</h1><p>Endpoints documented in wiki.</p>'
+    )
 })
 
 app.get('/api/ping/', (req, res) => {
