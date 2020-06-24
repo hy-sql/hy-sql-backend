@@ -1,7 +1,7 @@
 const Joi = require('@hapi/joi')
 const { parseGroupBy } = require('../../commandParsers/groupByParser')
 const {
-    queryContainsGroupByKeywords,
+    queryContainsGroupByKeyword,
     queryContainsWhereGroupByKeywords,
     queryContainsGroupByOrderByKeywords,
     queryContainsWhereGroupByOrderByKeywords,
@@ -24,7 +24,7 @@ describe.each([
         const command = splitCommandIntoArray(validCommand)
 
         test('is recognised to contain a GROUP BY keyword', () => {
-            expect(queryContainsGroupByKeywords(command)).toBeTruthy()
+            expect(queryContainsGroupByKeyword(command)).toBeTruthy()
         })
 
         test('is parsed and validated succesfully', () => {

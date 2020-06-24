@@ -27,7 +27,7 @@ const queryContainsWhereKeyword = (fullCommandAsStringArray) => {
  * @param {string[]} fullCommandAsStringArray command as string array
  * @returns {Boolean} GROUP BY was found true/false
  */
-const queryContainsGroupByKeywords = (fullCommandAsStringArray) => {
+const queryContainsGroupByKeyword = (fullCommandAsStringArray) => {
     const indexOfGroup = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'GROUP'
     )
@@ -47,7 +47,7 @@ const queryContainsGroupByKeywords = (fullCommandAsStringArray) => {
  * @param {string[]} fullCommandAsStringArray command as string array
  * @returns {Boolean} ORDER BY was found true/false
  */
-const queryContainsOrderByKeywords = (fullCommandAsStringArray) => {
+const queryContainsOrderByKeyword = (fullCommandAsStringArray) => {
     const indexOfOrder = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'ORDER'
     )
@@ -62,22 +62,12 @@ const queryContainsOrderByKeywords = (fullCommandAsStringArray) => {
 }
 
 const queryContainsWhereGroupByKeywords = (fullCommandAsStringArray) => {
-    const indexOfWhere = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'WHERE'
+    const containsWhere = queryContainsWhereKeyword(fullCommandAsStringArray)
+    const containsGroupBy = queryContainsGroupByKeyword(
+        fullCommandAsStringArray
     )
 
-    const indexOfGroup = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'GROUP'
-    )
-
-    if (indexOfWhere < 0 || indexOfGroup < 0) return false
-
-    const hasGroupBy =
-        indexOfGroup >= 0 &&
-        fullCommandAsStringArray[indexOfGroup + 1] &&
-        fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY'
-
-    return indexOfWhere >= 0 && indexOfWhere < indexOfGroup && hasGroupBy
+    return containsWhere && containsGroupBy
 }
 
 const queryContainsGroupByOrderByKeywords = (fullCommandAsStringArray) => {
@@ -181,8 +171,8 @@ const queryContainsLimitKeyword = (fullCommandAsStringArray) => {
 
 module.exports = {
     queryContainsWhereKeyword,
-    queryContainsGroupByKeywords,
-    queryContainsOrderByKeywords,
+    queryContainsGroupByKeyword,
+    queryContainsOrderByKeyword,
     queryContainsWhereGroupByKeywords,
     queryContainsWhereOrderByKeywords,
     queryContainsGroupByOrderByKeywords,

@@ -12,8 +12,8 @@ const {
 const { parseWhere } = require('./whereParser')
 const {
     queryContainsWhereKeyword,
-    queryContainsGroupByKeywords,
-    queryContainsOrderByKeywords,
+    queryContainsGroupByKeyword,
+    queryContainsOrderByKeyword,
     queryContainsWhereGroupByKeywords,
     queryContainsWhereOrderByKeywords,
     queryContainsGroupByOrderByKeywords,
@@ -42,9 +42,9 @@ const parseCommand = (fullCommandAsStringArray) => {
             return parseSelectGroupByOrderBy(fullCommandAsStringArray)
         case queryContainsWhereGroupByKeywords(fullCommandAsStringArray):
             return parseSelectWhereGroupBy(fullCommandAsStringArray)
-        case queryContainsOrderByKeywords(fullCommandAsStringArray):
+        case queryContainsOrderByKeyword(fullCommandAsStringArray):
             return parseSelectOrderBy(fullCommandAsStringArray)
-        case queryContainsGroupByKeywords(fullCommandAsStringArray):
+        case queryContainsGroupByKeyword(fullCommandAsStringArray):
             return parseSelectGroupBy(fullCommandAsStringArray)
         case queryContainsWhereKeyword(fullCommandAsStringArray):
             return parseSelectWhere(fullCommandAsStringArray)
