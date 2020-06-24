@@ -14,25 +14,17 @@ const checkLimitPosition = (fullCommandAsStringArray) => {
     const indexOfOffset = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'OFFSET'
     )
-
-    let correctlyPositioned =
-        indexOfOffset !== -1 && indexOfOffset < indexOfLimit ? false : true
-
-    if (!afterWhere(fullCommandAsStringArray, indexOfLimit)) {
-        correctlyPositioned = false
+    if (indexOfOffset !== -1 && indexOfOffset < indexOfLimit) {
+        throw new SQLError('OFFSET must always be after LIMIT')
     }
 
-    if (!afterGroupBy(fullCommandAsStringArray, indexOfLimit)) {
-        correctlyPositioned = false
-    }
-
-    if (!afterOrderBy(fullCommandAsStringArray, indexOfLimit)) {
-        correctlyPositioned = false
-    }
-
-    if (!correctlyPositioned) {
+    if (
+        !afterWhere(fullCommandAsStringArray, indexOfLimit) ||
+        !afterGroupBy(fullCommandAsStringArray, indexOfLimit) ||
+        !afterOrderBy(fullCommandAsStringArray, indexOfLimit)
+    ) {
         throw new SQLError(
-            'OFFSET must always be after LIMIT and LIMIT can not be before WHERE, GROUP BY or ORDER BY'
+            'LIMIT must always be after WHERE, GROUP BY and ORDER BY'
         )
     }
 }

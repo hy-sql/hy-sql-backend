@@ -229,7 +229,6 @@ describe.each([
     'SELECT nimi, hinta FROM Tuotteet LIMIT 2 WHERE hinta=2;',
     'SELECT nimi, hinta FROM Tuotteet LIMIT 2 ORDER BY hinta;',
     'SELECT nimi, hinta FROM Tuotteet LIMIT 2 GROUP BY hinta;',
-    'SELECT nimi, hinta FROM Tuotteet OFFSET 2 LIMIT 2;',
 ])('Invalid query containing incorrectly placed LIMIT', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
@@ -237,9 +236,21 @@ describe.each([
         test('throws correct error during parsing', () => {
             expect(() => selectParser.parseCommand(command)).toThrowError(
                 new SQLError(
-                    'OFFSET must always be after LIMIT and LIMIT can not be before WHERE, GROUP BY or ORDER BY'
+                    'LIMIT must always be after WHERE, GROUP BY and ORDER BY'
                 )
             )
         })
+    })
+})
+
+describe('Invalid query with OFFSET incorrectly placed before LIMIT', () => {
+    const command = splitCommandIntoArray(
+        'SELECT nimi, hinta FROM Tuotteet OFFSET 2 LIMIT 2;'
+    )
+
+    test('throws correct error during parsing', () => {
+        expect(() => selectParser.parseCommand(command)).toThrowError(
+            new SQLError('OFFSET must always be after LIMIT')
+        )
     })
 })
