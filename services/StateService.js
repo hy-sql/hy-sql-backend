@@ -123,6 +123,8 @@ class StateService {
 
         let selectedRows = this.selectRows(command, existingRows)
 
+        console.log('selectFrom > selectedRows', selectedRows)
+
         if (command.limit) {
             selectedRows = this.limitRows(command.limit, selectedRows)
         }
@@ -441,6 +443,15 @@ class StateService {
             ? this.filterRows(command.where.conditions, existingRows)
             : existingRows
 
+        console.log('selectRows > command.fields', command.fields)
+        if (command.having) {
+            command.fields = command.fields.concat(
+                command.having.conditions.AND[0].left
+            )
+            // TODO: poista lis�tty sarake, jos sit� ei ollut ennest��n
+            console.log('selectRows > command.fields', command.fields)
+        }
+
         if (command.fields[0].type === 'all') {
             return command.orderBy
                 ? this.orderRowsBy(command.orderBy.fields, filteredRows)
@@ -496,6 +507,15 @@ class StateService {
             command.fields[0].type === 'distinct'
                 ? executeSelectDistinct(selectedRows)
                 : selectedRows
+
+        console.log('selectRows > distinctRows', distinctRows)
+        /*
+        const havingRows = command.having
+            ? this.filterHavingRows(command.having.conditions, distinctRows)
+            : distinctRows
+
+        console.log('selectRows > havingRows', havingRows)
+        */
 
         return command.groupBy
             ? command.orderBy
