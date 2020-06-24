@@ -2,7 +2,6 @@ const _ = require('lodash')
 const {
     executeStringFunction,
     executeAggregateFunction,
-    executeSelectDistinct,
 } = require('./components/functions')
 const {
     evaluateExpression,
@@ -473,40 +472,28 @@ class StateService {
             ? this.initialGroupRowsBy(rowsWithNewFields, command.groupBy.fields)
             : rowsWithNewFields
 
-        console.log('initialGroupedRows', initialGroupedRows)
-
         const groupedRowsWithNewFieldsAndFunctions = command.groupBy
             ? initialGroupedRows.map((rowGroup) =>
                   this.createFunctionRows(command, rowGroup)
               )
             : this.createFunctionRows(command, initialGroupedRows)
 
-        // console.log(
-        //     'groupedRowsWithNewFieldsAndFunctions',
-        //     groupedRowsWithNewFieldsAndFunctions
-        // )
-
         const aggregateFunctionRows = command.groupBy
-            ? groupedRowsWithNewFieldsAndFunctions.map((rowGroup) => {
-                  //   console.log('rowGroup', rowGroup)
-                  const rows = this.pickAggregateFunctionRow(
-                      rowGroup,
-                      command.fields
+            ? _.compact(
+                  groupedRowsWithNewFieldsAndFunctions.map((rowGroup) =>
+                      this.pickAggregateFunctionRow(rowGroup, command.fields)
                   )
-                  console.log('rows', rows)
-                  return rows[0]
-              })
+              )
             : this.pickAggregateFunctionRow(
                   groupedRowsWithNewFieldsAndFunctions,
                   command.fields
               )
 
-        console.log('aggregateFunctionRows', aggregateFunctionRows)
-
-        if (aggregateFunctionRows) {
+        if (!_.isEmpty(aggregateFunctionRows)) {
             const aggregateFunctionRowsWithSelectedFields = aggregateFunctionRows.map(
                 (row) => _.pick(row, fieldsToReturn)
             )
+
             return aggregateFunctionRowsWithSelectedFields
         }
 
@@ -528,33 +515,38 @@ class StateService {
               )
             : orderedRows
 
-        console.log(
-            'rowsWithInitiallySelectedFields',
-            rowsWithInitiallySelectedFields
-        )
-
-        const distinctRows =
-            command.fields[0].type === 'distinct'
-                ? executeSelectDistinct(rowsWithInitiallySelectedFields)
-                : rowsWithInitiallySelectedFields
-
-        // console.log('distinctRows', distinctRows)
-
         const groupedRows = command.groupBy
-            ? this.groupRowsBy(distinctRows, command.groupBy.fields)
-            : distinctRows
-
-        // console.log('groupedRows', groupedRows)
+            ? this.groupRowsBy(
+                  rowsWithInitiallySelectedFields,
+                  command.groupBy.fields
+              )
+            : rowsWithInitiallySelectedFields
 
         const rowsWithSelectedFields = groupedRows.map((row) =>
             _.pick(row, fieldsToReturn)
         )
 
-        const finalOrderedRows = command.orderBy
-            ? this.orderRowsBy(command.orderBy.fields, rowsWithSelectedFields)
-            : rowsWithSelectedFields
+        const groupedOrderedRows =
+            command.groupBy && command.orderBy
+                ? this.orderRowsBy(
+                      command.orderBy.fields,
+                      rowsWithSelectedFields
+                  )
+                : rowsWithSelectedFields
 
-        return finalOrderedRows
+        return command.fields[0].type === 'distinct'
+            ? this.selectDistinct(groupedOrderedRows)
+            : groupedOrderedRows
+    }
+
+    /**
+     * Executes SELECT DISTINCT command for given rows. Expects rows containing only
+     * queried columns as input and filters out possible duplicate data. Returns only
+     * unique rows.
+     * @param {*} rows Rows containing queried columns.
+     */
+    selectDistinct(rows) {
+        return _.uniqWith(rows, _.isEqual)
     }
 
     pickAggregateFunctionRow(rows, fields) {
@@ -566,14 +558,14 @@ class StateService {
         )
 
         if (lastMinMaxFunction) {
-            const rowToReturn = _.filter(rows, {
+            const filteredRows = _.filter(rows, {
                 [lastMinMaxFunction.param.value]: executeAggregateFunction(
                     lastMinMaxFunction,
                     rows
                 ),
             })
 
-            return rowToReturn
+            return filteredRows[0]
         }
 
         const lastExpressionIncludingMinMaxFunction = _.findLast(
@@ -590,23 +582,25 @@ class StateService {
             }
         )
 
-        const lastMinMaxFunctionInExpression = _.findLast(
-            lastExpressionIncludingMinMaxFunction.expressionParts,
-            (field) =>
-                field.type === 'aggregateFunction' &&
-                (field.name === 'MIN' || field.name === 'MAX')
-        )
+        if (lastExpressionIncludingMinMaxFunction) {
+            const lastMinMaxFunctionInExpression = _.findLast(
+                lastExpressionIncludingMinMaxFunction.expressionParts,
+                (field) =>
+                    field.type === 'aggregateFunction' &&
+                    (field.name === 'MIN' || field.name === 'MAX')
+            )
 
-        if (lastMinMaxFunctionInExpression) {
-            const rowToReturn = _.filter(rows, {
-                [lastMinMaxFunctionInExpression.param
-                    .value]: executeAggregateFunction(
-                    lastMinMaxFunctionInExpression,
-                    rows
-                ),
-            })
+            if (lastMinMaxFunctionInExpression) {
+                const filteredRows = _.filter(rows, {
+                    [lastMinMaxFunctionInExpression.param
+                        .value]: executeAggregateFunction(
+                        lastMinMaxFunctionInExpression,
+                        rows
+                    ),
+                })
 
-            return rowToReturn
+                return filteredRows[0]
+            }
         }
 
         const lastOtherAggregateFunction = _.findLast(

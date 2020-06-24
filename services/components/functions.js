@@ -72,7 +72,8 @@ const executeAggregateFunction = (functionFields, rows) => {
         case 'COUNT':
             return functionFields.param.type === 'all'
                 ? rows.length
-                : _.filter(rows, paramValue).filter(Boolean).length
+                : _.map(rows, paramValue).length
+
         case 'MAX': {
             const result = _.get(_.maxBy(rows, paramValue), paramValue)
 
@@ -109,18 +110,7 @@ const executeAggregateFunction = (functionFields, rows) => {
     }
 }
 
-/**
- * Executes SELECT DISTINCT command for given rows. Expects rows containing only
- * queried columns as input and filters out possible duplicate data. Returns only
- * unique rows.
- * @param {*} rows Rows containing queried columns.
- */
-const executeSelectDistinct = (rows) => {
-    return _.uniqWith(rows, _.isEqual)
-}
-
 module.exports = {
     executeStringFunction,
     executeAggregateFunction,
-    executeSelectDistinct,
 }
