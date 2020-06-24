@@ -4,11 +4,13 @@
 
 [![codecov](https://codecov.io/gh/hy-sql/hy-sql-backend/branch/master/graph/badge.svg)](https://codecov.io/gh/hy-sql/hy-sql-backend)
 
-https://hy-sql.herokuapp.com/
+Production: https://hy-sql.herokuapp.com/
 
 Backend offers one stateless API-endpoint for parsing and executing SQL-queries.
 
-[API-documentation](https://github.com/hy-sql/project-info/blob/master/documents/rest-api.md)
+[API-documentation](https://github.com/hy-sql/project-info/wiki/API)
+
+[Information about the project](https://github.com/hy-sql/project-info)
 
 ## Development
 
