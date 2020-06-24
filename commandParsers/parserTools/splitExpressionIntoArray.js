@@ -3,7 +3,7 @@ const {
     containsArithmeticOperatorPattern,
     containsFunctionPattern,
 } = require('../../helpers/regex')
-const { containsFunction } = require('../../helpers/containsRegexTools')
+const { isFunction } = require('../../helpers/isRegexTools')
 
 /**
  * Transforms arithmetic expression from String into Array of individual expression parts
@@ -16,11 +16,11 @@ const { containsFunction } = require('../../helpers/containsRegexTools')
 const splitExpressionIntoArray = (expression) => {
     const splitExpression = _.flatten(
         expression
-            .replace(containsFunctionPattern, ' $1 ')
+            .replace(containsFunctionPattern, (m) => ` ${m} `)
             .split(' ')
             .filter(Boolean)
             .map((e) =>
-                containsFunction(e)
+                isFunction(e)
                     ? e
                     : e.split(containsArithmeticOperatorPattern).filter(Boolean)
             )
