@@ -30,12 +30,12 @@ describe.each([
 })
 
 describe.each([
-    // 'SELECT id nimi, hinta FROM Tuotteet;', //eka sarakkeiden pilkku puuttuu //FIXME: Select parser bug #107
-    'SELECT id,nimi,hinta FROM Tuotteet', //puolipiste lopusta
-    'SELECT id,nimi,hinta FROM ;', //taulu puuttuu
-    '       seLEct FROM      tuoTTeet ;', //sarakkeet puuttuu kokonaan
-    // '   selecT id nimi hinta FROM tuoTTeeT;', //sarakkeiden kaikki pilkut puuttuu //FIXME: Select parser bug #107
-    'SeleCT id,nimi,hinta   Tuotteet;', //FROM puuttuu
+    'SELECT id nimi, hinta FROM Tuotteet;',
+    'SELECT id,nimi,hinta FROM Tuotteet',
+    'SELECT id,nimi,hinta FROM ;',
+    '       seLEct FROM      tuoTTeet ;',
+    '   selecT id nimi hinta FROM tuoTTeeT;',
+    'SeleCT id,nimi,hinta   Tuotteet;',
 ])('invalid command with the right name (SELECT) testing', (command) => {
     const fullCommandAsStringArray = splitCommandIntoArray(command)
 

@@ -303,7 +303,6 @@ describe('selectFrom()', () => {
         expect(result.rows).toEqual(expectedRows)
     })
 
-    /* FIXME: Create massive regular expression for arithmetic expression field with functions etc...
     test('returns row asked by COUNT function in select with arithmetic expression', () => {
         const expectedRows = [
             {
@@ -320,7 +319,7 @@ describe('selectFrom()', () => {
         expect(result.rows).toEqual(expectedRows)
     })
 
-     test('returns row asked by select function expression', () => {
+    test('returns row asked by select function expression', () => {
         const expectedRows = [
             {
                 "LENGTH('string')*2": 12,
@@ -353,7 +352,6 @@ describe('selectFrom()', () => {
 
         expect(result.rows).toEqual(expectedRows)
     })
-    */
 
     test('returns expected error for LENGTH-function in select', () => {
         const selectCommand = 'SELECT LENGTH(nonexistent) FROM Tuotteet;'
@@ -492,43 +490,7 @@ describe('selectFrom()', () => {
     test('returns expected rows with multiple function expressions', () => {
         const expectedRows = [
             {
-                hinta: 7,
-                'MAX(hinta)': 8,
-                'MIN(hinta)': 4,
-                'COUNT(*)': 7,
-            },
-            {
-                hinta: 5,
-                'MAX(hinta)': 8,
-                'MIN(hinta)': 4,
-                'COUNT(*)': 7,
-            },
-            {
                 hinta: 4,
-                'MAX(hinta)': 8,
-                'MIN(hinta)': 4,
-                'COUNT(*)': 7,
-            },
-            {
-                hinta: 8,
-                'MAX(hinta)': 8,
-                'MIN(hinta)': 4,
-                'COUNT(*)': 7,
-            },
-            {
-                hinta: 4,
-                'MAX(hinta)': 8,
-                'MIN(hinta)': 4,
-                'COUNT(*)': 7,
-            },
-            {
-                hinta: 6,
-                'MAX(hinta)': 8,
-                'MIN(hinta)': 4,
-                'COUNT(*)': 7,
-            },
-            {
-                hinta: 6,
                 'MAX(hinta)': 8,
                 'MIN(hinta)': 4,
                 'COUNT(*)': 7,
