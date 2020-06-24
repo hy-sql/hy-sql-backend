@@ -489,10 +489,14 @@ class StateService {
                   command.fields
               )
 
+        console.log(aggregateFunctionRows)
+
         if (!_.isEmpty(aggregateFunctionRows)) {
             const aggregateFunctionRowsWithSelectedFields = aggregateFunctionRows.map(
                 (row) => _.pick(row, fieldsToReturn)
             )
+
+            console.log(aggregateFunctionRowsWithSelectedFields)
 
             return aggregateFunctionRowsWithSelectedFields
         }
@@ -565,7 +569,7 @@ class StateService {
                 ),
             })
 
-            return filteredRows[0]
+            return [filteredRows[0]]
         }
 
         const lastExpressionIncludingMinMaxFunction = _.findLast(
@@ -599,7 +603,7 @@ class StateService {
                     ),
                 })
 
-                return filteredRows[0]
+                return [filteredRows[0]]
             }
         }
 
