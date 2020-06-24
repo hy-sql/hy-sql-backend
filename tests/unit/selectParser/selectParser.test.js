@@ -236,7 +236,7 @@ describe.each([
         test('throws correct error during parsing', () => {
             expect(() => selectParser.parseCommand(command)).toThrowError(
                 new SQLError(
-                    'LIMIT must always be after WHERE, GROUP BY and ORDER BY'
+                    'LIMIT must always be positioned after WHERE, GROUP BY and ORDER BY'
                 )
             )
         })
@@ -250,7 +250,7 @@ describe('Invalid query with OFFSET incorrectly placed before LIMIT', () => {
 
     test('throws correct error during parsing', () => {
         expect(() => selectParser.parseCommand(command)).toThrowError(
-            new SQLError('OFFSET must always be after LIMIT')
+            new SQLError('OFFSET must always be positioned after LIMIT')
         )
     })
 })

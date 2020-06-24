@@ -15,7 +15,7 @@ const checkLimitPosition = (fullCommandAsStringArray) => {
         (s) => s.toUpperCase() === 'OFFSET'
     )
     if (indexOfOffset !== -1 && indexOfOffset < indexOfLimit) {
-        throw new SQLError('OFFSET must always be after LIMIT')
+        throw new SQLError('OFFSET must always be positioned after LIMIT')
     }
 
     if (
@@ -24,10 +24,36 @@ const checkLimitPosition = (fullCommandAsStringArray) => {
         !afterOrderBy(fullCommandAsStringArray, indexOfLimit)
     ) {
         throw new SQLError(
-            'LIMIT must always be after WHERE, GROUP BY and ORDER BY'
+            'LIMIT must always be positioned after WHERE, GROUP BY and ORDER BY'
         )
     }
 }
+
+const checkGroupByPosition = (fullCommandAsStringArray) => {
+    const indexOfGroup = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'GROUP'
+    )
+
+    if (
+        fullCommandAsStringArray[indexOfGroup + 1] &&
+        fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() !== 'BY'
+    ) {
+        return
+    }
+
+    if (
+        !afterWhere(fullCommandAsStringArray, indexOfGroup) ||
+        !beforeOrderBy(fullCommandAsStringArray, indexOfGroup)
+    ) {
+        throw new SQLError(
+            'GROUP BY must always be positioned after WHERE and before ORDER BY'
+        )
+    }
+}
+
+/*
+
+*/
 
 const afterWhere = (fullCommandAsStringArray, indexOfKeyword) => {
     const indexOfWhere = fullCommandAsStringArray.findIndex(
@@ -43,6 +69,7 @@ const afterGroupBy = (fullCommandAsStringArray, indexOfKeyword) => {
     )
 
     return indexOfGroup !== -1 &&
+        fullCommandAsStringArray[indexOfGroup + 1] &&
         fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY' &&
         indexOfKeyword < indexOfGroup
         ? false
@@ -55,10 +82,24 @@ const afterOrderBy = (fullCommandAsStringArray, indexOfKeyword) => {
     )
 
     return indexOfOrder !== -1 &&
+        fullCommandAsStringArray[indexOfOrder + 1] &&
         fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() === 'BY' &&
         indexOfKeyword < indexOfOrder
         ? false
         : true
 }
 
-module.exports = { checkLimitPosition }
+const beforeOrderBy = (fullCommandAsStringArray, indexOfKeyword) => {
+    const indexOfOrder = fullCommandAsStringArray.findIndex(
+        (s) => s.toUpperCase() === 'ORDER'
+    )
+
+    return indexOfOrder !== -1 &&
+        fullCommandAsStringArray[indexOfOrder + 1] &&
+        fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() === 'BY' &&
+        indexOfKeyword > indexOfOrder
+        ? false
+        : true
+}
+
+module.exports = { checkLimitPosition, checkGroupByPosition }

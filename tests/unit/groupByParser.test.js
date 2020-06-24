@@ -9,6 +9,7 @@ const {
 const GroupBySchema = require('../../schemas/GroupBySchema')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
 const { parseCommand } = require('../../commandParsers/selectParser')
+//const SQLError = require('../../models/SQLError')
 
 describe.each([
     'GROUP BY price',
@@ -136,3 +137,20 @@ describe.each([
         })
     })
 })
+
+/*describe.each([
+    'SELECT nimi, hinta FROM Tuotteet GROUP BY nimi WHERE hinta=2;',
+    'SELECT nimi, hinta FROM Tuotteet ORDER BY hinta GROUP BY nimi;',
+])('Query containing incorrectly placed GROUP BY', (invalidCommand) => {
+    describe(invalidCommand, () => {
+        const command = splitCommandIntoArray(invalidCommand)
+
+        test('throws correct error during parsing', () => {
+            expect(() => parseCommand(command)).toThrowError(
+                new SQLError(
+                    'GROUP BY must always be positioned after WHERE and before ORDER BY'
+                )
+            )
+        })
+    })
+})*/

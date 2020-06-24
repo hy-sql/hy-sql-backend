@@ -1,4 +1,7 @@
-const { checkLimitPosition } = require('../parserTools/checkPosition')
+const {
+    checkLimitPosition,
+    checkGroupByPosition,
+} = require('../parserTools/checkPosition')
 
 /**
  * Checks whether a command contains the keyword WHERE. Check is
@@ -10,19 +13,24 @@ const queryContainsWhereKeyword = (fullCommandAsStringArray) => {
     return fullCommandAsStringArray.some((s) => s.toUpperCase() === 'WHERE')
 }
 
+/**
+ * Checks whether a command contains the keyword GROUP BY and in the correct
+ * position. Check is case-insensitive. Returns true or false.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {Boolean} GROUP BY was found true/false
+ */
 const queryContainsGroupByKeywords = (fullCommandAsStringArray) => {
     const indexOfGroup = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'GROUP'
     )
 
-    if (indexOfGroup < 0) return false
+    if (indexOfGroup !== -1) checkGroupByPosition(fullCommandAsStringArray)
 
-    const hasGroupBy =
-        indexOfGroup >= 0 &&
+    return (
+        indexOfGroup !== -1 &&
         fullCommandAsStringArray[indexOfGroup + 1] &&
         fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY'
-
-    return hasGroupBy
+    )
 }
 
 /**
@@ -149,8 +157,8 @@ const queryContainsWhereGroupByOrderByKeywords = (fullCommandAsStringArray) => {
 }
 
 /**
- * Checks whether a command contains the keyword LIMIT. Check is
- * case-insensitive. Returns true or false.
+ * Checks whether a command contains the keyword LIMIT and in the correct
+ * position. Check is case-insensitive. Returns true or false.
  * @param {string[]} fullCommandAsStringArray command as string array
  * @returns {Boolean} LIMIT was found true/false
  */
