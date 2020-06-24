@@ -195,16 +195,24 @@ describe('USER STORY TESTS: large summary queries', () => {
         })
     })
 
-    /* TODO WHEN HAVING-FEATURE READY
-    test('As a user I want to be able to use HAVING', () => {
-        const expectedRows = []
+    /* TODO WHEN HAVING-FEATURE READY*/
+    test.skip('As a user I want to be able to use HAVING', () => {
+        const expectedRows = [
+            {
+                tuote_id: 1,
+                'COUNT(*)': 3,
+            },
+            {
+                tuote_id: 2,
+                'COUNT(*)': 2,
+            },
+        ]
         const selectParser =
-            'SELECT projekti_id, COUNT(*) FROM Tehtavat WHERE tarkeys >= 3 GROUP BY projekti_id HAVING COUNT(*) >= 2 ORDER BY projekti_id;'
+            'SELECT tuote_id, COUNT(*) FROM Tuotteet WHERE hinta >= 3 GROUP BY tuote_id HAVING COUNT(*) >= 2 ORDER BY tuote_id;'
         const commandArray = splitCommandIntoArray(selectParser)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual(expectedRows)
     })
-    */
 })
