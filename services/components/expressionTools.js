@@ -50,7 +50,7 @@ const evaluateExpressionPart = (expressionPart, row) => {
         case 'stringFunction':
             return executeStringFunction(expressionPart, row)
         case 'aggregateFunction':
-            return executeAggregateFunction(expressionPart)
+            return executeAggregateFunction(expressionPart, row)
         case 'text':
             return expressionPart.value
         case 'integer':
