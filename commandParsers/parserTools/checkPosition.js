@@ -128,6 +128,13 @@ const checkOrderByPosition = (fullCommandAsStringArray) => {
     }
 }
 
+/**
+ * Checks that a keyword is after WHERE in the given command. Returns
+ * true or false. Returns true if command does not contain keyword WHERE.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @param {Number} indexOfKeyword index of keyword
+ * @return {Boolean} keyword is after WHERE true/false
+ */
 const afterWhere = (fullCommandAsStringArray, indexOfKeyword) => {
     const indexOfWhere = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'WHERE'
@@ -136,6 +143,13 @@ const afterWhere = (fullCommandAsStringArray, indexOfKeyword) => {
     return indexOfKeyword > indexOfWhere
 }
 
+/**
+ * Checks that a keyword is before GROUP BY in the given command. Returns
+ * true or false. Returns true if command does not contain keyword GROUP BY.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @param {Number} indexOfKeyword index of keyword
+ * @return {Boolean} keyword is before GROUP BY true/false
+ */
 const beforeGroupBy = (fullCommandAsStringArray, indexOfKeyword) => {
     const indexOfGroup = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'GROUP'
@@ -149,6 +163,13 @@ const beforeGroupBy = (fullCommandAsStringArray, indexOfKeyword) => {
         : true
 }
 
+/**
+ * Checks that a keyword is after GROUP BY in the given command. Returns
+ * true or false. Returns true if command does not contain keyword GROUP BY.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @param {Number} indexOfKeyword index of keyword
+ * @return {Boolean} keyword is after GROUP BY true/false
+ */
 const afterGroupBy = (fullCommandAsStringArray, indexOfKeyword) => {
     const indexOfGroup = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'GROUP'
@@ -162,6 +183,13 @@ const afterGroupBy = (fullCommandAsStringArray, indexOfKeyword) => {
         : true
 }
 
+/**
+ * Checks that a keyword is before HAVING in the given command. Returns
+ * true or false. Returns true if command does not contain keyword HAVING.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @param {Number} indexOfKeyword index of keyword
+ * @return {Boolean} keyword is before HAVING true/false
+ */
 const beforeHaving = (fullCommandAsStringArray, indexOfKeyword) => {
     const indexOfHaving = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'HAVING'
@@ -170,6 +198,13 @@ const beforeHaving = (fullCommandAsStringArray, indexOfKeyword) => {
     return !(indexOfHaving !== -1 && indexOfKeyword > indexOfHaving)
 }
 
+/**
+ * Checks that a keyword is after HAVING in the given command. Returns
+ * true or false. Returns true if command does not contain keyword HAVING.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @param {Number} indexOfKeyword index of keyword
+ * @return {Boolean} keyword is after HAVING true/false
+ */
 const afterHaving = (fullCommandAsStringArray, indexOfKeyword) => {
     const indexOfHaving = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'HAVING'
@@ -178,6 +213,13 @@ const afterHaving = (fullCommandAsStringArray, indexOfKeyword) => {
     return indexOfKeyword > indexOfHaving
 }
 
+/**
+ * Checks that a keyword is before ORDER BY in the given command. Returns
+ * true or false. Returns true if command does not contain keyword ORDER BY.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @param {Number} indexOfKeyword index of keyword
+ * @return {Boolean} keyword is before ORDER BY true/false
+ */
 const beforeOrderBy = (fullCommandAsStringArray, indexOfKeyword) => {
     const indexOfOrder = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'ORDER'
@@ -191,6 +233,13 @@ const beforeOrderBy = (fullCommandAsStringArray, indexOfKeyword) => {
         : true
 }
 
+/**
+ * Checks that a keyword is after ORDER BY in the given command. Returns
+ * true or false. Returns true if command does not contain keyword ORDER BY.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @param {Number} indexOfKeyword index of keyword
+ * @return {Boolean} keyword is after ORDER BY true/false
+ */
 const afterOrderBy = (fullCommandAsStringArray, indexOfKeyword) => {
     const indexOfOrder = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'ORDER'
