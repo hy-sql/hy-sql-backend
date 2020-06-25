@@ -236,7 +236,7 @@ describe.each([
         test('throws correct error during parsing', () => {
             expect(() => selectParser.parseCommand(command)).toThrowError(
                 new SQLError(
-                    'LIMIT must always be positioned after WHERE, GROUP BY and ORDER BY'
+                    'LIMIT must always be positioned after WHERE, GROUP BY, HAVING and ORDER BY'
                 )
             )
         })
