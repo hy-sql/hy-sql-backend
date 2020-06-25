@@ -316,24 +316,6 @@ class StateService {
     }
 
     /**
-     * Handles re-ordering the given rows according to given field information
-     * @param {object[]} fields array of field objects
-     * @param {object[]} rows array of row objects
-     */
-    orderRowsBy(fields, rows) {
-        const arrayOfColumnNames = fields.map((f) => f.value)
-        const arrayOfOrderingKeywords = fields.map((f) => f.order.value)
-
-        const orderedRows = _.orderBy(
-            rows,
-            arrayOfColumnNames,
-            arrayOfOrderingKeywords
-        )
-
-        return orderedRows
-    }
-
-    /**
      * Handles filtering of the given rows according to the given conditions
      * for filterRows().
      * @param {object} conditions conditions to filter by
@@ -357,6 +339,24 @@ class StateService {
                     return _.intersection(filteredAnd, filteredOr)
                 }
 
+                if (
+                    condition.left.type === 'aggregateFunction' ||
+                    condition.right.type === 'aggregateFunction' ||
+                    (condition.left.type === 'expression' &&
+                        containsAggregateFunction(
+                            condition.left.expressionParts
+                        )) ||
+                    (condition.right === 'expression' &&
+                        containsAggregateFunction(
+                            condition.right.expressionParts
+                        ))
+                ) {
+                    const aggregateFunctionFilter = createFilter(
+                        rowsToReturn,
+                        condition
+                    )
+                    return _.filter(rowsToReturn, () => aggregateFunctionFilter)
+                }
                 return _.filter(rowsToReturn, (row) =>
                     createFilter(row, condition)
                 )
@@ -402,19 +402,14 @@ class StateService {
      * @param {object} command command of SELECT command
      * @param {object[]} existingRows array of row objects
      */
-    createFunctionRows(command, existingRows) {
-        const fields =
-            command.fields[0].type === 'distinct'
-                ? command.fields[0].value
-                : command.fields
-
+    createFunctionRows(fields, existingRows) {
         const createdRows = existingRows.reduce((rowsToReturn, row) => {
-            for (let i = 0; i < command.fields.length; i++) {
+            for (let i = 0; i < fields.length; i++) {
                 if (fields[i].type === 'stringFunction') {
                     const functionResult = executeStringFunction(fields[i], row)
 
                     row[fields[i].value] = functionResult
-                } else if (command.fields[i].type === 'aggregateFunction') {
+                } else if (fields[i].type === 'aggregateFunction') {
                     const functionResult = this.createAggregateFunctionRow(
                         fields[i],
                         existingRows
@@ -439,10 +434,6 @@ class StateService {
         const filteredRows = command.where
             ? this.filterRows(command.where.conditions, existingRows)
             : existingRows
-
-        const havingRows = command.having
-            ? this.filterRows(command.having.conditions, filteredRows)
-            : filteredRows
 
         if (command.fields[0].type === 'all') {
             return command.orderBy
@@ -474,6 +465,11 @@ class StateService {
             return [{ [command.fields[0].value]: evaluated }]
         }
 
+        const selectedFields =
+            command.fields[0].type === 'distinct'
+                ? command.fields[0].value
+                : command.fields
+
         const fieldsToReturn =
             command.fields[0].type === 'distinct'
                 ? command.fields[0].value.map((f) => f.value)
@@ -481,18 +477,26 @@ class StateService {
 
         const rowsWithNewFields = this.createRowsWithNewFields(
             command,
-            havingRows
+            filteredRows
         )
 
         const initialGroupedRows = command.groupBy
             ? this.initialGroupRowsBy(rowsWithNewFields, command.groupBy.fields)
             : rowsWithNewFields
 
-        const groupedRowsWithNewFieldsAndFunctions = command.groupBy
-            ? initialGroupedRows.map((rowGroup) =>
-                  this.createFunctionRows(command, rowGroup)
+        const havingRows = command.having
+            ? initialGroupedRows.map((group) =>
+                  this.filterRows(command.having.conditions, group)
               )
-            : this.createFunctionRows(command, initialGroupedRows)
+            : initialGroupedRows
+
+        const groupedRowsWithNewFieldsAndFunctions = command.groupBy
+            ? havingRows
+                  .map((rowGroup) =>
+                      this.createFunctionRows(selectedFields, rowGroup)
+                  )
+                  .filter((row) => row.length > 0)
+            : this.createFunctionRows(selectedFields, havingRows)
 
         const aggregateFunctionRows = command.groupBy
             ? this.groupRowsBy(
@@ -501,7 +505,7 @@ class StateService {
                           groupedRowsWithNewFieldsAndFunctions.map((rowGroup) =>
                               this.pickAggregateFunctionRow(
                                   rowGroup,
-                                  command.fields
+                                  selectedFields
                               )
                           )
                       )
@@ -510,7 +514,7 @@ class StateService {
               )
             : this.pickAggregateFunctionRow(
                   groupedRowsWithNewFieldsAndFunctions,
-                  command.fields
+                  selectedFields
               )
 
         const orderedAggregateFunctionRows = command.orderBy
@@ -518,11 +522,11 @@ class StateService {
             : aggregateFunctionRows
 
         if (!_.isEmpty(orderedAggregateFunctionRows)) {
-            const aggregateFunctionRowsWithSelectedFields = orderedAggregateFunctionRows.map(
+            const aggregateFunctionRowsWithfieldsToReturn = orderedAggregateFunctionRows.map(
                 (row) => _.pick(row, fieldsToReturn)
             )
 
-            return aggregateFunctionRowsWithSelectedFields
+            return aggregateFunctionRowsWithfieldsToReturn
         }
 
         const orderedRows = command.orderBy
@@ -532,25 +536,18 @@ class StateService {
               )
             : _.flatten(groupedRowsWithNewFieldsAndFunctions)
 
-        const rowsWithInitiallySelectedFields = command.groupBy
-            ? orderedRows.map((row) =>
-                  _.pick(
-                      row,
-                      fieldsToReturn.concat(
-                          command.groupBy.fields.map((f) => f.value)
-                      )
-                  )
-              )
+        const rowsWithInitiallyfieldsToReturn = command.groupBy
+            ? orderedRows.map((row) => _.pick(row, fieldsToReturn))
             : orderedRows
 
         const groupedRows = command.groupBy
             ? this.groupRowsBy(
-                  rowsWithInitiallySelectedFields,
+                  rowsWithInitiallyfieldsToReturn,
                   command.groupBy.fields
               )
-            : rowsWithInitiallySelectedFields
+            : rowsWithInitiallyfieldsToReturn
 
-        const rowsWithSelectedFields = groupedRows.map((row) =>
+        const rowsWithfieldsToReturn = groupedRows.map((row) =>
             _.pick(row, fieldsToReturn)
         )
 
@@ -558,9 +555,9 @@ class StateService {
             command.groupBy && command.orderBy
                 ? this.orderRowsBy(
                       command.orderBy.fields,
-                      rowsWithSelectedFields
+                      rowsWithfieldsToReturn
                   )
-                : rowsWithSelectedFields
+                : rowsWithfieldsToReturn
 
         return command.fields[0].type === 'distinct'
             ? this.selectDistinct(groupedOrderedRows)
@@ -736,6 +733,24 @@ class StateService {
         )
 
         return { [functionField.value]: executedFunction }
+    }
+
+    /**
+     * Handles re-ordering the given rows according to given field information
+     * @param {object[]} fields array of field objects
+     * @param {object[]} rows array of row objects
+     */
+    orderRowsBy(fields, rows) {
+        const arrayOfColumnNames = fields.map((f) => f.value)
+        const arrayOfOrderingKeywords = fields.map((f) => f.order.value)
+
+        const orderedRows = _.orderBy(
+            rows,
+            arrayOfColumnNames,
+            arrayOfOrderingKeywords
+        )
+
+        return orderedRows
     }
 
     /**

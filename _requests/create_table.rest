@@ -46,7 +46,8 @@ Content-Type: application/json
             "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);",
             "INSERT INTO Tuotteet (nimi, hinta) VALUES ('omena', 5);",
             "INSERT INTO Tuotteet (nimi, hinta) VALUES ('plop', 8);",
-            "SELECT LENGTH(nimi), hinta FROM Tuotteet GROUP BY LENGTH(nimi) HAVING LENGTH(nimi)>4;"
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('plop', 7);",
+            "SELECT nimi, COUNT(nimi) FROM Tuotteet GROUP BY nimi HAVING COUNT(nimi)>1;"
         ]
 }
 
@@ -56,8 +57,32 @@ POST http://localhost:3001/api/query
 Content-Type: application/json
 
 {
-  "commandArray": ["CREATE TABLE Tuotteet    (id INTEGER PRIMARY KEY,    nimi TEXT,    hinta INTEGER);",
-  "SELECT * FROM Tuotteet",
-  "INSERT INTO Tuotteet (nimi, hinta) VALUES ('retiisi', 7);"
+  "commandArray": [
+    "CREATE TABLE Tyontekijat (id INTEGER PRIMARY KEY, yritys TEXT, nimi TEXT);",
+    "INSERT INTO Tyontekijat (yritys, nimi) VALUES ('Ankka', 'Tupu');",
+    "INSERT INTO Tyontekijat (yritys, nimi) VALUES ('Ankka', 'Hupu');",
+    "INSERT INTO Tyontekijat (yritys, nimi) VALUES ('Ankka', 'Lupu');",
+    "INSERT INTO Tyontekijat (yritys, nimi) VALUES ('Hanhi', 'Hannu');",
+    "SELECT yritys FROM Tyontekijat GROUP BY yritys HAVING COUNT(*)+2>=5;"
   ]
+}
+
+### Testing
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": [
+            "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, tuote_id INTEGER, nimi TEXT, hinta INTEGER);",
+            "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (1, 'porkkana', 7);",
+            "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (1, 'banaani', 7);",
+            "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (1, 'banaani', 7);",
+            "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (2, 'banaani', 4);",
+            "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (2, 'retiisi', 7);",
+            "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (5, 'ol', 2);",
+            "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (6, 'bucket', 0);",
+            "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (7, 'ol', 1);",
+            "SELECT tuote_id, COUNT(*) FROM Tuotteet WHERE hinta >= 3 GROUP BY tuote_id HAVING COUNT(*)+1>=4 ORDER BY tuote_id;"
+        ]
 }
