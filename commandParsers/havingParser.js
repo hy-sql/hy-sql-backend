@@ -1,4 +1,4 @@
-const { parseConditions } = require('./fieldParser')
+const { parseConditions } = require('./conditionsParser')
 
 /**
  * Parses the HAVING part of a command into a HAVING object from the given string array.
