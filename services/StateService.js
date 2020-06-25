@@ -470,13 +470,8 @@ class StateService {
                 ? command.fields[0].value
                 : command.fields
 
-        const fieldsToReturn =
-            command.fields[0].type === 'distinct'
-                ? command.fields[0].value.map((f) => f.value)
-                : command.fields.map((f) => f.value)
-
         const rowsWithNewFields = this.createRowsWithNewFields(
-            command,
+            selectedFields,
             filteredRows
         )
 
@@ -520,6 +515,11 @@ class StateService {
         const orderedAggregateFunctionRows = command.orderBy
             ? this.orderRowsBy(command.orderBy.fields, aggregateFunctionRows)
             : aggregateFunctionRows
+
+        const fieldsToReturn =
+            command.fields[0].type === 'distinct'
+                ? command.fields[0].value.map((f) => f.value)
+                : command.fields.map((f) => f.value)
 
         if (!_.isEmpty(orderedAggregateFunctionRows)) {
             const aggregateFunctionRowsWithfieldsToReturn = orderedAggregateFunctionRows.map(
@@ -679,21 +679,14 @@ class StateService {
      * @param {object} command command of SELECT command
      * @param {object[]} existingRows array of row objects
      */
-    createRowsWithNewFields(command, existingRows) {
-        const fields =
-            command.fields[0].type === 'distinct'
-                ? command.fields[0].value
-                : command.fields
-
+    createRowsWithNewFields(fields, existingRows) {
         const createdRows = existingRows.reduce((rowsToReturn, row) => {
-            for (let i = 0; i < command.fields.length; i++) {
+            for (let i = 0; i < fields.length; i++) {
                 if (fields[i].type === 'column') {
                     const valueOfQueriedColumn = row[fields[i].value]
                     // eslint-disable-next-line eqeqeq
                     if (valueOfQueriedColumn == null) {
-                        throw new SQLError(
-                            `no such column ${command.fields[i].value}`
-                        )
+                        throw new SQLError(`no such column ${fields[i].value}`)
                     }
                 } else if (
                     fields[i].type === 'expression' &&

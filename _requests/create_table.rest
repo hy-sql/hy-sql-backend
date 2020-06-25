@@ -26,12 +26,12 @@ Content-Type: application/json
             "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (1, 'porkkana', 7);",
             "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (1, 'banaani', 7);",
             "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (1, 'banaani', 7);",
-            "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (2, 'banaani', 4);",
+            "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (2, 'banaani', 7);",
             "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (2, 'retiisi', 7);",
             "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (5, 'ol', 2);",
             "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (6, 'bucket', 0);",
-            "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (7, 'ol', 1);",
-            "SELECT nimi, SUM(hinta), COUNT(*) FROM Tuotteet GROUP BY nimi ORDER BY COUNT(*) DESC;"
+            "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (7, 'ol', 2);",
+            "SELECT DISTINCT nimi, length(nimi), hinta+1, length(tuote_id) FROM Tuotteet;"
           ]
 }
 
