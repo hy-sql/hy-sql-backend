@@ -3,6 +3,7 @@ const {
     checkGroupByPosition,
     checkOrderByPosition,
     checkWherePosition,
+    checkHavingPosition,
 } = require('../parserTools/checkPosition')
 
 /**
@@ -42,28 +43,19 @@ const queryContainsGroupByKeyword = (fullCommandAsStringArray) => {
 }
 
 /**
- * Checks whether a command contains the keywords GROUP, BY and HAVING and that they
- * are in the correct order. Check is case-insensitive. Returns true or false.
- * @param {any} fullCommandAsStringArray command as string array
- * @returns {Boolean} GROUP BY and HAVING were found true/false
+ * Checks whether a command contains the keyword HAVING and in the correct
+ * position. Check is case-insensitive. Returns true or false.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {Boolean} HAVING was found true/false
  */
-const queryContainsGroupByHavingKeywords = (fullCommandAsStringArray) => {
-    const indexOfGroup = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'GROUP'
-    )
-
+const queryContainsHavingKeyword = (fullCommandAsStringArray) => {
     const indexOfHaving = fullCommandAsStringArray.findIndex(
         (s) => s.toUpperCase() === 'HAVING'
     )
 
-    if (indexOfGroup < 0 || indexOfHaving < 0) return false
+    if (indexOfHaving !== -1) checkHavingPosition(fullCommandAsStringArray)
 
-    const hasGroupBy =
-        indexOfGroup >= 0 &&
-        fullCommandAsStringArray[indexOfGroup + 1] &&
-        fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY'
-
-    return indexOfGroup < indexOfHaving && hasGroupBy
+    return indexOfHaving !== -1
 }
 
 /**
@@ -87,7 +79,22 @@ const queryContainsOrderByKeyword = (fullCommandAsStringArray) => {
 }
 
 /**
- * Checks whether a command contains both keywords WHERE and GROUP BY and that they
+ * Checks whether a command contains the keywords GROUP BY and HAVING and that
+ * they are in the correct order. Check is case-insensitive. Returns true or false.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {Boolean} GROUP BY and HAVING were found true/false
+ */
+const queryContainsGroupByHavingKeywords = (fullCommandAsStringArray) => {
+    const containsGroupBy = queryContainsGroupByKeyword(
+        fullCommandAsStringArray
+    )
+    const containsHaving = queryContainsHavingKeyword(fullCommandAsStringArray)
+
+    return containsGroupBy && containsHaving
+}
+
+/**
+ * Checks whether a command contains the keywords WHERE and GROUP BY and that they
  * are in the correct order. Check is case-insensitive. Returns true or false.
  * @param {string[]} fullCommandAsStringArray command as string array
  * @returns {Boolean} WHERE and GROUP BY were found true/false
@@ -102,41 +109,24 @@ const queryContainsWhereGroupByKeywords = (fullCommandAsStringArray) => {
 }
 
 /**
- * Checks whether a command contains the keywords WHERE, GROUP, BY and HAVING and that they
- * are in the correct order. Check is case-insensitive. Returns true or false.
- * @param {any} fullCommandAsStringArray command as string array
- * @returns {Boolean} WHERE and GROUP BY and HAVING were found true/false
+ * Checks whether a command contains the keywords WHERE, GROUP BY and HAVING and
+ * that they are in the correct order. Check is case-insensitive. Returns true
+ * or false.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {Boolean} WHERE, GROUP BY and HAVING were found true/false
  */
 const queryContainsWhereGroupByHavingKeywords = (fullCommandAsStringArray) => {
-    const indexOfWhere = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'WHERE'
+    const containsWhere = queryContainsWhereKeyword(fullCommandAsStringArray)
+    const containsGroupBy = queryContainsGroupByKeyword(
+        fullCommandAsStringArray
     )
+    const containsHaving = queryContainsHavingKeyword(fullCommandAsStringArray)
 
-    const indexOfGroup = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'GROUP'
-    )
-
-    const indexOfHaving = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'HAVING'
-    )
-
-    if (indexOfWhere < 0 || indexOfGroup < 0 || indexOfHaving < 0) return false
-
-    const hasGroupBy =
-        indexOfGroup >= 0 &&
-        fullCommandAsStringArray[indexOfGroup + 1] &&
-        fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY'
-
-    return (
-        indexOfWhere >= 0 &&
-        indexOfWhere < indexOfGroup &&
-        indexOfGroup < indexOfHaving &&
-        hasGroupBy
-    )
+    return containsWhere && containsGroupBy && containsHaving
 }
 
 /**
- * Checks whether a command contains both keywords GROUP BY and ORDER BY and that they
+ * Checks whether a command contains the keywords GROUP BY and ORDER BY and that they
  * are in the correct order. Check is case-insensitive. Returns true or false.
  * @param {string[]} fullCommandAsStringArray command as string array
  * @returns {Boolean} GROUP BY and ORDER BY were found true/false
@@ -153,49 +143,28 @@ const queryContainsGroupByOrderByKeywords = (fullCommandAsStringArray) => {
 }
 
 /**
- * Checks whether a command contains the keywords GROUP, BY, HAVING, ORDER and BY and that they
- * are in the correct order. Check is case-insensitive. Returns true or false.
- * @param {any} fullCommandAsStringArray command as string array
- * @returns {Boolean} GROUP BY and HAVING and ORDER BY were found true/false
+ * Checks whether a command contains the keywords GROUP BY, HAVING and ORDER BY
+ * and that they are in the correct order. Check is case-insensitive. Returns
+ * true or false.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {Boolean} GROUP BY, HAVING and ORDER BY were found true/false
  */
 const queryContainsGroupByHavingOrderByKeywords = (
     fullCommandAsStringArray
 ) => {
-    const indexOfGroup = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'GROUP'
+    const containsGroupBy = queryContainsGroupByKeyword(
+        fullCommandAsStringArray
+    )
+    const containsHaving = queryContainsHavingKeyword(fullCommandAsStringArray)
+    const containsOrderBy = queryContainsOrderByKeyword(
+        fullCommandAsStringArray
     )
 
-    const indexOfHaving = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'HAVING'
-    )
-
-    const indexOfOrder = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'ORDER'
-    )
-
-    if (indexOfGroup < 0 || indexOfHaving < 0 || indexOfOrder < 0) return false
-
-    const hasGroupBy =
-        indexOfGroup >= 0 &&
-        fullCommandAsStringArray[indexOfGroup + 1] &&
-        fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY'
-
-    const hasOrderBy =
-        indexOfOrder >= 0 &&
-        fullCommandAsStringArray[indexOfOrder + 1] &&
-        fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() === 'BY'
-
-    return (
-        indexOfGroup >= 0 &&
-        indexOfGroup < indexOfHaving &&
-        indexOfHaving < indexOfOrder &&
-        hasGroupBy &&
-        hasOrderBy
-    )
+    return containsGroupBy && containsHaving && containsOrderBy
 }
 
 /**
- * Checks whether a command contains both keywords WHERE and ORDER BY and that they
+ * Checks whether a command contains the keywords WHERE and ORDER BY and that they
  * are in the correct order. Check is case-insensitive. Returns true or false.
  * @param {string[]} fullCommandAsStringArray command as string array
  * @returns {Boolean} WHERE and ORDER BY were found true/false
@@ -210,8 +179,9 @@ const queryContainsWhereOrderByKeywords = (fullCommandAsStringArray) => {
 }
 
 /**
- * Checks whether a command contains keywords WHERE, GROUP BY and ORDER BY and that they
- * are in the correct order. Check is case-insensitive. Returns true or false.
+ * Checks whether a command contains the keywords WHERE, GROUP BY and ORDER BY
+ * and that they are in the correct order. Check is case-insensitive. Returns
+ * true or false.
  * @param {string[]} fullCommandAsStringArray command as string array
  * @returns {Boolean} WHERE and ORDER BY were found true/false
  */
@@ -228,56 +198,25 @@ const queryContainsWhereGroupByOrderByKeywords = (fullCommandAsStringArray) => {
 }
 
 /**
- * Checks whether a command contains the keywords WHERE, GROUP, BY, HAVING, ORDER and BY and that they
- * are in the correct order. Check is case-insensitive. Returns true or false.
+ * Checks whether a command contains the keywords WHERE, GROUP BY, HAVING and
+ * ORDER BY and that they are in the correct order. Check is case-insensitive.
+ * Returns true or false.
  * @param {any} fullCommandAsStringArray command as string array
  * @returns {Boolean} WHERE and GROUP BY and HAVING and ORDER BY were found true/false
  */
 const queryContainsWhereGroupByHavingOrderByKeywords = (
     fullCommandAsStringArray
 ) => {
-    const indexOfWhere = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'WHERE'
+    const containsWhere = queryContainsWhereKeyword(fullCommandAsStringArray)
+    const containsGroupBy = queryContainsGroupByKeyword(
+        fullCommandAsStringArray
+    )
+    const containsHaving = queryContainsHavingKeyword(fullCommandAsStringArray)
+    const containsOrderBy = queryContainsOrderByKeyword(
+        fullCommandAsStringArray
     )
 
-    const indexOfGroup = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'GROUP'
-    )
-
-    const indexOfHaving = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'HAVING'
-    )
-
-    const indexOfOrder = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'ORDER'
-    )
-
-    if (
-        indexOfWhere < 0 ||
-        indexOfGroup < 0 ||
-        indexOfHaving < 0 ||
-        indexOfOrder < 0
-    )
-        return false
-
-    const hasGroupBy =
-        indexOfGroup >= 0 &&
-        fullCommandAsStringArray[indexOfGroup + 1] &&
-        fullCommandAsStringArray[indexOfGroup + 1].toUpperCase() === 'BY'
-
-    const hasOrderBy =
-        indexOfOrder >= 0 &&
-        fullCommandAsStringArray[indexOfOrder + 1] &&
-        fullCommandAsStringArray[indexOfOrder + 1].toUpperCase() === 'BY'
-
-    return (
-        indexOfWhere >= 0 &&
-        indexOfWhere < indexOfGroup &&
-        indexOfGroup < indexOfHaving &&
-        indexOfHaving < indexOfOrder &&
-        hasGroupBy &&
-        hasOrderBy
-    )
+    return containsWhere && containsGroupBy && containsHaving && containsOrderBy
 }
 
 /**
@@ -299,8 +238,8 @@ const queryContainsLimitKeyword = (fullCommandAsStringArray) => {
 module.exports = {
     queryContainsWhereKeyword,
     queryContainsGroupByKeyword,
-    queryContainsGroupByHavingKeywords,
     queryContainsOrderByKeyword,
+    queryContainsGroupByHavingKeywords,
     queryContainsWhereGroupByKeywords,
     queryContainsWhereGroupByHavingKeywords,
     queryContainsWhereOrderByKeywords,
