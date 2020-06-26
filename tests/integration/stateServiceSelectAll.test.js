@@ -156,9 +156,9 @@ describe('selectFrom() with command.where', () => {
         const parsedCommand = parseCommand(commandArray)
 
         const result = stateService.selectFrom(parsedCommand)
-        // expect(result.result).toBe(
-        //     'SELECT * FROM Tuotteet WHERE hinta=10 -query executed succesfully'
-        // )
+        expect(result.result).toBe(
+            'SELECT * FROM Tuotteet -query executed successfully'
+        )
         expect(result.rows.length).toBe(1)
         expect(result.rows[0].nimi).toBe('tuote')
     })
@@ -169,9 +169,9 @@ describe('selectFrom() with command.where', () => {
         const parsedCommand = parseCommand(commandArray)
 
         const result = stateService.selectFrom(parsedCommand)
-        // expect(result.result).toBe(
-        //     'SELECT * FROM Tuotteet WHERE hinta>10 -query executed succesfully'
-        // )
+        expect(result.result).toBe(
+            'SELECT * FROM Tuotteet -query executed successfully'
+        )
         expect(result.rows.length).toBe(1)
         expect(result.rows[0].nimi).toBe('testituote')
     })
@@ -182,9 +182,9 @@ describe('selectFrom() with command.where', () => {
         const parsedCommand = parseCommand(commandArray)
 
         const result = stateService.selectFrom(parsedCommand)
-        // expect(result.result).toBe(
-        //     'SELECT * FROM Tuotteet WHERE hinta>=20 -query executed succesfully'
-        // )
+        expect(result.result).toBe(
+            'SELECT * FROM Tuotteet -query executed successfully'
+        )
         expect(result.rows.length).toBe(1)
         expect(result.rows[0].nimi).toBe('testituote')
     })
@@ -195,9 +195,9 @@ describe('selectFrom() with command.where', () => {
         const parsedCommand = parseCommand(commandArray)
 
         const result = stateService.selectFrom(parsedCommand)
-        // expect(result.result).toBe(
-        //     'SELECT * FROM Tuotteet WHERE hinta<20 -query executed succesfully'
-        // )
+        expect(result.result).toBe(
+            'SELECT * FROM Tuotteet -query executed successfully'
+        )
         expect(result.rows.length).toBe(1)
         expect(result.rows[0].nimi).toBe('tuote')
     })
@@ -208,9 +208,9 @@ describe('selectFrom() with command.where', () => {
         const parsedCommand = parseCommand(commandArray)
 
         const result = stateService.selectFrom(parsedCommand)
-        // expect(result.result).toBe(
-        //     'SELECT * FROM Tuotteet WHERE hinta<=10 -query executed succesfully'
-        // )
+        expect(result.result).toBe(
+            'SELECT * FROM Tuotteet -query executed successfully'
+        )
         expect(result.rows.length).toBe(1)
         expect(result.rows[0].nimi).toBe('tuote')
     })

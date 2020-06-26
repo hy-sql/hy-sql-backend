@@ -19,6 +19,10 @@ const containsAggregateFunction = (input) => {
     return containsAggregateFunctionPattern.test(input)
 }
 
+/**
+ * Tests whether a string contains an arithmetic expression.
+ * @param {String} input string to test
+ */
 const containsArithmeticExpression = (input) => {
     return containsArithmeticExpressionPattern.test(input)
 }
@@ -31,6 +35,10 @@ const containsArithmeticOperator = (input) => {
     return containsArithmeticOperatorPattern.test(input)
 }
 
+/**
+ * Tests whether a string contains an arithmetic operator allowing whitespace.
+ * @param {String} input string to test
+ */
 const containsArithmeticOperatorWithWhiteSpace = (input) => {
     return containsArithmeticOperatorWithWhiteSpacePattern.test(input)
 }
@@ -43,14 +51,27 @@ const containsComparisonOperator = (input) => {
     return containsComparisonOperatorPattern.test(input)
 }
 
+/**
+ * Tests whether a string contains a comparison operator allowing whitespace.
+ * @param {String} input string to test
+ */
 const containsComparisonOperatorWithWhiteSpace = (input) => {
     return containsComparisonOperatorWithWhiteSpacePattern.test(input)
 }
 
+/**
+ * Tests whether a string contains a string function or an aggregate function.
+ * @param {String} input string to test
+ */
 const containsFunction = (input) => {
     containsFunctionPattern.test(input)
 }
 
+/**
+ * Tests whether a string contains a string function or an aggregate function
+ * allowing whitespace.
+ * @param {String} input string to test
+ */
 const containsFunctionWithWhiteSpaces = (input) => {
     return containsFunctionWithWhiteSpacesPattern.test(input)
 }
