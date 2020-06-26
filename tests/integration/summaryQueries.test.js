@@ -195,7 +195,6 @@ describe('USER STORY TESTS: large summary queries', () => {
         })
     })
 
-    /* TODO WHEN HAVING-FEATURE READY*/
     test('As a user I want to be able to use HAVING', () => {
         const expectedRows = [
             {

@@ -5,6 +5,7 @@ const {
     queryContainsWhereGroupByKeywords,
     queryContainsGroupByOrderByKeywords,
     queryContainsWhereGroupByOrderByKeywords,
+    queryContainsGroupByHavingKeywords,
 } = require('../../commandParsers/parserTools/queryContains')
 const GroupBySchema = require('../../schemas/GroupBySchema')
 const splitCommandIntoArray = require('../../commandParsers/parserTools/splitCommandIntoArray')
@@ -61,6 +62,32 @@ describe.each([
             expect(parsedCommand.groupBy).toHaveProperty('keyword')
             expect(parsedCommand.groupBy).toHaveProperty('fields')
             expect(parsedCommand.groupBy.keyword).toBe('GROUP BY')
+        })
+    })
+})
+
+describe.each([
+    'SELECT price, COUNT(*) FROM Table GROUP BY price HAVING COUNT(*)>1;',
+    'SELECT price, COUNT(*) FROM Table GROUP by price HAVING COUNT(*)>1;',
+    'SELECT price, name FROM Table GROUP by price HAVING price>5;',
+])('Valid GROUP BY HAVING-part of a query', (validCommand) => {
+    describe(validCommand, () => {
+        const command = splitCommandIntoArray(validCommand)
+
+        test('is recognised to contain a GROUP BY and HAVING keywords', () => {
+            expect(queryContainsGroupByHavingKeywords(command)).toBeTruthy()
+        })
+
+        const parsedCommand = parseCommand(command)
+
+        test('is parsed and validated succesfully', () => {
+            expect(parsedCommand).toHaveProperty('groupBy')
+            expect(parsedCommand.groupBy).toHaveProperty('keyword')
+            expect(parsedCommand.groupBy).toHaveProperty('fields')
+            expect(parsedCommand.groupBy.keyword).toBe('GROUP BY')
+            expect(parsedCommand).toHaveProperty('having')
+            expect(parsedCommand.having).toHaveProperty('keyword')
+            expect(parsedCommand.having.keyword).toBe('HAVING')
         })
     })
 })

@@ -39,6 +39,8 @@ describe('groupRowsBy()', () => {
         "SELECT nimi, COUNT(nimi) FROM Tuotteet WHERE nimi='olut' GROUP BY COUNT(nimi);",
         'SELECT nimi, SUM(lkm) FROM Tuotteet GROUP BY nimi;',
         'SELECT nimi, hinta, SUM(lkm), COUNT(*) FROM Tuotteet GROUP BY nimi, hinta ORDER BY hinta, nimi;',
+        'SELECT nimi, COUNT(*) FROM Tuotteet GROUP BY nimi HAVING COUNT(*)>=2;',
+        'SELECT hinta, COUNT(*) FROM Tuotteet GROUP BY hinta HAVING hinta>4;',
     ]
 
     test(`returns expected rows for: ${queries[0]}`, () => {
@@ -214,6 +216,50 @@ describe('groupRowsBy()', () => {
         ]
 
         const commandArray = splitCommandIntoArray(queries[4])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand)
+
+        expect(result.rows).toEqual(expectedRows)
+    })
+
+    test(`returns expected rows for ${queries[5]}`, () => {
+        const expectedRows = [
+            {
+                nimi: 'olut',
+                'COUNT(*)': 4,
+            },
+            {
+                nimi: 'selleri',
+                'COUNT(*)': 2,
+            },
+        ]
+        const commandArray = splitCommandIntoArray(queries[5])
+        const parsedCommand = commandService.parseCommand(commandArray)
+        const result = stateService.updateState(parsedCommand)
+
+        expect(result.rows).toEqual(expectedRows)
+    })
+
+    test(`returns expected rows for ${queries[6]}`, () => {
+        const expectedRows = [
+            {
+                'COUNT(*)': 3,
+                hinta: 5,
+            },
+            {
+                'COUNT(*)': 1,
+                hinta: 6,
+            },
+            {
+                'COUNT(*)': 1,
+                hinta: 7,
+            },
+            {
+                'COUNT(*)': 1,
+                hinta: 8,
+            },
+        ]
+        const commandArray = splitCommandIntoArray(queries[6])
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand)
 
