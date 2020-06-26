@@ -16,9 +16,9 @@ const {
 const { parseWhere } = require('./whereParser')
 const {
     queryContainsWhereKeyword,
-    queryContainsGroupByKeywords,
+    queryContainsGroupByKeyword,
     queryContainsGroupByHavingKeywords,
-    queryContainsOrderByKeywords,
+    queryContainsOrderByKeyword,
     queryContainsWhereGroupByKeywords,
     queryContainsWhereGroupByHavingKeywords,
     queryContainsWhereOrderByKeywords,
@@ -34,13 +34,13 @@ const { parseGroupBy } = require('./groupByParser')
 const { parseHaving } = require('./havingParser')
 const { parseLimit } = require('./limitParser')
 const SQLError = require('../models/SQLError')
-const { checkLimitPosition } = require('./parserTools/checkCorrectPosition')
 
 /**
- * Parses and validates a SELECT command object from the given string array.
- * Returns a Joi validation result object containing the parsed command object
- * with key value and possible validation errors as object with key error.
+ * Handles passing the given command as string array to the correct function
+ * to be parsed into and validated as a SELECT command object. Returns the
+ * validated command object if no error was thrown.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseCommand = (fullCommandAsStringArray) => {
     switch (true) {
@@ -64,11 +64,11 @@ const parseCommand = (fullCommandAsStringArray) => {
             return parseSelectWhereGroupByHaving(fullCommandAsStringArray)
         case queryContainsWhereGroupByKeywords(fullCommandAsStringArray):
             return parseSelectWhereGroupBy(fullCommandAsStringArray)
-        case queryContainsOrderByKeywords(fullCommandAsStringArray):
+        case queryContainsOrderByKeyword(fullCommandAsStringArray):
             return parseSelectOrderBy(fullCommandAsStringArray)
         case queryContainsGroupByHavingKeywords(fullCommandAsStringArray):
             return parseSelectGroupByHaving(fullCommandAsStringArray)
-        case queryContainsGroupByKeywords(fullCommandAsStringArray):
+        case queryContainsGroupByKeyword(fullCommandAsStringArray):
             return parseSelectGroupBy(fullCommandAsStringArray)
         case queryContainsWhereKeyword(fullCommandAsStringArray):
             return parseSelectWhere(fullCommandAsStringArray)
@@ -78,7 +78,9 @@ const parseCommand = (fullCommandAsStringArray) => {
 }
 
 /**
- * Handles parsing of the base SELECT command from the given array.
+ * Handles parsing of the base SELECT command from the given array. Also
+ * handles calling a parser for the LIMIT part of a command and throws an
+ * error if the command contains keyword OFFSET without containing LIMIT.
  * @param {string[]} fullCommandAsStringArray command as string array
  */
 const parseBaseCommand = (fullCommandAsStringArray) => {
@@ -98,11 +100,15 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
     }
 
     if (queryContainsLimitKeyword(fullCommandAsStringArray)) {
-        const { limit, indexOfLimit } = handleLimitParsing(
-            fullCommandAsStringArray
+        parsedCommand.indexOfLimit = fullCommandAsStringArray.findIndex(
+            (s) => s.toUpperCase() === 'LIMIT'
         )
-        parsedCommand.limit = limit
-        parsedCommand.indexOfLimit = indexOfLimit
+        parsedCommand.limit = parseLimit(
+            fullCommandAsStringArray.slice(
+                parsedCommand.indexOfLimit,
+                fullCommandAsStringArray.length - 1
+            )
+        )
     } else if (
         fullCommandAsStringArray.some((s) => s.toUpperCase() === 'OFFSET')
     ) {
@@ -115,9 +121,11 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
 }
 
 /**
- * Parses and validates a SELECT command not containing WHERE or ORDER BY
- * from the given array. Returns a Joi validation result object.
+ * Parses and validates a SELECT command object from the given string array.
+ * Returns the validated command object or throws a validation error if the
+ * object fails validation.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseSelect = (fullCommandAsStringArray) => {
     const parsedBaseCommand = parseBaseCommand(fullCommandAsStringArray)
@@ -129,9 +137,11 @@ const parseSelect = (fullCommandAsStringArray) => {
 }
 
 /**
- * Parses and validates a SELECT command containing WHERE but not ORDER BY
- * from the given array. Returns a Joi validation result object.
+ * Parses and validates a SELECT command containing WHERE from the given array.
+ * Returns the validated command object or throws a validation error if the
+ * object fails validation.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseSelectWhere = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
@@ -156,6 +166,13 @@ const parseSelectWhere = (fullCommandAsStringArray) => {
     return validatedCommand
 }
 
+/**
+ * Parses and validates a SELECT command containing GROUP BY from the given
+ * array. Returns the validated command object or throws a validation error
+ * if the object fails validation.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
+ */
 const parseSelectGroupBy = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
 
@@ -180,9 +197,11 @@ const parseSelectGroupBy = (fullCommandAsStringArray) => {
 }
 
 /**
- * Parses and validates a SELECT command containing GROUP BY and HAVING but not WHERE
- * from the given array. Returns a Joi validation result object.
+ * Parses and validates a SELECT command containing GROUP BY and HAVING from
+ * the given array. Returns the validated command object or throws a validation
+ * error if the object fails validation.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseSelectGroupByHaving = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
@@ -219,9 +238,11 @@ const parseSelectGroupByHaving = (fullCommandAsStringArray) => {
 }
 
 /**
- * Parses and validates a SELECT command containing ORDER BY but not WHERE
- * from the given array. Returns a Joi validation result object.
+ * Parses and validates a SELECT command containing ORDER BY from the given
+ * array. Returns the validated command object or throws a validation error
+ * if the object fails validation.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseSelectOrderBy = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
@@ -246,6 +267,13 @@ const parseSelectOrderBy = (fullCommandAsStringArray) => {
     return validatedCommand
 }
 
+/**
+ * Parses and validates a SELECT command containing WHERE and GROUP BY from
+ * the given array. Returns the validated command object or throws a validation
+ * error if the object fails validation.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
+ */
 const parseSelectWhereGroupBy = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
 
@@ -282,8 +310,10 @@ const parseSelectWhereGroupBy = (fullCommandAsStringArray) => {
 
 /**
  * Parses and validates a SELECT command containing WHERE, GROUP BY and HAVING
- * from the given array. Returns a Joi validation result object.
+ * from the given array. Returns the validated command object or throws a
+ * validation error if the object fails validation.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseSelectWhereGroupByHaving = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
@@ -328,9 +358,11 @@ const parseSelectWhereGroupByHaving = (fullCommandAsStringArray) => {
 }
 
 /**
- * Parses and validates a SELECT command containing both WHERE and ORDER BY
- * from the given array. Returns a Joi validation result object.
+ * Parses and validates a SELECT command containing WHERE and ORDER BY from
+ * the given array. Returns the validated command object or throws a validation
+ * error if the object fails validation.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseSelectWhereOrderBy = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
@@ -366,6 +398,13 @@ const parseSelectWhereOrderBy = (fullCommandAsStringArray) => {
     return validatedCommand
 }
 
+/**
+ * Parses and validates a SELECT command containing GROUP BY and ORDER BY
+ * from the given array. Returns the validated command object or throws a
+ * validation error if the object fails validation.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
+ */
 const parseSelectGroupByOrderBy = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
 
@@ -401,9 +440,11 @@ const parseSelectGroupByOrderBy = (fullCommandAsStringArray) => {
 }
 
 /**
- * Parses and validates a SELECT command containing GROUP BY and HAVING and ORDER BY but not WHERE
- * from the given array. Returns a Joi validation result object.
+ * Parses and validates a SELECT command containing GROUP BY, HAVING and
+ * ORDER BY from the given array. Returns the validated command object or
+ * throws a validation error if the object fails validation.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseSelectGroupByHavingOrderBy = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
@@ -447,6 +488,13 @@ const parseSelectGroupByHavingOrderBy = (fullCommandAsStringArray) => {
     return validatedCommand
 }
 
+/**
+ * Parses and validates a SELECT command containing WHERE, GROUP BY and
+ * ORDER BY from the given array. Returns the validated command object
+ * or throws a validation error if the object fails validation.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
+ */
 const parseSelectWhereGroupByOrderBy = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
 
@@ -490,9 +538,11 @@ const parseSelectWhereGroupByOrderBy = (fullCommandAsStringArray) => {
 }
 
 /**
- * Parses and validates a SELECT command containing WHERE and GROUP BY and HAVING and ORDER BY
- * from the given array. Returns a Joi validation result object.
+ * Parses and validates a SELECT command containing WHERE, GROUP BY, HAVING
+ * and ORDER BY from the given array. Returns the validated command object
+ * or throws a validation error if the object fails validation.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseSelectWhereGroupByHavingOrderBy = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
@@ -542,29 +592,6 @@ const parseSelectWhereGroupByHavingOrderBy = (fullCommandAsStringArray) => {
     )
 
     return validatedCommand
-}
-
-/**
- * Handles calling parseLimit with correct parameter and checks correct positioning
- * of LIMIT and OFFSET.
- * @param {object} parsedCommand parsed SELECT command object
- * @param {string[]} fullCommandAsStringArray command as string array
- */
-const handleLimitParsing = (fullCommandAsStringArray) => {
-    checkLimitPosition(fullCommandAsStringArray)
-
-    const indexOfLimit = fullCommandAsStringArray.findIndex(
-        (s) => s.toUpperCase() === 'LIMIT'
-    )
-
-    const limit = parseLimit(
-        fullCommandAsStringArray.slice(
-            indexOfLimit,
-            fullCommandAsStringArray.length - 1
-        )
-    )
-
-    return { limit, indexOfLimit }
 }
 
 module.exports = { parseCommand }
