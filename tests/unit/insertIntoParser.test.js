@@ -29,14 +29,14 @@ describe.each([
 })
 
 describe.each([
-    "INSERT INTO Tuotteet id, nimi, hinta) VALUES (1, 'nauris', 3);", //eka avaava sulku
-    "INSERT INTO Tuotteet (id, nimi, hinta) VALUES (3, 'kaapo', 5)", //puolipiste lopusta
-    "insert into tuotteet (id, nimi, hinta) VALUES (2, 'kurpitsa', 4;", //toka sulkeva sulku
-    '       insERt intO       tuoTTeet (id, NIMI, hintA) VALuES;', //arvot puuttuu kokonaan
-    "   insert inTO    tuoTTeet (id       , NIMI, hintA) VALUES 16,     'tomaatti', 6;", //tokat sulut puuttuu
-    "InSERt    Tuotteet (id, nimi, hinta) VALUES (17, 'sipuli', 65);", //INTO puuttuu
-    "INSERT INTO Tuotteet (id, nimi, hinta) VALUES (13, 'kurkku', 17, 18);", //liikaa arvoja
-    "INSERT INTO Tuotteet (id, nimi, hinta) VALUES (1, 'porkkana');", //liian vähän arvoja
+    "INSERT INTO Tuotteet id, nimi, hinta) VALUES (1, 'nauris', 3);",
+    "INSERT INTO Tuotteet (id, nimi, hinta) VALUES (3, 'kaapo', 5)",
+    "insert into tuotteet (id, nimi, hinta) VALUES (2, 'kurpitsa', 4;",
+    '       insERt intO       tuoTTeet (id, NIMI, hintA) VALuES;',
+    "   insert inTO    tuoTTeet (id       , NIMI, hintA) VALUES 16,     'tomaatti', 6;",
+    "InSERt    Tuotteet (id, nimi, hinta) VALUES (17, 'sipuli', 65);",
+    "INSERT INTO Tuotteet (id, nimi, hinta) VALUES (13, 'kurkku', 17, 18);",
+    "INSERT INTO Tuotteet (id, nimi, hinta) VALUES (1, 'porkkana');",
 ])('invalid command with the right name (CREATE TABLE) testing', (command) => {
     const fullCommandAsStringArray = splitCommandIntoArray(command)
 

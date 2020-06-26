@@ -3,6 +3,9 @@ const { ColumnSchema } = require('./FieldSchemas')
 const FunctionSchema = require('./FunctionSchema')
 const { ExpressionSchema } = require('./ExpressionSchema')
 
+/**
+ * Joi schema for validating GROUP BY objects.
+ */
 const GroupBySchema = Joi.object({
     keyword: Joi.string()
         .pattern(/[;]/, { invert: true })

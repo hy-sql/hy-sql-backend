@@ -4,10 +4,11 @@ const { parseColumnNames } = require('./parserTools/parseColumnNames')
 const SQLError = require('../models/SQLError')
 
 /**
- * Parses and validates an INSERT INTO command object from the given string array.
- * Returns a Joi validation result object containing the parsed command object
- * with key value and possible validation errors as object with key error.
+ * Parses and validates an INSERT INTO command object from the given array.
+ * Returns the validated command object or throws a validation error if the
+ * object fails validation.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseCommand = (fullCommandAsStringArray) => {
     let anchorLocation = fullCommandAsStringArray
@@ -48,7 +49,7 @@ const parseCommand = (fullCommandAsStringArray) => {
         parsedCommand.columnsClosingBracket = ')'
     }
 
-    //VALUES kentät
+    //VALUES fields
     let block = []
     loop1: for (
         let index = anchorLocation + 1;

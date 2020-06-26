@@ -188,7 +188,7 @@ describe('insertIntoTable()', () => {
     })
 })
 
-describe('executeSelectDistinct()', () => {
+describe('selectDistinct()', () => {
     const state = new State(new Map())
     const stateService = new StateService(state)
     const rows = [

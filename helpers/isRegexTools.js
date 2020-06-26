@@ -36,6 +36,10 @@ const fieldsSplitByComma = (input) => fieldsSplitByCommaPattern.test(input)
 
 const selectAll = (input) => selectAllPattern.test(input)
 
+/**
+ * Functions that test the given input against a regular expression
+ * for use in the application.
+ */
 module.exports = {
     isAggregateFunction,
     isArithmeticExpression,

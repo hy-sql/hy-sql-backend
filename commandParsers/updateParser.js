@@ -7,10 +7,11 @@ const { parseWhere } = require('./whereParser')
 const { queryContainsWhereKeyword } = require('./parserTools/queryContains')
 
 /**
- * Parses and validates a UPDATE command object from the given string array.
- * Returns a Joi validation result object containing the parsed command object
- * with key value and possible validation errors as object with key error.
- * @param {string[]} fullCommandAsStringList command as string array
+ * Handles passing the given command as string array to the correct function
+ * to be parsed into and validated as a UPDATE command object. Returns the
+ * validated command object if no error was thrown.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseCommand = (fullCommandAsStringList) => {
     if (queryContainsWhereKeyword(fullCommandAsStringList)) {
@@ -48,9 +49,11 @@ const parseBaseCommand = (fullCommandAsStringList) => {
 }
 
 /**
- * Parses and validates a UPDATE command not containing WHERE
- * from the given array. Returns a Joi validation result object.
- * @param {string[]} fullCommandAsStringList command as string array
+ * Parses and validates a UPDATE command object not containing WHERE from
+ * the given string array. Returns the validated command object or throws
+ * a validation error if the object fails validation.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseUpdateWithoutWhere = (fullCommandAsStringList) => {
     const updateCommand = parseBaseCommand(fullCommandAsStringList)
@@ -71,9 +74,11 @@ const parseUpdateWithoutWhere = (fullCommandAsStringList) => {
 }
 
 /**
- * Parses and validates a UPDATE command containing WHERE from the given array.
- * Returns a Joi validation result object.
- * @param {string[]} fullCommandAsStringList command as string array
+ * Parses and validates a UPDATE command object containing WHERE from
+ * the given string array. Returns the validated command object or throws
+ * a validation error if the object fails validation.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseUpdateWithWhere = (fullCommandAsStringList) => {
     const updateCommand = parseBaseCommand(fullCommandAsStringList)
