@@ -6,10 +6,11 @@ const { checkForAdditionalAtEnd } = require('./parserTools/checkForAdditional')
 const SQLError = require('../models/SQLError')
 
 /**
- * Parses and validates a DELETE command object from the given string array.
- * Returns a Joi validation result object containing the parsed command object
- * with key value and possible validation errors as object with key error.
+ * Handles passing the given command as string array to the correct function
+ * to be parsed into and validated as a DELETE command object. Returns the
+ * validated command object if no error was thrown.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseCommand = (fullCommandAsStringArray) => {
     if (queryContainsWhereKeyword(fullCommandAsStringArray)) {
@@ -39,9 +40,11 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
 }
 
 /**
- * Parses and validates a DELETE command not containing WHERE
- * from the given array. Returns a Joi validation result object.
+ * Parses and validates a DELETE command object from the given string array.
+ * Returns the validated command object or throws a validation error if the
+ * object fails validation or contains something additional at the end.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseDelete = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
@@ -55,8 +58,10 @@ const parseDelete = (fullCommandAsStringArray) => {
 
 /**
  * Parses and validates a DELETE command containing WHERE from the given array.
- * Returns a Joi validation result object.
+ * Returns the validated command object or throws a validation error if the
+ * object fails validation.
  * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
  */
 const parseDeleteWhere = (fullCommandAsStringArray) => {
     const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
