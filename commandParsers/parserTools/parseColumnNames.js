@@ -1,5 +1,3 @@
-const { namify, cleanStringArray } = require('./smallTools')
-
 /**
  * Parses column names from the given array while keeping count of current index.
  * Returns parsed column namess and the updated current index in an object or
@@ -52,6 +50,27 @@ const parseColumnNames = (stringArray, parserCounter) => {
         }
     }
     return { pccolumns: parserCounter }
+}
+
+/**
+ * Removes commas from the given array.
+ * @param {string[]} stringArray a string array
+ */
+const cleanStringArray = (stringArray) => {
+    return stringArray.map((col) => col.replace(/,/g, '').trim())
+}
+
+/**
+ * Maps the given array into an array of objects that contain the original
+ * values as values of name-keys.
+ * @param {string[]} stringList a string array
+ */
+const namify = (stringList) => {
+    return stringList.map((str) => {
+        return {
+            name: str,
+        }
+    })
 }
 
 module.exports = { parseColumnNames }
