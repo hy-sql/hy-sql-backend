@@ -229,17 +229,103 @@ describe.each([
     'SELECT nimi, hinta FROM Tuotteet LIMIT 2 WHERE hinta=2;',
     'SELECT nimi, hinta FROM Tuotteet LIMIT 2 ORDER BY hinta;',
     'SELECT nimi, hinta FROM Tuotteet LIMIT 2 GROUP BY hinta;',
-    'SELECT nimi, hinta FROM Tuotteet OFFSET 2 LIMIT 2;',
-])('Invalid query containing incorrectly placed LIMIT', (invalidCommand) => {
-    describe(invalidCommand, () => {
-        const command = splitCommandIntoArray(invalidCommand)
+    'SELECT nimi, hinta FROM Tuotteet LIMIT 2 HAVING hinta;',
+])(
+    'Invalid query containing LIMIT incorrectly placed before other keywords',
+    (invalidCommand) => {
+        describe(invalidCommand, () => {
+            const command = splitCommandIntoArray(invalidCommand)
 
-        test('throws correct error during parsing', () => {
-            expect(() => selectParser.parseCommand(command)).toThrowError(
-                new SQLError(
-                    'OFFSET must always be after LIMIT and LIMIT can not be before WHERE, GROUP BY or ORDER BY'
+            test('throws correct error during parsing', () => {
+                expect(() => selectParser.parseCommand(command)).toThrowError(
+                    new SQLError(
+                        'LIMIT must always be positioned after WHERE, GROUP BY, HAVING and ORDER BY'
+                    )
                 )
-            )
+            })
         })
+    }
+)
+
+describe('Invalid query with OFFSET incorrectly placed before LIMIT', () => {
+    const command = splitCommandIntoArray(
+        'SELECT nimi, hinta FROM Tuotteet OFFSET 2 LIMIT 2;'
+    )
+
+    test('throws correct error during parsing', () => {
+        expect(() => selectParser.parseCommand(command)).toThrowError(
+            new SQLError('OFFSET must always be positioned after LIMIT')
+        )
+    })
+})
+
+describe('Invalid SELECT-query containing incorrectly placed keywords', () => {
+    const queries = [
+        'SELECT nimi, hinta FROM Tuotteet GROUP BY nimi WHERE hinta>2;',
+        'SELECT nimi, hinta FROM Tuotteet HAVING COUNT(*)>1 WHERE hinta>2;',
+        'SELECT nimi, hinta FROM Tuotteet ORDER BY nimi WHERE hinta>2;',
+        'SELECT nimi, hinta FROM Tuotteet HAVING COUNT(*)>1 GROUP BY hinta;',
+        'SELECT nimi, hinta FROM Tuotteet ORDER BY nimi GROUP BY hinta;',
+        'SELECT nimi, hinta FROM Tuotteet ORDER BY HAVING COUNT(*)>1 hinta;',
+    ]
+
+    test(`'${queries[0]}' throws correct error during parsing`, () => {
+        const command = splitCommandIntoArray(queries[0])
+
+        expect(() => selectParser.parseCommand(command)).toThrowError(
+            new SQLError(
+                'WHERE must always be positioned before GROUP BY, HAVING and ORDER BY'
+            )
+        )
+    })
+
+    test(`'${queries[1]}' throws correct error during parsing`, () => {
+        const command = splitCommandIntoArray(queries[1])
+
+        expect(() => selectParser.parseCommand(command)).toThrowError(
+            new SQLError(
+                'WHERE must always be positioned before GROUP BY, HAVING and ORDER BY'
+            )
+        )
+    })
+
+    test(`'${queries[2]}' throws correct error during parsing`, () => {
+        const command = splitCommandIntoArray(queries[2])
+
+        expect(() => selectParser.parseCommand(command)).toThrowError(
+            new SQLError(
+                'WHERE must always be positioned before GROUP BY, HAVING and ORDER BY'
+            )
+        )
+    })
+
+    test(`'${queries[3]}' throws correct error during parsing`, () => {
+        const command = splitCommandIntoArray(queries[3])
+
+        expect(() => selectParser.parseCommand(command)).toThrowError(
+            new SQLError(
+                'GROUP BY must always be positioned after WHERE and before HAVING and ORDER BY'
+            )
+        )
+    })
+
+    test(`'${queries[4]}' throws correct error during parsing`, () => {
+        const command = splitCommandIntoArray(queries[4])
+
+        expect(() => selectParser.parseCommand(command)).toThrowError(
+            new SQLError(
+                'GROUP BY must always be positioned after WHERE and before HAVING and ORDER BY'
+            )
+        )
+    })
+
+    test(`'${queries[5]}' throws correct error during parsing`, () => {
+        const command = splitCommandIntoArray(queries[5])
+
+        expect(() => selectParser.parseCommand(command)).toThrowError(
+            new SQLError(
+                'HAVING must always be positioned after WHERE and GROUP BY and before ORDER BY'
+            )
+        )
     })
 })

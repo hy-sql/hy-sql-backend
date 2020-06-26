@@ -22,6 +22,8 @@ Run tests: `npm run test`
 
 Run ESlint: `npm run lint`
 
+Testcoverage: `npm run testcoverage`
+
 Examples of API usage are found at `_requests/`. HTTP POST -requests support Visual Studio REST Client.
 
 ## Docker
