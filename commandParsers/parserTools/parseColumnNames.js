@@ -20,7 +20,7 @@ const parseColumnNames = (stringArray, parserCounter) => {
                 continue loop1
             case ',':
                 continue loop1
-            // katkaisevat sanat, lisää näitä, *TODO: RESERVED WORDS LISTA*
+            // Strings that break the loop, add more here: *TODO: RESERVED WORDS LIST*
             case ';':
             case 'SELECT':
             case 'CREATE':

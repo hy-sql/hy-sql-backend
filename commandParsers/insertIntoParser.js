@@ -48,7 +48,7 @@ const parseCommand = (fullCommandAsStringArray) => {
         parsedCommand.columnsClosingBracket = ')'
     }
 
-    //VALUES kentät
+    //VALUES fields
     let block = []
     loop1: for (
         let index = anchorLocation + 1;
