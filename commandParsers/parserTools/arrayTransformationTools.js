@@ -1,7 +1,7 @@
 const {
-    containsFunctionWithWhiteSpacesPattern,
-    containsComparisonOperatorWithWhiteSpacePattern,
     containsArithmeticOperatorWithWhiteSpacePattern,
+    containsComparisonOperatorWithWhiteSpacePattern,
+    containsFunctionWithWhiteSpacesPattern,
 } = require('../../helpers/regex')
 const { fieldsSplitByComma } = require('../../helpers/isRegexTools')
 const SQLError = require('../../models/SQLError')
@@ -59,6 +59,9 @@ const transformSplitConditionsIntoConditionsArray = (conditionsInputArray) => {
             m.replace(/\s+/g, '')
         )
         .replace(containsComparisonOperatorWithWhiteSpacePattern, (m) =>
+            m.replace(/\s+/g, '')
+        )
+        .replace(containsArithmeticOperatorWithWhiteSpacePattern, (m) =>
             m.replace(/\s+/g, '')
         )
         .replace(/AND/gi, ' AND ')
