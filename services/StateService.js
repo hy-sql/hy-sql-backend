@@ -664,17 +664,18 @@ class StateService {
      * @param {Array} fields
      */
     groupRowsBy(rows, fields) {
-        return _.chain(rows)
-            .flattenDepth(
-                groupByMultipleProps(
-                    rows,
-                    fields.map((f) => f.value)
-                ),
-                fields.length - 1
-            )
-            .uniqWith(_.isEqual)
-            .orderBy(fields.map((f) => f.value))
-            .value()
+        const grouped = _.flattenDepth(
+            groupByMultipleProps(
+                rows,
+                fields.map((f) => f.value)
+            ),
+            fields.length - 1
+        ).map((group) => group.slice(0, 1))
+
+        return _.orderBy(
+            _.flatten(grouped),
+            fields.map((f) => f.value)
+        )
     }
 
     /**

@@ -2,10 +2,10 @@ const CommandArraySchema = require('../schemas/CommandArraySchema')
 const splitCommandIntoArray = require('../commandParsers/parserTools/splitCommandIntoArray')
 
 /**
- * Handles parsing of the array of sql queries (strings) received in the request
- * into an array of command objects. Expects the sql query array to be found in
- * request.body.commandArray and at places the array of command objects
- * into request.parsedCommands.
+ * Handles splitting the array of sql queries (strings) received in the request
+ * into arrays of split commands, format required by the command parsers.
+ * Expects the sql query array to be found in request.body.commandArray and
+ * places the array of split commands into request.splitCommands.
  */
 const splitCommands = (request, response, next) => {
     const commandArray = request.body.commandArray

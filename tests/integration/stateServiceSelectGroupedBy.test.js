@@ -62,10 +62,6 @@ describe('groupRowsBy()', () => {
                 hinta: 4,
             },
             {
-                nimi: 'olut',
-                hinta: 5,
-            },
-            {
                 nimi: 'porkkana',
                 hinta: 5,
             },
