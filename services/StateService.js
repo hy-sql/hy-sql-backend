@@ -493,11 +493,6 @@ class StateService {
                   .filter((row) => row.length > 0)
             : this.createFunctionRows(selectedFields, havingRows)
 
-        console.log(
-            'groupedRowsWithNewFieldsAndFunctions',
-            groupedRowsWithNewFieldsAndFunctions
-        )
-
         const aggregateFunctionRows = command.groupBy
             ? this.groupRowsBy(
                   _.flatten(
@@ -551,8 +546,6 @@ class StateService {
                   command.groupBy.fields
               )
             : rowsWithInitiallyfieldsToReturn
-
-        console.log('groupedRows', groupedRows)
 
         const rowsWithfieldsToReturn = groupedRows.map((row) =>
             _.pick(row, fieldsToReturn)

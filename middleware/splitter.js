@@ -16,8 +16,6 @@ const splitCommands = (request, response, next) => {
         })
     }
 
-    console.log(commandArray)
-
     const validatedCommandArray = CommandArraySchema.validate(commandArray)
 
     if (validatedCommandArray.error) {
@@ -29,8 +27,6 @@ const splitCommands = (request, response, next) => {
     const splitCommands = commandArray.map((input) =>
         splitCommandIntoArray(input)
     )
-
-    console.log(splitCommands)
 
     request.splitCommands = splitCommands
 
