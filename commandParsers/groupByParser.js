@@ -1,4 +1,4 @@
-const { parseSelectFields } = require('./fieldsParser')
+const { parseInputFields } = require('./fieldsParser')
 
 /**
  * Parses the GROUP BY part of a command into a GROUP BY object from the given string array.
@@ -13,9 +13,7 @@ const parseGroupBy = (slicedCommandAsStringArray) => {
                       .slice(0, 2)
                       .join(' ')
                       .toUpperCase(),
-                  fields: parseSelectFields(
-                      slicedCommandAsStringArray.slice(2)
-                  ),
+                  fields: parseInputFields(slicedCommandAsStringArray.slice(2)),
               }
             : null
 
