@@ -36,30 +36,34 @@ const evaluateExpression = (expressionArray, row) => {
 /**
  * Returns result of a single expression part
  * @param {Object} expressionPart
- * @param {Object} row
+ * @param {Object/Array} rowOrRows aggregateFunction takes an array of rows as parameter
+ * other take row Object
  */
-const evaluateExpressionPart = (expressionPart, row) => {
+const evaluateExpressionPart = (expressionPart, rowOrRows) => {
     switch (expressionPart.type) {
         case 'expression': {
             const expressionResult = evaluateExpression(
                 expressionPart.expressionParts,
-                row
+                rowOrRows
             )
             return expressionResult
         }
         case 'stringFunction':
-            return executeStringFunction(expressionPart, row)
+            return executeStringFunction(expressionPart, rowOrRows)
         case 'aggregateFunction':
-            return executeAggregateFunction(expressionPart, row)
+            return executeAggregateFunction(expressionPart, rowOrRows)
         case 'text':
             return expressionPart.value
         case 'integer':
             return expressionPart.value
         case 'column':
-            if (!row[expressionPart.value] && row[expressionPart.value] !== 0) {
+            if (
+                !rowOrRows[expressionPart.value] &&
+                rowOrRows[expressionPart.value] !== 0
+            ) {
                 throw new SQLError(`No such column: ${expressionPart.value}`)
             }
-            return row[expressionPart.value]
+            return rowOrRows[expressionPart.value]
         case 'operator':
             return expressionPart.value
     }
