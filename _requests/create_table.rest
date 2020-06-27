@@ -3,15 +3,12 @@ Content-Type: application/json
 
 {
   "commandArray": [
-            "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER, lkm INTEGER);",
-            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('retiisi', 7, 20);",
-            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('porkkana', 5, 40);",
-            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('nauris', 4, 40);",
-            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('lanttu', 8, 20);",
-            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri', 4, 30);",
-            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri', 6, 70);",
-            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('null', 6, 70);",
-            "SELECT COUNT(*)*2 FROM Tuotteet;"
+            "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
+"INSERT INTO Tuotteet (nimi, hinta) VALUES ('banaani', 4);",
+"INSERT INTO Tuotteet (nimi, hinta) VALUES ('banaani', 3);",
+"INSERT INTO Tuotteet (nimi, hinta) VALUES ('nauris', 6);",
+"INSERT INTO Tuotteet (nimi, hinta) VALUES ('nauris', 3);",
+"SELECT nimi, hinta FROM Tuotteet GROUP BY hinta;"
   ]
 }
 
@@ -63,7 +60,7 @@ Content-Type: application/json
     "INSERT INTO Tyontekijat (yritys, nimi) VALUES ('Ankka', 'Hupu');",
     "INSERT INTO Tyontekijat (yritys, nimi) VALUES ('Ankka', 'Lupu');",
     "INSERT INTO Tyontekijat (yritys, nimi) VALUES ('Hanhi', 'Hannu');",
-    "SELECT yritys FROM Tyontekijat GROUP BY yritys HAVING COUNT(*)+2>=5;"
+    "SELECT yritys, nimi FROM Tyontekijat GROUP BY yritys;"
   ]
 }
 
@@ -84,5 +81,28 @@ Content-Type: application/json
             "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (6, 'bucket', 0);",
             "INSERT INTO Tuotteet (tuote_id, nimi, hinta) VALUES (7, 'ol', 1);",
             "SELECT tuote_id, COUNT(*) FROM Tuotteet WHERE hinta >= 3 GROUP BY tuote_id HAVING COUNT(*)+1>=4 ORDER BY tuote_id;"
+        ]
+}
+
+### Testing
+
+POST http://localhost:3001/api/query
+Content-Type: application/json
+
+{
+  "commandArray": [
+            "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER, lkm INTEGER);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('retiisi', 7, 20);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('porkkana', 5, 40);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('nauris', 4, 40);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('lanttu', 8, 20);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri', 4, 30);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('selleri', 4, 70);",
+            "INSERT INTO Tuotteet (nimi,hinta,lkm) VALUES ('maito', 6, 70);",
+            "INSERT INTO Tuotteet (nimi,hinta, lkm) VALUES ('olut',4, 50);",
+            "INSERT INTO Tuotteet (nimi,hinta, lkm) VALUES ('olut',4, 70);",
+            "INSERT INTO Tuotteet (nimi,hinta, lkm) VALUES ('olut',5, 40);",
+            "INSERT INTO Tuotteet (nimi,hinta, lkm) VALUES ('olut',5, 40);",
+            "SELECT nimi, hinta, lkm, SUM(lkm), COUNT(*) FROM Tuotteet GROUP BY nimi, hinta;"
         ]
 }
