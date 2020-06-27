@@ -23,7 +23,6 @@ class StateService {
      *   - if the update was successful either a result object of form { result: result } or
      *      { result: result, rows: [] } for SELECT commands
      *   - if the command is not executed successfully an error is thrown
-     *     is returned
      * @param {object} command command object
      */
     updateState(command) {
@@ -45,7 +44,7 @@ class StateService {
 
     /**
      * Handles updating the state according to a CREATE TABLE command.
-     * Returns error object if the table name given in command already exists or
+     * Throws an error if the table name given in command already exists or
      * if some of the columns to be created have duplicate names.
      * Returns result object if the table was added to existing tables successfully.
      * @param {object} command CREATE TABLE command object
@@ -66,7 +65,7 @@ class StateService {
 
     /**
      * Handles updating the state according to a INSERT INTO command.
-     * Returns error object if the table name given in command does not exist
+     * Throws an error if the table name given in command does not exist
      * or when attempting to add values of wrong data type into columns.
      * Returns result object if the row was added to the table successfully.
      * @param {object} command INSERT INTO command object
@@ -102,15 +101,14 @@ class StateService {
         this.state.insertIntoTable(command.tableName, newRow)
 
         return {
-            result: `INSERT INTO ${command.tableName} -query was executed succesfully`,
+            result: `INSERT INTO ${command.tableName} -query was executed successfully`,
         }
     }
 
     /**
-     * Handles SELECT commands.
-     * Returns error object if the table name given in command does not exist
-     * or the commans is not executable (for example MAX is called for a nonexitent
-     * column).
+     * Handles SELECT commands. Throws an error if the table name given in command
+     * does not exist or the command is not executable (for example MAX is called
+     * for a nonexitent column).
      * Returns result object of form { result: result, rows: [] } if successful.
      * @param {object} command SELECT command object
      */
@@ -150,7 +148,7 @@ class StateService {
 
     /**
      * Handles updating the state according to a UPDATE command.
-     * Returns error object if the table name given in command does not exist
+     * Throws an error if the table name given in command does not exist
      * or when attempting to add values of wrong data type into columns.
      * Returns result object if the rows of the table were updated successfully.
      * @param {object} command UPDATE command object
@@ -201,8 +199,7 @@ class StateService {
     }
 
     /**
-     * Help function for updateTable().
-     * Updates wanted columns in given row.
+     * Help function for updateTable(). Updates wanted columns in given row.
      * @param {*} row Row object
      * @param {*} columnsToUpdate Object that contains columnName and value which will be updated
      */
@@ -217,7 +214,7 @@ class StateService {
 
     /**
      * Handles updating the state according to a DELETE command.
-     * Returns error object if the table name given in command does not exist.
+     * Throws an error if the table name given in command does not exist.
      * Returns result object if the required rows were successfully deleted from table.
      * @param {object} command DELETE command object
      */
@@ -247,7 +244,8 @@ class StateService {
 
     /**
      * Handles narrowing down the amount of rows to be returned according to the values
-     * given to LIMIT ... OFFSET in a query.
+     * given to LIMIT ... OFFSET in a query. Throws an error if value given to LIMIT or
+     * OFFSET is negative or if after narrowing down the amount of rows there are no rows left.
      * @param {object} limitObject .limit of a command object
      * @param {object[]} rows rows to limit
      */
@@ -568,12 +566,17 @@ class StateService {
      * Executes SELECT DISTINCT command for given rows. Expects rows containing only
      * queried columns as input and filters out possible duplicate data. Returns only
      * unique rows.
-     * @param {*} rows Rows containing queried columns.
+     * @param {object[]} rows Rows containing queried columns.
      */
     selectDistinct(rows) {
         return _.uniqWith(rows, _.isEqual)
     }
 
+    /**
+     * Handles picking correct aggregate function row for selectRows().
+     * @param {object[]} rows
+     * @param {object[]} fields
+     */
     pickAggregateFunctionRow(rows, fields) {
         const lastMinMaxFunction = _.findLast(
             fields,
