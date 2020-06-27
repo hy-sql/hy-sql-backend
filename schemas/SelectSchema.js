@@ -13,6 +13,7 @@ const { ExpressionSchema } = require('./ExpressionSchema')
 const DistinctSchema = require('./DistinctSchema')
 const FunctionSchema = require('./FunctionSchema')
 const { LimitSchema } = require('./LimitSchema')
+const SQLError = require('../models/SQLError')
 
 /**
  * Joi schema for validating SELECT commands not containing WHERE or ORDER BY.
@@ -60,6 +61,16 @@ const SelectSchema = Joi.object({
     }),
 
     limit: LimitSchema,
+
+    unrecognized: Joi.array()
+        .max(0)
+        .error((errors) => {
+            throw new SQLError(
+                `The following part of the query is probably incorrect and causing it to fail: ${errors[0].value.join(
+                    ' '
+                )}`
+            )
+        }),
 })
 
 /**

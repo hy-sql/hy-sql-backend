@@ -21,4 +21,29 @@ const checkForAdditionalAtEnd = (fullCommandAsStringArray, expectedLength) => {
     }
 }
 
-module.exports = { checkForAdditionalAtEnd }
+const checkForAdditionalAtEndOfBaseSelect = (
+    fullCommandAsStringArray,
+    parsedBaseCommand,
+    expectedEndOfBaseSelect
+) => {
+    const indexOfTableName = fullCommandAsStringArray.findIndex(
+        (t) => t === parsedBaseCommand.tableName
+    )
+
+    if (!expectedEndOfBaseSelect) {
+        return fullCommandAsStringArray.slice(
+            indexOfTableName + 1,
+            fullCommandAsStringArray.length - 1
+        )
+    }
+
+    return fullCommandAsStringArray.slice(
+        indexOfTableName + 1,
+        expectedEndOfBaseSelect
+    )
+}
+
+module.exports = {
+    checkForAdditionalAtEnd,
+    checkForAdditionalAtEndOfBaseSelect,
+}

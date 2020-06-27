@@ -3,7 +3,7 @@ const splitCommandIntoArray = require('../../../commandParsers/parserTools/split
 
 describe.each([
     'SELECT nimi, hinta FROM Taulu ;',
-    'SELECT nimi, hinta FROM Taulu  ORDER hinta;',
+    'SELECT nimi, hinta FROM Taulu  ORDER BY hinta;',
     'SELECT nimi, hinta FROM Taulu ORDER BY that;',
     'SELECT nimi, hinta FROM Taulu ORDER BY that;',
 ])('SELECT nimi, hinta query not containing WHERE keyword', (wrongCommand) => {
