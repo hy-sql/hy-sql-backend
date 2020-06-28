@@ -1,8 +1,8 @@
+const _ = require('lodash')
 const Joi = require('@hapi/joi')
 const { InsertIntoSchema } = require('../schemas/InsertIntoSchema')
 const { parseInputFields } = require('./fieldsParser')
 const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBracket')
-const SQLError = require('../models/SQLError')
 
 /**
  * Parses and validates an INSERT INTO command object from the given array.
@@ -16,22 +16,62 @@ const parseCommand = (fullCommandAsStringArray) => {
         (e) => e.toUpperCase() === 'VALUES'
     )
 
-    if (indexOfValuesKeyword < 0) {
-        throw new SQLError(
-            'INSERT INTO needs a VALUES keyword before the actual values to be inserted'
-        )
-    }
+    const indexOfOpeningColumnsBracket = fullCommandAsStringArray.findIndex(
+        (e) => e === '('
+    )
+
+    const indexOfClosingColumnsBracket = findIndexOfClosingBracket(
+        fullCommandAsStringArray,
+        indexOfOpeningColumnsBracket
+    )
+
+    const indexOfOpeningValuesBracket = _.findIndex(
+        fullCommandAsStringArray,
+        (e) => e === '(',
+        indexOfValuesKeyword > 0
+            ? indexOfValuesKeyword
+            : indexOfOpeningColumnsBracket + 1
+    )
+
+    const indexOfClosingValuesBracket = findIndexOfClosingBracket(
+        fullCommandAsStringArray,
+        indexOfOpeningValuesBracket
+    )
 
     const parsedCommand = {
         name: fullCommandAsStringArray.slice(0, 2).join(' '),
         tableName: fullCommandAsStringArray[2],
-        columns: parseColumns(
-            fullCommandAsStringArray.slice(0, indexOfValuesKeyword)
-        ),
+        openingColumnsBracket: fullCommandAsStringArray[3],
+        columns:
+            indexOfOpeningColumnsBracket > 0
+                ? parseInputFields(
+                      fullCommandAsStringArray.slice(
+                          indexOfOpeningColumnsBracket + 1,
+                          indexOfClosingColumnsBracket
+                              ? indexOfClosingColumnsBracket
+                              : indexOfValuesKeyword
+                      )
+                  )
+                : null,
+        closingColumnsBracket:
+            fullCommandAsStringArray[indexOfClosingColumnsBracket],
         valuesKeyword: fullCommandAsStringArray[indexOfValuesKeyword],
-        values: parseValues(
-            fullCommandAsStringArray.slice(indexOfValuesKeyword + 1)
-        ),
+        openingValuesBracket:
+            indexOfOpeningValuesBracket > indexOfOpeningColumnsBracket
+                ? fullCommandAsStringArray[indexOfOpeningValuesBracket]
+                : null,
+        values:
+            indexOfOpeningValuesBracket > 0
+                ? parseInputFields(
+                      fullCommandAsStringArray.slice(
+                          indexOfOpeningValuesBracket + 1,
+                          indexOfClosingValuesBracket ||
+                              fullCommandAsStringArray.length - 1
+                      )
+                  )
+                : null,
+        closingValuesBracket:
+            fullCommandAsStringArray[indexOfClosingValuesBracket],
         finalSemicolon:
             fullCommandAsStringArray[fullCommandAsStringArray.length - 1],
     }
@@ -39,56 +79,6 @@ const parseCommand = (fullCommandAsStringArray) => {
     const validatedCommand = Joi.attempt(parsedCommand, InsertIntoSchema)
 
     return validatedCommand
-}
-
-const parseColumns = (fullCommandAsStringArray) => {
-    const indexOfOpeningBracket = fullCommandAsStringArray.findIndex(
-        (e) => e === '('
-    )
-
-    const indexOfClosingBracket = findIndexOfClosingBracket(
-        fullCommandAsStringArray,
-        indexOfOpeningBracket
-    )
-
-    if (indexOfOpeningBracket < 0 || indexOfOpeningBracket < 0) {
-        throw new SQLError('columns must be surrounded by brackets')
-    }
-
-    if (indexOfOpeningBracket < 3) {
-        throw new SQLError('Table name missing')
-    }
-
-    return parseInputFields(
-        fullCommandAsStringArray.slice(
-            indexOfOpeningBracket + 1,
-            indexOfClosingBracket
-        )
-    )
-}
-
-const parseValues = (slicedStringArray) => {
-    if (slicedStringArray.length < 2) {
-        throw new SQLError('Values missing')
-    }
-
-    const indexOfOpeningBracket = slicedStringArray.findIndex((e) => e === '(')
-
-    const indexOfClosingBracket = findIndexOfClosingBracket(
-        slicedStringArray,
-        indexOfOpeningBracket
-    )
-
-    if (indexOfOpeningBracket < 0 || indexOfOpeningBracket < 0) {
-        throw new SQLError('values must be surrounded by brackets')
-    }
-
-    return parseInputFields(
-        slicedStringArray.slice(
-            indexOfOpeningBracket + 1,
-            indexOfClosingBracket
-        )
-    )
 }
 
 module.exports = { parseCommand }

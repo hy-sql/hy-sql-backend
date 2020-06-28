@@ -4,11 +4,11 @@ Content-Type: application/json
 {
   "commandArray": [
             "CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);",
-"INSERT INTO Tuotteet (nimi, hinta) VALUES ('banaani', 4);",
-"INSERT INTO Tuotteet (nimi, hinta) VALUES ('banaani', 3);",
-"INSERT INTO Tuotteet (nimi, hinta) VALUES ('nauris', 6);",
-"INSERT INTO Tuotteet (nimi, hinta) VALUES ('nauris', 3);",
-"SELECT nimi, *, LENGTH(nimi) FROM Tuotteet;"
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('banaani', 4);",
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('banaani', 3);",
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('nauris', 6);",
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('nauris', 3);",
+            "SELECT nimi, *, LENGTH(nimi) FROM Tuotteet;"
   ]
 }
 

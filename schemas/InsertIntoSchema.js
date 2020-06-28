@@ -23,16 +23,25 @@ const InsertIntoSchema = Joi.object({
         .max(64)
         .messages({
             'string.base': 'this is not a string',
-            'any.required': 'Query must contain a table name',
-            'string.pattern.base':
-                'Table name is invalid. Only a-z,A-Z,0-9 and _ allowed.',
+            'any.required': 'Table name missing or invalid',
+            'string.pattern.base': 'Table name missing or invalid',
             'string.max': 'The table name is too long',
         }),
+
+    openingColumnsBracket: Joi.string().valid('(').required().messages({
+        'any.only': 'columns must be surrounded by brackets',
+        'any.required': 'columns must be surrounded by brackets',
+    }),
 
     columns: Joi.array().min(1).items(ColumnSchema).required().messages({
         'array.base': 'this is not an array',
         'array.min': 'there should be at least one column specified',
         'any.required': 'There should be at least one column specified',
+    }),
+
+    closingColumnsBracket: Joi.string().valid(')').required().messages({
+        'any.only': 'columns must be surrounded by brackets',
+        'any.required': 'columns must be surrounded by brackets',
     }),
 
     valuesKeyword: Joi.string()
@@ -46,6 +55,11 @@ const InsertIntoSchema = Joi.object({
                 'This query is expected to contain the following keyword: VALUES',
         }),
 
+    openingValuesBracket: Joi.string().valid('(').required().messages({
+        'any.only': 'values must be surrounded by brackets',
+        'any.required': 'values must be surrounded by brackets',
+    }),
+
     values: Joi.array()
         .items(TextSchema, IntegerSchema)
         .min(Joi.ref('columns.length'))
@@ -57,6 +71,11 @@ const InsertIntoSchema = Joi.object({
             'array.max': 'Amount of values must match amount of columns',
             'any.required': 'There should be at least one value specified',
         }),
+
+    closingValuesBracket: Joi.string().valid(')').required().messages({
+        'any.only': 'values must be surrounded by brackets',
+        'any.required': 'values must be surrounded by brackets',
+    }),
 
     finalSemicolon: Joi.string().valid(';').required().messages({
         'any.only': 'Query must end with ;',
