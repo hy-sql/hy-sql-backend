@@ -41,7 +41,7 @@ describe.each([
     'SELECT * FROM Taulu where is=true order by false',
     'SELECT * FROM Taulu where "this"="that" order by that;',
     // "SELECT * FROM Taulu76 where name='test' ' order by column;", //TODO: see transformSplitConditionsIntoConditionsArray
-    // JSDoc in commandParsers/arrayTransformationTools.js
+    // JSDoc in commandParsers/parserTools/arrayTransformationTools.js
 ])('Invalid SELECT * -query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)

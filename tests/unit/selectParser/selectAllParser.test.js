@@ -93,7 +93,7 @@ describe.each([
     "SELECT * FROM Tuotteet WHERE name name='test';",
     "SELECT * FROM Tuotteet WHERE name='test' additional;",
     // "SELECT * FROM Tuotteet WHERE name='test' ';", //TODO: see transformSplitConditionsIntoConditionsArray
-    // JSDoc in commandParsers/arrayTransformationTools.js
+    // JSDoc in commandParsers/parserTools/arrayTransformationTools.js
 ])('Invalid SELECT * FROM ... WHERE ...-query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
