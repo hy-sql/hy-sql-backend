@@ -1,13 +1,6 @@
 // ARRAYS TO USE WITH RegExp
 
-const constraints = [
-    'CHECK',
-    'NOT NULL',
-    'UNIQUE',
-    'PRIMARY KEY',
-    'FOREIGN KEY',
-    'INDEX',
-]
+const constraints = ['CHECK', 'NOT NULL', 'UNIQUE', 'PRIMARY KEY', 'INDEX']
 
 const comparisonOperators = ['>=', '<=', '<>', '=', '>', '<']
 
@@ -48,6 +41,8 @@ const aggregateFunctionsNamePattern = new RegExp(
 )
 
 // EXACT MATCHES
+
+const containsConstraintsPattern = new RegExp(`(${constraints.join('|')})`)
 
 const selectAllPattern = new RegExp('^\\*$')
 
@@ -156,18 +151,6 @@ const containsArithmeticExpressionPattern = new RegExp(
     'gi'
 )
 
-// TODO: improve this to match the ones above
-const constraintsNamePatternForSplit = new RegExp(
-    [
-        '(?<=PRIMARY KEY)|(?=PRIMARY KEY)',
-        '(?<=CHECK)|(?=CHECK)',
-        '(?<=NOT NULL)|(?=NOT NULL)',
-        '(?<=UNIQUE)|(?=UNIQUE)',
-        '(?<=FOREIGN KEY)|(?=FOREIGN KEY)',
-        '(?<=INDEX)|(?=INDEX)',
-    ].join('|')
-)
-
 /**
  * Regular expressions for use in the application.
  * @exports RegExp
@@ -180,7 +163,7 @@ module.exports = {
     arithmeticOperatorPattern,
     comparisonOperatorPattern,
     constraintsNamePattern,
-    constraintsNamePatternForSplit,
+    containsConstraintsPattern,
     containsAggregateFunctionPattern,
     containsArithmeticExpressionPattern,
     containsArithmeticOperatorPattern,

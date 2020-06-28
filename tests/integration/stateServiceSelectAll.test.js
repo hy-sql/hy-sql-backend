@@ -26,9 +26,9 @@ describe('selectFrom()', () => {
             tableName: 'Tuotteet',
             openingBracket: '(',
             columns: [
-                { name: 'id', type: 'INTEGER', primaryKey: true },
-                { name: 'nimi', type: 'TEXT', primaryKey: false },
-                { name: 'hinta', type: 'INTEGER', primaryKey: false },
+                { name: 'id', type: 'INTEGER', constraints: ['PRIMARY KEY'] },
+                { name: 'nimi', type: 'TEXT', constraints: [] },
+                { name: 'hinta', type: 'INTEGER', constraints: [] },
             ],
             closingBracket: ')',
             finalSemicolon: ';',
@@ -272,9 +272,9 @@ describe('selectFrom() with command.where and command.orderBy', () => {
             },
         ]
 
-        const selectParser =
+        const selectCommand =
             "SELECT * from Tuotteet WHERE nimi='olut' ORDER BY hinta ASC;"
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)
@@ -300,10 +300,10 @@ describe('selectFrom() with command.where and command.orderBy', () => {
                 hinta: 8,
             },
         ]
-        const selectParser =
+        const selectCommand =
             'SELECT * FROM Tuotteet WHERE hinta>5 ORDER BY hinta ASC;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)

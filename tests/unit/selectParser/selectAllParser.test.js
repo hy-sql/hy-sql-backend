@@ -108,9 +108,9 @@ describe.each([
     'SELECT * FROM Tuotteet  price=7;',
 ])(
     'SELECT * FROM ... WHERE ...-query with misspelled or missing WHERE',
-    (validCommand) => {
-        describe(validCommand, () => {
-            const command = splitCommandIntoArray(validCommand)
+    (invalidCommand) => {
+        describe(invalidCommand, () => {
+            const command = splitCommandIntoArray(invalidCommand)
 
             test('fails validation after parsed to command object', () => {
                 expect(() =>

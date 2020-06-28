@@ -45,7 +45,7 @@ describe.each([
     test('fails validation after parsed to command object', () => {
         expect(() => {
             commandService.parseCommand(fullCommandAsStringArray)
-        }).toThrow()
+        }).toThrowError()
     })
 })
 
@@ -60,6 +60,6 @@ describe.each([
     test('fails validation after parsed to command object', () => {
         expect(() => {
             commandService.parseCommand(fullCommandAsStringArray)
-        }).toThrow()
+        }).toThrowError()
     })
 })

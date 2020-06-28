@@ -18,7 +18,7 @@ describe.each([
     'GROUP BY price, amount',
     "GROUP BY LENGTH('test')",
     'GROUP BY SUM(amount)',
-    // 'GROUP BY price*5-LENGTH(name)',
+    'GROUP BY price*5-LENGTH(name)',
 ])('Valid GROUP BY-part of a query', (validCommand) => {
     describe(validCommand, () => {
         const command = splitCommandIntoArray(validCommand)
@@ -159,7 +159,7 @@ describe.each([
         test('fails validation after parsed to command object', () => {
             expect(() => {
                 parseCommand(command)
-            }).toThrow()
+            }).toThrowError()
         })
     })
 })

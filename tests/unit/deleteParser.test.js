@@ -11,7 +11,7 @@ describe.each(['DEL FROM Taulu;'])(
             test('fails validation after parsed to command object', () => {
                 expect(() => {
                     deleteParser.parseCommand(command)
-                }).toThrow()
+                }).toThrowError()
             })
         })
     }
@@ -57,7 +57,7 @@ describe.each([
         test('fails validation after parsed to command object', () => {
             expect(() => {
                 deleteParser.parseCommand(command)
-            }).toThrow()
+            }).toThrowError()
         })
     })
 })
@@ -104,7 +104,7 @@ describe.each([
         test('fails validation after parsed to command object', () => {
             expect(() => {
                 deleteParser.parseCommand(command)
-            }).toThrow()
+            }).toThrowError()
         })
     })
 })
