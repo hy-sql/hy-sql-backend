@@ -26,9 +26,9 @@ describe('selectFrom()', () => {
             tableName: 'Tuotteet',
             openingBracket: '(',
             columns: [
-                { name: 'id', type: 'INTEGER', primaryKey: true },
-                { name: 'nimi', type: 'TEXT', primaryKey: false },
-                { name: 'hinta', type: 'INTEGER', primaryKey: false },
+                { name: 'id', type: 'INTEGER', constraints: ['PRIMARY KEY'] },
+                { name: 'nimi', type: 'TEXT', constraints: [] },
+                { name: 'hinta', type: 'INTEGER', constraints: [] },
             ],
             closingBracket: ')',
             finalSemicolon: ';',

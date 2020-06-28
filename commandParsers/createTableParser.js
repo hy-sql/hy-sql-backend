@@ -1,6 +1,6 @@
 const Joi = require('@hapi/joi')
 const { CreateTableSchema } = require('../schemas/CreateTableSchema')
-const { constraintsNamePatternForSplit } = require('../helpers/regex')
+const { containsConstraintsPattern } = require('../helpers/regex')
 
 /**
  * Parses and validates a CREATE TABLE command object from the given string array.
@@ -57,14 +57,13 @@ const parseColumns = (columnsAsStringList) => {
 
 /**
  * Handles parsing of the column constraints contained in the given array.
- * TODO: Validate only one column to have unique constraints such as PRIMARY KEY
  * @param {string[]} constraintsAsStringArray array containing the column constraints
  */
 const parseColumnConstraints = (constraintsAsStringArray) => {
     const separatedConstraintsAsStringList = constraintsAsStringArray
         .join(' ')
         .toUpperCase()
-        .split(constraintsNamePatternForSplit)
+        .split(containsConstraintsPattern)
         .map((c) => c.trim())
         .filter(Boolean)
 
