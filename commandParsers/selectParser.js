@@ -33,6 +33,9 @@ const { parseSelectFields } = require('./fieldsParser')
 const { parseGroupBy } = require('./groupByParser')
 const { parseHaving } = require('./havingParser')
 const { parseLimit } = require('./limitParser')
+const {
+    checkForAdditionalAtEndOfBaseSelect,
+} = require('./parserTools/checkForAdditional')
 const SQLError = require('../models/SQLError')
 
 /**
@@ -128,10 +131,17 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
  * @returns {object} command object
  */
 const parseSelect = (fullCommandAsStringArray) => {
-    const parsedBaseCommand = parseBaseCommand(fullCommandAsStringArray)
-    delete parsedBaseCommand.indexOfLimit
+    const parsedCommand = parseBaseCommand(fullCommandAsStringArray)
 
-    const validatedCommand = Joi.attempt(parsedBaseCommand, SelectSchema)
+    parsedCommand.unrecognized = checkForAdditionalAtEndOfBaseSelect(
+        fullCommandAsStringArray,
+        parsedCommand,
+        parsedCommand.indexOfLimit
+    )
+
+    delete parsedCommand.indexOfLimit
+
+    const validatedCommand = Joi.attempt(parsedCommand, SelectSchema)
 
     return validatedCommand
 }
@@ -157,6 +167,12 @@ const parseSelectWhere = (fullCommandAsStringArray) => {
                 ? parsedCommand.indexOfLimit
                 : fullCommandAsStringArray.length - 1
         )
+    )
+
+    parsedCommand.unrecognized = checkForAdditionalAtEndOfBaseSelect(
+        fullCommandAsStringArray,
+        parsedCommand,
+        indexOfWhere
     )
 
     delete parsedCommand.indexOfLimit
@@ -187,6 +203,12 @@ const parseSelectGroupBy = (fullCommandAsStringArray) => {
                 ? parsedCommand.indexOfLimit
                 : fullCommandAsStringArray.length - 1
         )
+    )
+
+    parsedCommand.unrecognized = checkForAdditionalAtEndOfBaseSelect(
+        fullCommandAsStringArray,
+        parsedCommand,
+        indexOfGroup
     )
 
     delete parsedCommand.indexOfLimit
@@ -227,6 +249,12 @@ const parseSelectGroupByHaving = (fullCommandAsStringArray) => {
         )
     )
 
+    parsedCommand.unrecognized = checkForAdditionalAtEndOfBaseSelect(
+        fullCommandAsStringArray,
+        parsedCommand,
+        indexOfGroup
+    )
+
     delete parsedCommand.indexOfLimit
 
     const validatedCommand = Joi.attempt(
@@ -258,6 +286,12 @@ const parseSelectOrderBy = (fullCommandAsStringArray) => {
                 ? parsedCommand.indexOfLimit
                 : fullCommandAsStringArray.length - 1
         )
+    )
+
+    parsedCommand.unrecognized = checkForAdditionalAtEndOfBaseSelect(
+        fullCommandAsStringArray,
+        parsedCommand,
+        indexOfOrder
     )
 
     delete parsedCommand.indexOfLimit
@@ -296,6 +330,12 @@ const parseSelectWhereGroupBy = (fullCommandAsStringArray) => {
                 ? parsedCommand.indexOfLimit
                 : fullCommandAsStringArray.length - 1
         )
+    )
+
+    parsedCommand.unrecognized = checkForAdditionalAtEndOfBaseSelect(
+        fullCommandAsStringArray,
+        parsedCommand,
+        indexOfWhere
     )
 
     delete parsedCommand.indexOfLimit
@@ -347,6 +387,12 @@ const parseSelectWhereGroupByHaving = (fullCommandAsStringArray) => {
         )
     )
 
+    parsedCommand.unrecognized = checkForAdditionalAtEndOfBaseSelect(
+        fullCommandAsStringArray,
+        parsedCommand,
+        indexOfWhere
+    )
+
     delete parsedCommand.indexOfLimit
 
     const validatedCommand = Joi.attempt(
@@ -388,6 +434,12 @@ const parseSelectWhereOrderBy = (fullCommandAsStringArray) => {
         )
     )
 
+    parsedCommand.unrecognized = checkForAdditionalAtEndOfBaseSelect(
+        fullCommandAsStringArray,
+        parsedCommand,
+        indexOfWhere
+    )
+
     delete parsedCommand.indexOfLimit
 
     const validatedCommand = Joi.attempt(
@@ -427,6 +479,12 @@ const parseSelectGroupByOrderBy = (fullCommandAsStringArray) => {
                 ? parsedCommand.indexOfLimit
                 : fullCommandAsStringArray.length - 1
         )
+    )
+
+    parsedCommand.unrecognized = checkForAdditionalAtEndOfBaseSelect(
+        fullCommandAsStringArray,
+        parsedCommand,
+        indexOfGroup
     )
 
     delete parsedCommand.indexOfLimit
@@ -478,6 +536,12 @@ const parseSelectGroupByHavingOrderBy = (fullCommandAsStringArray) => {
         )
     )
 
+    parsedCommand.unrecognized = checkForAdditionalAtEndOfBaseSelect(
+        fullCommandAsStringArray,
+        parsedCommand,
+        indexOfGroup
+    )
+
     delete parsedCommand.indexOfLimit
 
     const validatedCommand = Joi.attempt(
@@ -525,6 +589,12 @@ const parseSelectWhereGroupByOrderBy = (fullCommandAsStringArray) => {
                 ? parsedCommand.indexOfLimit
                 : fullCommandAsStringArray.length - 1
         )
+    )
+
+    parsedCommand.unrecognized = checkForAdditionalAtEndOfBaseSelect(
+        fullCommandAsStringArray,
+        parsedCommand,
+        indexOfWhere
     )
 
     delete parsedCommand.indexOfLimit
@@ -582,6 +652,12 @@ const parseSelectWhereGroupByHavingOrderBy = (fullCommandAsStringArray) => {
                 ? parsedCommand.indexOfLimit
                 : fullCommandAsStringArray.length - 1
         )
+    )
+
+    parsedCommand.unrecognized = checkForAdditionalAtEndOfBaseSelect(
+        fullCommandAsStringArray,
+        parsedCommand,
+        indexOfWhere
     )
 
     delete parsedCommand.indexOfLimit

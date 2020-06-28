@@ -2,9 +2,8 @@ const { parseCommand } = require('../../../commandParsers/selectParser')
 const splitCommandIntoArray = require('../../../commandParsers/parserTools/splitCommandIntoArray')
 
 describe.each([
-    'SELECT * FROM Taulu ;',
-    'SELECT * FROM Taulu  ORDER hinta;',
-    'SELECT * FROM Taulu ORDER BY that;',
+    'SELECT * FROM Taulu;',
+    'SELECT * FROM Taulu ORDER BY hinta;',
     'SELECT * FROM Taulu ORDER BY that;',
 ])('SELECT * query not containing WHERE keyword', (wrongCommand) => {
     describe(wrongCommand, () => {
