@@ -59,9 +59,24 @@ class StateService {
             rows: [],
         }
 
+        this.validatePrimaryKey(newTable)
+
         this.state.createTable(newTable)
 
         return { result: `Table ${newTable.name} created successfully` }
+    }
+
+    validatePrimaryKey(table) {
+        const columnsContainingPrimaryKeyConstraint = table.columns.filter(
+            (c) => c.constraints.includes('PRIMARY KEY')
+        )
+
+        if (columnsContainingPrimaryKeyConstraint.length > 1)
+            throw new SQLError(
+                `table ${table.name} has more than one primary key`
+            )
+
+        return
     }
 
     /**
