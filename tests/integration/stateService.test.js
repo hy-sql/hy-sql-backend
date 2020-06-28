@@ -128,33 +128,19 @@ describe('insertIntoTable()', () => {
             closingBracket: ')',
             finalSemicolon: ';',
         }
+
         stateService.createTable(createCommand)
-        const insertCommand = {
-            name: 'INSERT INTO',
-            tableName: 'Tuotteet',
-            columns: [
-                {
-                    name: 'nimi',
-                },
-                {
-                    name: 'hinta',
-                },
-            ],
-            values: [
-                {
-                    column: 'nimi',
-                    value: 'tuote',
-                    type: 'TEXT',
-                },
-                {
-                    column: 'hinta',
-                    value: 10,
-                    type: 'INTEGER',
-                },
-            ],
-        }
-        stateService.insertIntoTable(insertCommand)
-        const rows = state.getTableByName(insertCommand.tableName).rows
+
+        const insertCommand =
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('tuote', 10);"
+
+        const splitInsertCommand = splitCommandIntoArray(insertCommand)
+
+        const parsedCommand = commandService.parseCommand(splitInsertCommand)
+
+        stateService.insertIntoTable(parsedCommand)
+
+        const rows = state.getTableByName(parsedCommand.tableName).rows
         expect(rows[0].id).toBe(1)
         expect(rows[0].nimi).toBe('tuote')
         expect(rows[0].hinta).toBe(10)

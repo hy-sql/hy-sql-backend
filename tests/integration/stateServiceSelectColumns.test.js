@@ -25,7 +25,7 @@ describe('selectFromTable()', () => {
 
         const commands = [
             'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
-            'INSERT INTO Tuotteet (nimi, hinta) VALUES (tuote, 10);',
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('tuote', 10);",
         ]
 
         const splitCommandArray = commands.map((input) =>
@@ -53,7 +53,7 @@ describe('selectFromTable()', () => {
 
         const commands = [
             'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
-            'INSERT INTO Tuotteet (nimi, hinta) VALUES (tuote, 10);',
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('tuote', 10);",
         ]
 
         const splitCommandArray = commands.map((input) =>
@@ -85,8 +85,8 @@ describe('selectFrom() with command.where', () => {
 
         const commands = [
             'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
-            'INSERT INTO Tuotteet (nimi, hinta) VALUES (tuote, 10);',
-            'INSERT INTO Tuotteet (nimi, hinta) VALUES (testituote, 20);',
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('tuote', 10);",
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('testituote', 20);",
         ]
 
         const splitCommandArray = commands.map((input) =>

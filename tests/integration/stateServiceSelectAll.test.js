@@ -36,7 +36,7 @@ describe('selectFrom()', () => {
         stateService.createTable(createCommand)
 
         const insertCommand =
-            'INSERT INTO Tuotteet (nimi, hinta) VALUES (tuote, 10);'
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('tuote', 10);"
         const splitCommand = splitCommandIntoArray(insertCommand)
         const parsedCommand = commandService.parseCommand(splitCommand)
 
@@ -135,8 +135,8 @@ describe('selectFrom() with command.where', () => {
 
         const commands = [
             'CREATE TABLE Tuotteet (id INTEGER PRIMARY KEY, nimi TEXT, hinta INTEGER);',
-            'INSERT INTO Tuotteet (nimi, hinta) VALUES (tuote, 10);',
-            'INSERT INTO Tuotteet (nimi, hinta) VALUES (testituote, 20);',
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('tuote', 10);",
+            "INSERT INTO Tuotteet (nimi, hinta) VALUES ('testituote', 20);",
         ]
 
         const splitCommandArray = commands.map((input) =>

@@ -15,6 +15,7 @@ const SQLError = require('../models/SQLError')
 class StateService {
     constructor(state) {
         this.state = state
+        this._id = 0
     }
 
     /**
@@ -75,28 +76,37 @@ class StateService {
 
         const table = this.findTable(command.tableName)
 
-        const highest_id =
-            table.rows.length === 0 ? 0 : _.maxBy(table.rows, 'id').id
-        const newRow = {
-            id: highest_id + 1,
-        }
+        const newRow = command.columns.reduce(
+            (rowToReturn, column, i) => {
+                const columnName = column.value
+                const value = command.values[i].value
+                const valueType = command.values[i].type.toUpperCase()
 
-        for (let i = 0; i < command.columns.length; i++) {
-            const columnName = command.columns[i].name
-            const value = command.values[i]
-
-            const columnIndex = table.columns.findIndex(
-                (e) => e.name === columnName
-            )
-            const columnType = table.columns[columnIndex].type
-
-            if (columnType !== value.type)
-                throw new SQLError(
-                    `Wrong datatype: expected ${columnType} but was ${value.type}`
+                const existingColumn = _.find(
+                    table.columns,
+                    (column) => column.name === columnName
                 )
 
-            newRow[columnName] = value.value
-        }
+                if (!existingColumn) {
+                    throw new SQLError(`No such column: ${columnName}`)
+                }
+
+                const columnType = existingColumn.type
+
+                if (columnType !== valueType) {
+                    throw new SQLError(
+                        `Wrong datatype: expected ${columnType} but was ${valueType}`
+                    )
+                }
+
+                rowToReturn[columnName] = value
+
+                return rowToReturn
+            },
+            {
+                id: this.generateId(),
+            }
+        )
 
         this.state.insertIntoTable(command.tableName, newRow)
 
@@ -178,17 +188,15 @@ class StateService {
                 command.where.conditions,
                 rowsToUpdate
             )
-            let notChangedRows = _.difference(table.rows, rowsToUpdate)
-            notChangedRows.forEach((row) => {
-                newRows = newRows.concat(row)
-            })
+            const notChangedRows = _.difference(table.rows, rowsToUpdate)
+            newRows = newRows.concat(notChangedRows)
         }
 
-        rowsToUpdate.forEach((row) => {
-            newRows = newRows.concat(
-                this.updateRow(row, command.columns, table.columns)
-            )
-        })
+        const updatedRows = rowsToUpdate.map((row) =>
+            this.updateRow(row, command.columns, table.columns)
+        )
+
+        newRows = newRows.concat(updatedRows)
 
         newRows = _.sortBy(newRows, 'id')
         this.state.replaceRows(command.tableName, newRows)
@@ -204,12 +212,15 @@ class StateService {
      * @param {*} columnsToUpdate Object that contains columnName and value which will be updated
      */
     updateRow(row, columnsToUpdate) {
-        for (let i = 0; i < columnsToUpdate.length; i++) {
-            const columnName = columnsToUpdate[i].columnName
-            const value = columnsToUpdate[i].value
-            row[columnName] = value
-        }
-        return row
+        const updatedRow = { ...row }
+
+        columnsToUpdate.forEach((column) => {
+            const columnName = column.columnName
+            const value = column.value
+            updatedRow[columnName] = value
+        })
+
+        return updatedRow
     }
 
     /**
@@ -243,51 +254,145 @@ class StateService {
     }
 
     /**
-     * Handles narrowing down the amount of rows to be returned according to the values
-     * given to LIMIT ... OFFSET in a query. Throws an error if value given to LIMIT or
-     * OFFSET is negative or if after narrowing down the amount of rows there are no rows left.
-     * @param {object} limitObject .limit of a command object
-     * @param {object[]} rows rows to limit
+     * Goes through all possible select command options and returns selected fields
+     * @param {Object} command
+     * @param {Array} existingRows
      */
-    limitRows(limitObject, rows) {
-        let limitedRows = rows
+    selectRows(command, existingRows) {
+        const filteredRows = command.where
+            ? this.filterRows(command.where.conditions, existingRows)
+            : existingRows
 
-        let offset = undefined
-        if (limitObject.offset) {
-            offset =
-                limitObject.offset.field.type === 'expression'
-                    ? evaluateExpression(
-                          limitObject.offset.field.expressionParts,
-                          {},
-                          limitedRows
-                      )
-                    : limitObject.offset.field.value
-
-            limitedRows = _.drop(limitedRows, offset)
+        if (command.fields[0].type === 'all') {
+            return command.orderBy
+                ? this.orderRowsBy(command.orderBy.fields, filteredRows)
+                : filteredRows
         }
 
-        const limit =
-            limitObject.field.type === 'expression'
-                ? evaluateExpression(
-                      limitObject.field.expressionParts,
-                      {},
-                      limitedRows
-                  )
-                : limitObject.field.value
-
-        if (limit >= 0) limitedRows = _.take(limitedRows, limit)
-
-        if (limit < 0 || offset < 0) {
-            throw new SQLError('Value given to LIMIT or OFFSET is negative.')
+        if (
+            command.fields[0].type === 'aggregateFunction' &&
+            command.fields.length === 1
+        ) {
+            return [
+                this.createRowWithAggregateFunctionResult(
+                    command.fields[0],
+                    filteredRows
+                ),
+            ]
         }
 
-        if (limitedRows.length === 0) {
-            throw new SQLError(
-                'No rows left to return. Try changing value given to LIMIT or OFFSET.'
+        if (
+            command.fields[0].type === 'expression' &&
+            containsAggregateFunction(command.fields[0].expressionParts)
+        ) {
+            const evaluated = evaluateAggregateExpression(
+                command.fields[0].expressionParts,
+                existingRows
             )
+
+            return [{ [command.fields[0].value]: evaluated }]
         }
 
-        return limitedRows
+        const selectedFields =
+            command.fields[0].type === 'distinct'
+                ? command.fields[0].value
+                : command.fields
+
+        const rowsWithNewFields = this.createRowsWithNewFields(
+            selectedFields,
+            filteredRows
+        )
+
+        const initialGroupedRows = command.groupBy
+            ? this.initialGroupRowsBy(rowsWithNewFields, command.groupBy.fields)
+            : rowsWithNewFields
+
+        const havingRows = command.having
+            ? initialGroupedRows.map((group) =>
+                  this.filterRows(command.having.conditions, group)
+              )
+            : initialGroupedRows
+
+        const groupedRowsWithNewFieldsAndFunctions = command.groupBy
+            ? havingRows
+                  .map((rowGroup) =>
+                      this.createRowsWithFunctionResults(
+                          selectedFields,
+                          rowGroup
+                      )
+                  )
+                  .filter((row) => row.length > 0)
+            : this.createRowsWithFunctionResults(selectedFields, havingRows)
+
+        const aggregateFunctionRows = command.groupBy
+            ? this.groupRowsBy(
+                  _.flatten(
+                      _.compact(
+                          groupedRowsWithNewFieldsAndFunctions.map((rowGroup) =>
+                              this.pickAggregateFunctionRow(
+                                  rowGroup,
+                                  selectedFields
+                              )
+                          )
+                      )
+                  ),
+                  command.groupBy.fields
+              )
+            : this.pickAggregateFunctionRow(
+                  groupedRowsWithNewFieldsAndFunctions,
+                  selectedFields
+              )
+
+        const orderedAggregateFunctionRows = command.orderBy
+            ? this.orderRowsBy(command.orderBy.fields, aggregateFunctionRows)
+            : aggregateFunctionRows
+
+        const fieldsToReturn =
+            command.fields[0].type === 'distinct'
+                ? command.fields[0].value.map((f) => f.value)
+                : command.fields.map((f) => f.value)
+
+        if (!_.isEmpty(orderedAggregateFunctionRows)) {
+            const aggregateFunctionRowsWithfieldsToReturn = orderedAggregateFunctionRows.map(
+                (row) => _.pick(row, fieldsToReturn)
+            )
+
+            return aggregateFunctionRowsWithfieldsToReturn
+        }
+
+        const orderedRows = command.orderBy
+            ? this.orderRowsBy(
+                  command.orderBy.fields,
+                  _.flatten(groupedRowsWithNewFieldsAndFunctions)
+              )
+            : _.flatten(groupedRowsWithNewFieldsAndFunctions)
+
+        const rowsWithInitiallyfieldsToReturn = command.groupBy
+            ? orderedRows.map((row) => _.pick(row, fieldsToReturn))
+            : orderedRows
+
+        const groupedRows = command.groupBy
+            ? this.groupRowsBy(
+                  rowsWithInitiallyfieldsToReturn,
+                  command.groupBy.fields
+              )
+            : rowsWithInitiallyfieldsToReturn
+
+        const rowsWithfieldsToReturn = groupedRows.map((row) =>
+            _.pick(row, fieldsToReturn)
+        )
+
+        const groupedOrderedRows =
+            command.groupBy && command.orderBy
+                ? this.orderRowsBy(
+                      command.orderBy.fields,
+                      rowsWithfieldsToReturn
+                  )
+                : rowsWithfieldsToReturn
+
+        return command.fields[0].type === 'distinct'
+            ? this.selectDistinct(groupedOrderedRows)
+            : groupedOrderedRows
     }
 
     /**
@@ -382,9 +487,32 @@ class StateService {
                 } else if (condition.OR) {
                     filtered = this.filterOrRows(condition.OR, existingRows)
                 } else {
-                    filtered = _.filter(existingRows, (row) =>
-                        createFilter(row, condition)
-                    )
+                    if (
+                        condition.left.type === 'aggregateFunction' ||
+                        condition.right.type === 'aggregateFunction' ||
+                        (condition.left.type === 'expression' &&
+                            containsAggregateFunction(
+                                condition.left.expressionParts
+                            )) ||
+                        (condition.right === 'expression' &&
+                            containsAggregateFunction(
+                                condition.right.expressionParts
+                            ))
+                    ) {
+                        const aggregateFunctionFilter = createFilter(
+                            existingRows,
+                            condition
+                        )
+
+                        filtered = _.filter(
+                            existingRows,
+                            () => aggregateFunctionFilter
+                        )
+                    } else {
+                        filtered = _.filter(existingRows, (row) =>
+                            createFilter(row, condition)
+                        )
+                    }
                 }
 
                 return rowsToReturn.concat(filtered)
@@ -393,173 +521,6 @@ class StateService {
         )
 
         return filteredRows
-    }
-
-    /**
-     * Handles creating result rows for selectRows().
-     * @param {object} command command of SELECT command
-     * @param {object[]} existingRows array of row objects
-     */
-    createFunctionRows(fields, existingRows) {
-        const createdRows = existingRows.reduce((rowsToReturn, row) => {
-            for (let i = 0; i < fields.length; i++) {
-                if (fields[i].type === 'stringFunction') {
-                    const functionResult = executeStringFunction(fields[i], row)
-
-                    row[fields[i].value] = functionResult
-                } else if (fields[i].type === 'aggregateFunction') {
-                    const functionResult = this.createAggregateFunctionRow(
-                        fields[i],
-                        existingRows
-                    )
-
-                    row[fields[i].value] = functionResult[fields[i].value]
-                }
-            }
-
-            return rowsToReturn
-        }, existingRows)
-
-        return createdRows
-    }
-
-    /**
-     * Goes through all possible select command options and returns selected fields
-     * @param {Object} command
-     * @param {Array} existingRows
-     */
-    selectRows(command, existingRows) {
-        const filteredRows = command.where
-            ? this.filterRows(command.where.conditions, existingRows)
-            : existingRows
-
-        if (command.fields[0].type === 'all') {
-            return command.orderBy
-                ? this.orderRowsBy(command.orderBy.fields, filteredRows)
-                : filteredRows
-        }
-
-        if (
-            command.fields[0].type === 'aggregateFunction' &&
-            command.fields.length === 1
-        ) {
-            return [
-                this.createAggregateFunctionRow(
-                    command.fields[0],
-                    filteredRows
-                ),
-            ]
-        }
-
-        if (
-            command.fields[0].type === 'expression' &&
-            containsAggregateFunction(command.fields[0].expressionParts)
-        ) {
-            const evaluated = evaluateAggregateExpression(
-                command.fields[0].expressionParts,
-                existingRows
-            )
-
-            return [{ [command.fields[0].value]: evaluated }]
-        }
-
-        const selectedFields =
-            command.fields[0].type === 'distinct'
-                ? command.fields[0].value
-                : command.fields
-
-        const rowsWithNewFields = this.createRowsWithNewFields(
-            selectedFields,
-            filteredRows
-        )
-
-        const initialGroupedRows = command.groupBy
-            ? this.initialGroupRowsBy(rowsWithNewFields, command.groupBy.fields)
-            : rowsWithNewFields
-
-        const havingRows = command.having
-            ? initialGroupedRows.map((group) =>
-                  this.filterRows(command.having.conditions, group)
-              )
-            : initialGroupedRows
-
-        const groupedRowsWithNewFieldsAndFunctions = command.groupBy
-            ? havingRows
-                  .map((rowGroup) =>
-                      this.createFunctionRows(selectedFields, rowGroup)
-                  )
-                  .filter((row) => row.length > 0)
-            : this.createFunctionRows(selectedFields, havingRows)
-
-        const aggregateFunctionRows = command.groupBy
-            ? this.groupRowsBy(
-                  _.flatten(
-                      _.compact(
-                          groupedRowsWithNewFieldsAndFunctions.map((rowGroup) =>
-                              this.pickAggregateFunctionRow(
-                                  rowGroup,
-                                  selectedFields
-                              )
-                          )
-                      )
-                  ),
-                  command.groupBy.fields
-              )
-            : this.pickAggregateFunctionRow(
-                  groupedRowsWithNewFieldsAndFunctions,
-                  selectedFields
-              )
-
-        const orderedAggregateFunctionRows = command.orderBy
-            ? this.orderRowsBy(command.orderBy.fields, aggregateFunctionRows)
-            : aggregateFunctionRows
-
-        const fieldsToReturn =
-            command.fields[0].type === 'distinct'
-                ? command.fields[0].value.map((f) => f.value)
-                : command.fields.map((f) => f.value)
-
-        if (!_.isEmpty(orderedAggregateFunctionRows)) {
-            const aggregateFunctionRowsWithfieldsToReturn = orderedAggregateFunctionRows.map(
-                (row) => _.pick(row, fieldsToReturn)
-            )
-
-            return aggregateFunctionRowsWithfieldsToReturn
-        }
-
-        const orderedRows = command.orderBy
-            ? this.orderRowsBy(
-                  command.orderBy.fields,
-                  _.flatten(groupedRowsWithNewFieldsAndFunctions)
-              )
-            : _.flatten(groupedRowsWithNewFieldsAndFunctions)
-
-        const rowsWithInitiallyfieldsToReturn = command.groupBy
-            ? orderedRows.map((row) => _.pick(row, fieldsToReturn))
-            : orderedRows
-
-        const groupedRows = command.groupBy
-            ? this.groupRowsBy(
-                  rowsWithInitiallyfieldsToReturn,
-                  command.groupBy.fields
-              )
-            : rowsWithInitiallyfieldsToReturn
-
-        const rowsWithfieldsToReturn = groupedRows.map((row) =>
-            _.pick(row, fieldsToReturn)
-        )
-
-        const groupedOrderedRows =
-            command.groupBy && command.orderBy
-                ? this.orderRowsBy(
-                      command.orderBy.fields,
-                      rowsWithfieldsToReturn
-                  )
-                : rowsWithfieldsToReturn
-
-        return command.fields[0].type === 'distinct'
-            ? this.selectDistinct(groupedOrderedRows)
-            : groupedOrderedRows
     }
 
     /**
@@ -573,9 +534,77 @@ class StateService {
     }
 
     /**
-     * Handles picking correct aggregate function row for selectRows().
-     * @param {object[]} rows
-     * @param {object[]} fields
+     * Handles creating result rows (e.g. arithmetic expressions) for selectRows().
+     * @param {object} command command of SELECT command
+     * @param {object[]} existingRows array of row objects
+     */
+    createRowsWithNewFields(fields, existingRows) {
+        const createdRows = existingRows.reduce((rowsToReturn, row) => {
+            fields.forEach((field) => {
+                if (field.type === 'column') {
+                    const valueOfQueriedColumn = row[field.value]
+                    // eslint-disable-next-line eqeqeq
+                    if (valueOfQueriedColumn == null) {
+                        throw new SQLError(`no such column ${field.value}`)
+                    }
+                } else if (
+                    field.type === 'expression' &&
+                    containsAggregateFunction(field.expressionParts)
+                ) {
+                    const evaluated = evaluateAggregateExpression(
+                        field.expressionParts,
+                        existingRows
+                    )
+                    row[field.value] = evaluated
+                } else if (field.type === 'expression') {
+                    const expressionResult = evaluateExpression(
+                        field.expressionParts,
+                        row,
+                        existingRows
+                    )
+
+                    row[field.value] = expressionResult
+                }
+            })
+
+            return rowsToReturn
+        }, existingRows)
+
+        return createdRows
+    }
+
+    /**
+     * Handles creating result rows for selectRows().
+     * @param {object} command command of SELECT command
+     * @param {object[]} existingRows array of row objects
+     */
+    createRowsWithFunctionResults(fields, existingRows) {
+        const createdRows = existingRows.reduce((rowsToReturn, row) => {
+            fields.forEach((field) => {
+                if (field.type === 'stringFunction') {
+                    const functionResult = executeStringFunction(field, row)
+
+                    row[field.value] = functionResult
+                } else if (field.type === 'aggregateFunction') {
+                    const functionResult = this.createRowWithAggregateFunctionResult(
+                        field,
+                        existingRows
+                    )
+
+                    row[field.value] = functionResult[field.value]
+                }
+            })
+
+            return rowsToReturn
+        }, existingRows)
+
+        return createdRows
+    }
+
+    /**
+     * Picks last executed aggregate function result from rows
+     * @param {Array} rows
+     * @param {Array} fields
      */
     pickAggregateFunctionRow(rows, fields) {
         const lastMinMaxFunction = _.findLast(
@@ -644,7 +673,7 @@ class StateService {
     }
 
     /**
-     * Groups rows for individual aggregate function evaluation
+     * Groups rows for aggregate function evaluation
      * @param {Array} rows
      * @param {Array} fields
      */
@@ -679,51 +708,11 @@ class StateService {
     }
 
     /**
-     * Handles creating result rows for selectRows().
-     * @param {object} command command of SELECT command
-     * @param {object[]} existingRows array of row objects
-     */
-    createRowsWithNewFields(fields, existingRows) {
-        const createdRows = existingRows.reduce((rowsToReturn, row) => {
-            for (let i = 0; i < fields.length; i++) {
-                if (fields[i].type === 'column') {
-                    const valueOfQueriedColumn = row[fields[i].value]
-                    // eslint-disable-next-line eqeqeq
-                    if (valueOfQueriedColumn == null) {
-                        throw new SQLError(`no such column ${fields[i].value}`)
-                    }
-                } else if (
-                    fields[i].type === 'expression' &&
-                    containsAggregateFunction(fields[i].expressionParts)
-                ) {
-                    const evaluated = evaluateAggregateExpression(
-                        fields[i].expressionParts,
-                        existingRows
-                    )
-                    row[fields[i].value] = evaluated
-                } else if (fields[i].type === 'expression') {
-                    const expressionResult = evaluateExpression(
-                        fields[i].expressionParts,
-                        row,
-                        existingRows
-                    )
-
-                    row[fields[i].value] = expressionResult
-                }
-            }
-
-            return rowsToReturn
-        }, existingRows)
-
-        return createdRows
-    }
-
-    /**
      * Handles creating a result row from an aggragate function.
      * @param {object} functionField object containing the function information
      * @param {object[]} existingRows array of row objects
      */
-    createAggregateFunctionRow(functionField, existingRows) {
+    createRowWithAggregateFunctionResult(functionField, existingRows) {
         const executedFunction = executeAggregateFunction(
             functionField,
             existingRows
@@ -751,6 +740,79 @@ class StateService {
     }
 
     /**
+     * Handles narrowing down the amount of rows to be returned according to the values
+     * given to LIMIT ... OFFSET in a query.
+     * @param {object} limitObject .limit of a command object
+     * @param {object[]} rows rows to limit
+     */
+    limitRows(limitObject, rows) {
+        let limitedRows = rows
+
+        let offset = undefined
+        if (limitObject.offset) {
+            offset =
+                limitObject.offset.field.type === 'expression'
+                    ? evaluateExpression(
+                          limitObject.offset.field.expressionParts,
+                          {},
+                          limitedRows
+                      )
+                    : limitObject.offset.field.value
+
+            limitedRows = _.drop(limitedRows, offset)
+        }
+
+        const limit =
+            limitObject.field.type === 'expression'
+                ? evaluateExpression(
+                      limitObject.field.expressionParts,
+                      {},
+                      limitedRows
+                  )
+                : limitObject.field.value
+
+        if (limit >= 0) limitedRows = _.take(limitedRows, limit)
+
+        if (limit < 0 || offset < 0) {
+            throw new SQLError('Value given to LIMIT or OFFSET is negative.')
+        }
+
+        if (limitedRows.length === 0) {
+            throw new SQLError(
+                'No rows left to return. Try changing value given to LIMIT or OFFSET.'
+            )
+        }
+
+        return limitedRows
+    }
+
+    /**
+     * Generates id
+     */
+    generateId() {
+        return ++this._id
+    }
+
+    /**
+     * Retrieves and returns a table object with a name matching the given one.
+     * Returns undefined if no such table exists.
+     * @param {String} tableName the name of the wanted table
+     */
+    findTable(tableName) {
+        return this.state.getTableByName(tableName)
+    }
+
+    /**
+     * Checks whether a table by the given name already exists.
+     * Throws an error message or returns nothing.
+     * @param {String} tableName name to be searched for
+     */
+    checkIfTableExists(tableName) {
+        if (!this.state.tableExists(tableName))
+            throw new SQLError(`No such table ${tableName}`)
+    }
+
+    /**
      * Checks whether a table exists with the table name given in the command.
      * Also checks if there are duplicate column names.
      * Returns either an error message or nothing.
@@ -771,30 +833,11 @@ class StateService {
     }
 
     /**
-     * Checks whether a table by the given name already exists.
-     * Throws an error message or returns nothing.
-     * @param {String} tableName name to be searched for
-     */
-    checkIfTableExists(tableName) {
-        if (!this.state.tableExists(tableName))
-            throw new SQLError(`No such table ${tableName}`)
-    }
-
-    /**
      * Checks an array for duplicate values and returns an array of them.
      * @param {Array} arr array to be checked
      */
     findDuplicates(arr) {
         return arr.filter((item, index) => arr.indexOf(item) !== index)
-    }
-
-    /**
-     * Retrieves and returns a table object with a name matching the given one.
-     * Returns undefined if no such table exists.
-     * @param {String} tableName the name of the wanted table
-     */
-    findTable(tableName) {
-        return this.state.getTableByName(tableName)
     }
 }
 
