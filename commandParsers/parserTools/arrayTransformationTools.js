@@ -72,8 +72,6 @@ const transformSplitConditionsIntoConditionsArray = (conditionsInputArray) => {
         .split(/\s+(?=(?:(?:[^']*'){2})*[^']*$)/)
         .filter(Boolean)
 
-    console.log(conditionsArray)
-
     return conditionsArray
 }
 
