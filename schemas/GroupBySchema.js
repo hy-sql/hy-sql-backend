@@ -20,7 +20,11 @@ const GroupBySchema = Joi.object({
         }),
 
     fields: Joi.array()
-        .items(ColumnSchema, FunctionSchema, ExpressionSchema)
+        .items(
+            ColumnSchema,
+            FunctionSchema.shared(ExpressionSchema),
+            ExpressionSchema.shared(FunctionSchema)
+        )
         .min(1),
 })
 
