@@ -47,7 +47,7 @@ describe.each([
     'SELECT * FROM Taulu order by where where;',
     'SELECT * FROM Taulu order by asc hi;',
     'SELECT * FROM Taulu order by asc hi:',
-    // 'SELECT * FROM Taulu order asc by;', FIXME: Requires check for extra input after command
+    'SELECT * FROM Taulu order asc by;',
     'SELECT * FROM Taulu by order',
     'SELECT * FROM Taulu order by)a;',
     'SELECT nimi, hinta FROM Tuotteet ORDER BY DESC;',
