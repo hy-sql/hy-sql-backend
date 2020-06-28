@@ -126,9 +126,8 @@ class StateService {
         this.checkIfTableExists(command.tableName)
 
         const table = this.findTable(command.tableName)
-        const existingRows = table.rows
 
-        let selectedRows = this.selectRows(command, existingRows)
+        let selectedRows = this.selectRows(command, table)
 
         if (command.limit) {
             selectedRows = this.limitRows(command.limit, selectedRows)
@@ -193,7 +192,7 @@ class StateService {
         }
 
         const updatedRows = rowsToUpdate.map((row) =>
-            this.updateRow(row, command.columns, table.columns)
+            this.updateRow(command.columns, row)
         )
 
         newRows = newRows.concat(updatedRows)
@@ -211,7 +210,7 @@ class StateService {
      * @param {*} row Row object
      * @param {*} columnsToUpdate Object that contains columnName and value which will be updated
      */
-    updateRow(row, columnsToUpdate) {
+    updateRow(columnsToUpdate, row) {
         const updatedRow = { ...row }
 
         columnsToUpdate.forEach((column) => {
@@ -258,45 +257,19 @@ class StateService {
      * @param {Object} command
      * @param {Array} existingRows
      */
-    selectRows(command, existingRows) {
-        const filteredRows = command.where
-            ? this.filterRows(command.where.conditions, existingRows)
-            : existingRows
-
-        if (command.fields[0].type === 'all') {
-            return command.orderBy
-                ? this.orderRowsBy(command.orderBy.fields, filteredRows)
-                : filteredRows
-        }
-
-        if (
-            command.fields[0].type === 'aggregateFunction' &&
-            command.fields.length === 1
-        ) {
-            return [
-                this.createRowWithAggregateFunctionResult(
-                    command.fields[0],
-                    filteredRows
-                ),
-            ]
-        }
-
-        if (
-            command.fields[0].type === 'expression' &&
-            containsAggregateFunction(command.fields[0].expressionParts)
-        ) {
-            const evaluated = evaluateAggregateExpression(
-                command.fields[0].expressionParts,
-                existingRows
-            )
-
-            return [{ [command.fields[0].value]: evaluated }]
-        }
-
+    selectRows(command, table) {
         const selectedFields =
             command.fields[0].type === 'distinct'
                 ? command.fields[0].value
                 : command.fields
+
+        const columnsToReturn = this.getcolumnsToReturn(selectedFields, table)
+
+        const existingRows = table.rows
+
+        const filteredRows = command.where
+            ? this.filterRows(command.where.conditions, existingRows)
+            : existingRows
 
         const rowsWithNewFields = this.createRowsWithNewFields(
             selectedFields,
@@ -304,7 +277,7 @@ class StateService {
         )
 
         const initialGroupedRows = command.groupBy
-            ? this.initialGroupRowsBy(rowsWithNewFields, command.groupBy.fields)
+            ? this.initialGroupRowsBy(command.groupBy.fields, rowsWithNewFields)
             : rowsWithNewFields
 
         const havingRows = command.having
@@ -326,38 +299,33 @@ class StateService {
 
         const aggregateFunctionRows = command.groupBy
             ? this.groupRowsBy(
+                  command.groupBy.fields,
                   _.flatten(
                       _.compact(
                           groupedRowsWithNewFieldsAndFunctions.map((rowGroup) =>
                               this.pickAggregateFunctionRow(
-                                  rowGroup,
-                                  selectedFields
+                                  selectedFields,
+                                  rowGroup
                               )
                           )
                       )
-                  ),
-                  command.groupBy.fields
+                  )
               )
             : this.pickAggregateFunctionRow(
-                  groupedRowsWithNewFieldsAndFunctions,
-                  selectedFields
+                  selectedFields,
+                  groupedRowsWithNewFieldsAndFunctions
               )
 
         const orderedAggregateFunctionRows = command.orderBy
             ? this.orderRowsBy(command.orderBy.fields, aggregateFunctionRows)
             : aggregateFunctionRows
 
-        const fieldsToReturn =
-            command.fields[0].type === 'distinct'
-                ? command.fields[0].value.map((f) => f.value)
-                : command.fields.map((f) => f.value)
-
         if (!_.isEmpty(orderedAggregateFunctionRows)) {
-            const aggregateFunctionRowsWithfieldsToReturn = orderedAggregateFunctionRows.map(
-                (row) => _.pick(row, fieldsToReturn)
+            const aggregateFunctionRowsWithcolumnsToReturn = orderedAggregateFunctionRows.map(
+                (row) => _.pick(row, columnsToReturn)
             )
 
-            return aggregateFunctionRowsWithfieldsToReturn
+            return aggregateFunctionRowsWithcolumnsToReturn
         }
 
         const orderedRows = command.orderBy
@@ -367,32 +335,52 @@ class StateService {
               )
             : _.flatten(groupedRowsWithNewFieldsAndFunctions)
 
-        const rowsWithInitiallyfieldsToReturn = command.groupBy
-            ? orderedRows.map((row) => _.pick(row, fieldsToReturn))
+        const rowsWithInitiallycolumnsToReturn = command.groupBy
+            ? orderedRows.map((row) => _.pick(row, columnsToReturn))
             : orderedRows
 
         const groupedRows = command.groupBy
             ? this.groupRowsBy(
-                  rowsWithInitiallyfieldsToReturn,
-                  command.groupBy.fields
+                  command.groupBy.fields,
+                  rowsWithInitiallycolumnsToReturn
               )
-            : rowsWithInitiallyfieldsToReturn
+            : rowsWithInitiallycolumnsToReturn
 
-        const rowsWithfieldsToReturn = groupedRows.map((row) =>
-            _.pick(row, fieldsToReturn)
+        const rowsWithcolumnsToReturn = groupedRows.map((row) =>
+            _.pick(row, columnsToReturn)
         )
 
         const groupedOrderedRows =
             command.groupBy && command.orderBy
                 ? this.orderRowsBy(
                       command.orderBy.fields,
-                      rowsWithfieldsToReturn
+                      rowsWithcolumnsToReturn
                   )
-                : rowsWithfieldsToReturn
+                : rowsWithcolumnsToReturn
 
         return command.fields[0].type === 'distinct'
             ? this.selectDistinct(groupedOrderedRows)
             : groupedOrderedRows
+    }
+
+    /**
+     * Creates an array of columns to return by select command
+     * @param {Array} fields
+     * @param {Object} table
+     * @returns {Array} string array of columns
+     */
+    getcolumnsToReturn(fields, table) {
+        const listOfAllTableColumns = table.columns.map((column) => column.name)
+
+        const fieldValues = fields.map((f) => {
+            if (f.type === 'all') {
+                return listOfAllTableColumns
+            }
+
+            return f.value
+        })
+
+        return _.uniq(_.flatten(fieldValues))
     }
 
     /**
@@ -534,12 +522,15 @@ class StateService {
     }
 
     /**
-     * Handles creating result rows (e.g. arithmetic expressions) for selectRows().
+     * Handles creating arithmetic expressions result rows for selectRows()
+     * and checks the existance of queried columns, throws error if not found
      * @param {object} command command of SELECT command
      * @param {object[]} existingRows array of row objects
      */
     createRowsWithNewFields(fields, existingRows) {
         const createdRows = existingRows.reduce((rowsToReturn, row) => {
+            let newRow = { ...row }
+
             fields.forEach((field) => {
                 if (field.type === 'column') {
                     const valueOfQueriedColumn = row[field.value]
@@ -547,6 +538,8 @@ class StateService {
                     if (valueOfQueriedColumn == null) {
                         throw new SQLError(`no such column ${field.value}`)
                     }
+
+                    newRow[field.value] = valueOfQueriedColumn
                 } else if (
                     field.type === 'expression' &&
                     containsAggregateFunction(field.expressionParts)
@@ -555,7 +548,8 @@ class StateService {
                         field.expressionParts,
                         existingRows
                     )
-                    row[field.value] = evaluated
+
+                    newRow[field.value] = evaluated
                 } else if (field.type === 'expression') {
                     const expressionResult = evaluateExpression(
                         field.expressionParts,
@@ -563,18 +557,18 @@ class StateService {
                         existingRows
                     )
 
-                    row[field.value] = expressionResult
+                    newRow[field.value] = expressionResult
                 }
             })
 
-            return rowsToReturn
-        }, existingRows)
+            return rowsToReturn.concat(newRow)
+        }, [])
 
         return createdRows
     }
 
     /**
-     * Handles creating result rows for selectRows().
+     * Handles creating string and aggregate function result rows for selectRows().
      * @param {object} command command of SELECT command
      * @param {object[]} existingRows array of row objects
      */
@@ -606,7 +600,7 @@ class StateService {
      * @param {Array} rows
      * @param {Array} fields
      */
-    pickAggregateFunctionRow(rows, fields) {
+    pickAggregateFunctionRow(fields, rows) {
         const lastMinMaxFunction = _.findLast(
             fields,
             (field) =>
@@ -665,7 +659,22 @@ class StateService {
             (field) => field.type === 'aggregateFunction'
         )
 
-        if (lastOtherAggregateFunction) {
+        const lastExpressionIncludingOtherAggregateFunction = _.findLast(
+            fields,
+            (field) => {
+                if (field.type === 'expression') {
+                    return _.findLast(
+                        field.expressionParts,
+                        (part) => part.type === 'aggregateFunction'
+                    )
+                }
+            }
+        )
+
+        if (
+            lastOtherAggregateFunction ||
+            lastExpressionIncludingOtherAggregateFunction
+        ) {
             return [rows[0]]
         }
 
@@ -673,11 +682,11 @@ class StateService {
     }
 
     /**
-     * Groups rows for aggregate function evaluation
+     * Helper function, groups rows for aggregate function evaluation
      * @param {Array} rows
      * @param {Array} fields
      */
-    initialGroupRowsBy(rows, fields) {
+    initialGroupRowsBy(fields, rows) {
         return _.flattenDepth(
             groupByMultipleProps(
                 rows,
@@ -692,7 +701,7 @@ class StateService {
      * @param {Array} rows
      * @param {Array} fields
      */
-    groupRowsBy(rows, fields) {
+    groupRowsBy(fields, rows) {
         const grouped = _.flattenDepth(
             groupByMultipleProps(
                 rows,
@@ -708,7 +717,7 @@ class StateService {
     }
 
     /**
-     * Handles creating a result row from an aggragate function.
+     * Handles creating a result row from an aggregate function.
      * @param {object} functionField object containing the function information
      * @param {object[]} existingRows array of row objects
      */

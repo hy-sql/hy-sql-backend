@@ -106,7 +106,7 @@ const distinctKeywordPattern = new RegExp('^DISTINCT$', 'i')
 const containsArithmeticOperatorPattern = new RegExp('([\\+|\\-|*|/|%])', 'g')
 
 const containsArithmeticOperatorWithWhiteSpacePattern = new RegExp(
-    '\\s*([\\+|\\-|*|/|%])\\s*',
+    '(?<!,)\\s*([\\+|\\-|*|/|%])\\s*',
     'g'
 )
 
