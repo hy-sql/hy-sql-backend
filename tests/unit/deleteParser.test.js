@@ -96,7 +96,7 @@ describe.each([
     "DELETE FROM Tuotteet WHERE name='';",
     "DELETE FROM Tuotteet WHERE price name='test';",
     "DELETE FROM Tuotteet WHERE name='test' additional;",
-    // "DELETE FROM Tuotteet WHERE name='test' ';", FIX ME: requires checking for additional at end of DELETE...WHERE-query
+    "DELETE FROM Tuotteet WHERE name='test' ';",
 ])('Invalid DELETE FROM ... WHERE ...-query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)

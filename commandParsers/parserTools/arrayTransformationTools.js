@@ -53,6 +53,10 @@ const transformSelectInputArrayIntoFieldsArray = (selectInputArray) => {
  * output is [ 'LENGTH(nimi)=5', 'OR', '(', 'LENGTH(nimi)<7', 'AND', 'hinta=4', ')' ]
  */
 const transformSplitConditionsIntoConditionsArray = (conditionsInputArray) => {
+    if (conditionsInputArray.length === 0) {
+        return conditionsInputArray
+    }
+
     const conditionsArray = conditionsInputArray
         .join(' ')
         .replace(containsFunctionWithWhiteSpacesPattern, (m) =>
@@ -66,8 +70,7 @@ const transformSplitConditionsIntoConditionsArray = (conditionsInputArray) => {
         )
         .replace(/AND/gi, ' AND ')
         .replace(/OR/gi, ' OR ')
-        .split(/ +(?=(?:(?:[^']*'){2})*[^']*$)/g)
-        .filter(Boolean)
+        .match(/(?:[^\s"']+|['"][^'"]*["'])+|'/g)
 
     return conditionsArray
 }

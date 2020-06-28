@@ -41,7 +41,7 @@ describe.each([
     'SELECT nimi, hinta FROM Taulu where #=5 order by 5;',
     'SELECT nimi, hinta FROM Taulu where is=true order by false',
     'SELECT nimi, hinta FROM Taulu where "this"="that" order by that;',
-    // "SELECT nimi, hinta FROM Taulu76 where name='test' ' order by column;", FIXME: Additional after where part
+    "SELECT nimi, hinta FROM Taulu76 where name='test' ' order by column;",
 ])('Invalid SELECT nimi, hinta -query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
