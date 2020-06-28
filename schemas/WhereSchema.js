@@ -42,6 +42,9 @@ const ConditionsSchema = Joi.object({
 const conditionsArraySchema = Joi.array()
     .items(Joi.link('#conditionSchema'), Joi.link('#conditionsSchema'))
     .id('conditionsArray')
+    .messages({
+        'array.includes': 'Not a condition',
+    })
 
 /**
  * Joi schema for validating WHERE objects.

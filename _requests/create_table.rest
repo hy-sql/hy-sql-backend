@@ -60,7 +60,7 @@ Content-Type: application/json
     "INSERT INTO Tyontekijat (yritys, nimi) VALUES ('Ankka', 'Hupu');",
     "INSERT INTO Tyontekijat (yritys, nimi) VALUES ('Ankka', 'Lupu');",
     "INSERT INTO Tyontekijat (yritys, nimi) VALUES ('Hanhi', 'Hannu');",
-    "SELECT yritys, nimi FROM Tyontekijat GROUP BY yritys;"
+    "SELECT yritys, nimi FROM Tyontekijat WHERE yritys;"
   ]
 }
 

@@ -96,8 +96,7 @@ describe.each([
     "DELETE FROM Tuotteet WHERE name='';",
     "DELETE FROM Tuotteet WHERE price name='test';",
     "DELETE FROM Tuotteet WHERE name='test' additional;",
-    // "DELETE FROM Tuotteet WHERE name='test' ';", //TODO: see transformSplitConditionsIntoConditionsArray
-    // JSDoc in commandParsers/parserTools/arrayTransformationTools.js
+    "DELETE FROM Tuotteet WHERE name='test' ';",
 ])('Invalid DELETE FROM ... WHERE ...-query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)

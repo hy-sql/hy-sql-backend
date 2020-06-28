@@ -92,8 +92,7 @@ describe.each([
     "SELECT * FROM Tuotteet WHERE name='';",
     "SELECT * FROM Tuotteet WHERE name name='test';",
     "SELECT * FROM Tuotteet WHERE name='test' additional;",
-    // "SELECT * FROM Tuotteet WHERE name='test' ';", //TODO: see transformSplitConditionsIntoConditionsArray
-    // JSDoc in commandParsers/parserTools/arrayTransformationTools.js
+    "SELECT * FROM Tuotteet WHERE name='test' ';",
 ])('Invalid SELECT * FROM ... WHERE ...-query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
@@ -114,7 +113,9 @@ describe.each([
             const command = splitCommandIntoArray(invalidCommand)
 
             test('fails validation after parsed to command object', () => {
-                expect(() => selectParser.parseCommand(command)).toThrowError()
+                expect(() =>
+                    commandService.parseCommand(command)
+                ).toThrowError()
             })
         })
     }
