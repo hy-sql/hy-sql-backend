@@ -122,7 +122,7 @@ describe.each([
 
                 expect(parsedCommand).toBeDefined()
                 expect(parsedCommand).not.toHaveProperty('where')
-                expect(parsedCommand).toThrow()
+                expect(parsedCommand).toThrowError()
             })
         })
     }

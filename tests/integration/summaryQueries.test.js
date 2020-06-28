@@ -44,9 +44,9 @@ describe('USER STORY TESTS: large summary queries', () => {
                 'COUNT(*)': 2,
             },
         ]
-        const selectParser =
+        const selectCommand =
             'SELECT tuote_id, COUNT(*) FROM Tuotteet WHERE hinta >= 3 GROUP BY tuote_id ORDER BY tuote_id;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)
@@ -77,9 +77,9 @@ describe('USER STORY TESTS: large summary queries', () => {
                 'MIN(hinta)': 2,
             },
         ]
-        const selectParser =
+        const selectCommand =
             'SELECT tuote_id, COUNT(*), AVG(hinta), MAX(hinta), MIN(hinta) FROM Tuotteet WHERE hinta >= 2 GROUP BY tuote_id  ORDER BY tuote_id;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)
@@ -120,9 +120,9 @@ describe('USER STORY TESTS: large summary queries', () => {
                     'LENGTH(nimi)': 7,
                 },
             ]
-            const selectParser =
+            const selectCommand =
                 "SELECT nimi, hinta, 5*hinta+3, LENGTH(nimi) FROM Tuotteet WHERE hinta=LENGTH(nimi) OR (hinta+1=5 AND nimi<>'banaani') OR (hinta=2*hinta) ORDER BY LENGTH(nimi), hinta;"
-            const commandArray = splitCommandIntoArray(selectParser)
+            const commandArray = splitCommandIntoArray(selectCommand)
             const parsedCommand = commandService.parseCommand(commandArray)
 
             const result = stateService.updateState(parsedCommand)
@@ -157,9 +157,9 @@ describe('USER STORY TESTS: large summary queries', () => {
                     'COUNT(*)': 1,
                 },
             ]
-            const selectParser =
+            const selectCommand =
                 'SELECT nimi, SUM(hinta), COUNT(*) FROM Tuotteet GROUP BY nimi ORDER BY COUNT(*) DESC;'
-            const commandArray = splitCommandIntoArray(selectParser)
+            const commandArray = splitCommandIntoArray(selectCommand)
             const parsedCommand = commandService.parseCommand(commandArray)
 
             const result = stateService.updateState(parsedCommand)
@@ -185,9 +185,9 @@ describe('USER STORY TESTS: large summary queries', () => {
                     hinta: 0,
                 },
             ]
-            const selectParser =
+            const selectCommand =
                 "SELECT DISTINCT nimi, hinta FROM Tuotteet WHERE hinta=LENGTH(nimi) OR (hinta+1=5 AND nimi<>'banaani') OR (hinta=2*hinta) ORDER BY hinta DESC;"
-            const commandArray = splitCommandIntoArray(selectParser)
+            const commandArray = splitCommandIntoArray(selectCommand)
             const parsedCommand = commandService.parseCommand(commandArray)
 
             const result = stateService.updateState(parsedCommand)
@@ -206,9 +206,9 @@ describe('USER STORY TESTS: large summary queries', () => {
                 'COUNT(*)': 2,
             },
         ]
-        const selectParser =
+        const selectCommand =
             'SELECT tuote_id, COUNT(*) FROM Tuotteet WHERE hinta >= 3 GROUP BY tuote_id HAVING COUNT(*) >= 2 ORDER BY tuote_id;'
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
 
         const result = stateService.updateState(parsedCommand)

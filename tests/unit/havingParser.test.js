@@ -135,7 +135,7 @@ describe.each([
             test('fails validation after parsed to command object', () => {
                 expect(() => {
                     parseCommand(command)
-                }).toThrow()
+                }).toThrowError()
             })
         })
     }
