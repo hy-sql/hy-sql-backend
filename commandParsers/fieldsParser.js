@@ -98,13 +98,13 @@ const parseExpression = (expression) => {
  * Handles parsing of fields in SELECT.
  * @param {string[]} fieldArray array containing the field information
  */
-const parseSelectFields = (selectInputArray) => {
-    if (isDistinctKeyword(selectInputArray[0])) {
-        return parseParametersFromDistinct(selectInputArray.slice(1))
+const parseInputFields = (fieldInputArray) => {
+    if (isDistinctKeyword(fieldInputArray[0])) {
+        return parseParametersFromDistinct(fieldInputArray.slice(1))
     }
 
     const fieldsArray = transformSelectInputArrayIntoFieldsArray(
-        selectInputArray
+        fieldInputArray
     )
 
     const parsedFields = fieldsArray.map((f) => {
@@ -123,7 +123,7 @@ const parseParametersFromDistinct = (selectInputArray) => {
     return [
         {
             type: 'distinct',
-            value: parseSelectFields(selectInputArray),
+            value: parseInputFields(selectInputArray),
         },
     ]
 }
@@ -174,7 +174,7 @@ const parseParameterFromAggregateFunction = (functionAsString) => {
 
 module.exports = {
     parseExpression,
-    parseSelectFields,
+    parseInputFields,
     parseOrderByFields,
     parseField,
 }

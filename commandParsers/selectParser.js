@@ -29,7 +29,7 @@ const {
     queryContainsLimitKeyword,
 } = require('./parserTools/queryContains')
 const { parseOrderBy } = require('./orderByParser')
-const { parseSelectFields } = require('./fieldsParser')
+const { parseInputFields } = require('./fieldsParser')
 const { parseGroupBy } = require('./groupByParser')
 const { parseHaving } = require('./havingParser')
 const { parseLimit } = require('./limitParser')
@@ -93,7 +93,7 @@ const parseBaseCommand = (fullCommandAsStringArray) => {
 
     const parsedCommand = {
         name: fullCommandAsStringArray[0],
-        fields: parseSelectFields(
+        fields: parseInputFields(
             fullCommandAsStringArray.slice(1, indexOfFrom)
         ),
         from: fullCommandAsStringArray[indexOfFrom],
