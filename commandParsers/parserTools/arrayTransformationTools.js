@@ -51,6 +51,9 @@ const transformSelectInputArrayIntoFieldsArray = (selectInputArray) => {
  *
  * const output = transformSplitConditionsIntoConditionsArray(slicedConditionsPartOfCommand)
  * output is [ 'LENGTH(nimi)=5', 'OR', '(', 'LENGTH(nimi)<7', 'AND', 'hinta=4', ')' ]
+ *
+ * TODO: improve split regex. It does not split on odd number of single quotes
+ * e.g. "name='test' '" would not be split
  */
 const transformSplitConditionsIntoConditionsArray = (conditionsInputArray) => {
     const conditionsArray = conditionsInputArray
@@ -66,8 +69,10 @@ const transformSplitConditionsIntoConditionsArray = (conditionsInputArray) => {
         )
         .replace(/AND/gi, ' AND ')
         .replace(/OR/gi, ' OR ')
-        .split(/ +(?=(?:(?:[^']*'){2})*[^']*$)/g)
+        .split(/\s+(?=(?:(?:[^']*'){2})*[^']*$)/)
         .filter(Boolean)
+
+    console.log(conditionsArray)
 
     return conditionsArray
 }
