@@ -11,7 +11,7 @@ describe.each(['DEL FROM Taulu;'])(
             test('fails validation after parsed to command object', () => {
                 expect(() => {
                     deleteParser.parseCommand(command)
-                }).toThrow()
+                }).toThrowError()
             })
         })
     }
@@ -57,7 +57,7 @@ describe.each([
         test('fails validation after parsed to command object', () => {
             expect(() => {
                 deleteParser.parseCommand(command)
-            }).toThrow()
+            }).toThrowError()
         })
     })
 })
@@ -96,7 +96,8 @@ describe.each([
     "DELETE FROM Tuotteet WHERE name='';",
     "DELETE FROM Tuotteet WHERE price name='test';",
     "DELETE FROM Tuotteet WHERE name='test' additional;",
-    // "DELETE FROM Tuotteet WHERE name='test' ';", FIX ME: requires checking for additional at end of DELETE...WHERE-query
+    // "DELETE FROM Tuotteet WHERE name='test' ';", //TODO: see transformSplitConditionsIntoConditionsArray
+    // JSDoc in commandParsers/parserTools/arrayTransformationTools.js
 ])('Invalid DELETE FROM ... WHERE ...-query', (invalidCommand) => {
     describe(invalidCommand, () => {
         const command = splitCommandIntoArray(invalidCommand)
@@ -104,7 +105,7 @@ describe.each([
         test('fails validation after parsed to command object', () => {
             expect(() => {
                 deleteParser.parseCommand(command)
-            }).toThrow()
+            }).toThrowError()
         })
     })
 })

@@ -46,7 +46,7 @@ describe.each([
         test('fails validation after parsed to command object', () => {
             expect(() => {
                 updateParser.parseCommand(fullCommandAsStringArray)
-            }).toThrow()
+            }).toThrowError()
         })
     })
 })

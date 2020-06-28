@@ -57,9 +57,9 @@ describe('selectFrom()', () => {
             },
         ]
 
-        const selectParser = 'SELECT 5*hinta-3 FROM Tuotteet;'
+        const selectCommand = 'SELECT 5*hinta-3 FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
@@ -92,9 +92,9 @@ describe('selectFrom()', () => {
             },
         ]
 
-        const selectParser = 'SELECT LENGTH(nimi) FROM Tuotteet;'
+        const selectCommand = 'SELECT LENGTH(nimi) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
@@ -134,9 +134,9 @@ describe('selectFrom()', () => {
             },
         ]
 
-        const selectParser = 'SELECT 5+hinta*4, LENGTH(nimi) FROM Tuotteet;'
+        const selectCommand = 'SELECT 5+hinta*4, LENGTH(nimi) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
@@ -176,9 +176,9 @@ describe('selectFrom()', () => {
             },
         ]
 
-        const selectParser = 'SELECT LENGTH(nimi), 5+hinta*4 FROM Tuotteet;'
+        const selectCommand = 'SELECT LENGTH(nimi), 5+hinta*4 FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
@@ -225,10 +225,10 @@ describe('selectFrom()', () => {
             },
         ]
 
-        const selectParser =
+        const selectCommand =
             'SELECT length(nimi), 5+hinta*4, lkm FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
@@ -243,9 +243,9 @@ describe('selectFrom()', () => {
             },
         ]
 
-        const selectParser = 'SELECT COUNT(nimi) FROM Tuotteet;'
+        const selectCommand = 'SELECT COUNT(nimi) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 
@@ -260,9 +260,9 @@ describe('selectFrom()', () => {
             },
         ]
 
-        const selectParser = 'SELECT COUNT(*) FROM Tuotteet;'
+        const selectCommand = 'SELECT COUNT(*) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand)
 
@@ -294,9 +294,9 @@ describe('selectFrom()', () => {
             },
         ]
 
-        const selectParser = "SELECT LENGTH('string') FROM Tuotteet;"
+        const selectCommand = "SELECT LENGTH('string') FROM Tuotteet;"
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand)
 
@@ -310,9 +310,9 @@ describe('selectFrom()', () => {
             },
         ]
 
-        const selectParser = 'SELECT COUNT(*)*2 FROM Tuotteet;'
+        const selectCommand = 'SELECT COUNT(*)*2 FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand)
 
@@ -344,9 +344,9 @@ describe('selectFrom()', () => {
             },
         ]
 
-        const selectParser = "SELECT LENGTH('string')*2 FROM Tuotteet;"
+        const selectCommand = "SELECT LENGTH('string')*2 FROM Tuotteet;"
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand)
 
@@ -428,27 +428,27 @@ describe('selectFrom()', () => {
     })
 
     test('returns row asked by SUM-function in select', () => {
-        const selectParser = 'SELECT SUM(hinta) FROM Tuotteet;'
+        const selectCommand = 'SELECT SUM(hinta) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'SUM(hinta)': 40 }])
     })
 
     test('returns row asked by SUM-function in select', () => {
-        const selectParser = 'SELECT SUM(nimi) FROM Tuotteet;'
+        const selectCommand = 'SELECT SUM(nimi) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'SUM(nimi)': 0 }])
     })
 
     test('returns expected error for SUM-function in select', () => {
-        const selectParser = 'SELECT SUM(nonexistent) FROM Tuotteet;'
+        const selectCommand = 'SELECT SUM(nonexistent) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
         expect(() => stateService.updateState(parsedCommand)).toThrowError(
             new SQLError(
@@ -458,27 +458,27 @@ describe('selectFrom()', () => {
     })
 
     test('returns row asked by AVG-function in select', () => {
-        const selectParser = 'SELECT AVG(hinta) FROM Tuotteet;'
+        const selectCommand = 'SELECT AVG(hinta) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'AVG(hinta)': 5.714285714285714 }])
     })
 
     test('returns row asked by AVG-function in select', () => {
-        const selectParser = 'SELECT AVG(nimi) FROM Tuotteet;'
+        const selectCommand = 'SELECT AVG(nimi) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
         const result = stateService.updateState(parsedCommand)
         expect(result.rows).toEqual([{ 'AVG(nimi)': 0 }])
     })
 
     test('returns expected error for AVG-function in select', () => {
-        const selectParser = 'SELECT AVG(nonexistent) FROM Tuotteet;'
+        const selectCommand = 'SELECT AVG(nonexistent) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
         const parsedCommand = commandService.parseCommand(commandArray)
         expect(() => stateService.updateState(parsedCommand)).toThrowError(
             new SQLError(
@@ -497,10 +497,10 @@ describe('selectFrom()', () => {
             },
         ]
 
-        const selectParser =
+        const selectCommand =
             'SELECT hinta, MAX(hinta), MIN(hinta), COUNT(*) FROM Tuotteet;'
 
-        const commandArray = splitCommandIntoArray(selectParser)
+        const commandArray = splitCommandIntoArray(selectCommand)
 
         const parsedCommand = commandService.parseCommand(commandArray)
 

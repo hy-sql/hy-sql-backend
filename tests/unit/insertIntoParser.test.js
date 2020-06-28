@@ -42,7 +42,7 @@ describe.each([
     test('fails validation after parsed to command object', () => {
         expect(() => {
             insertIntoParser.parseCommand(fullCommandAsStringArray)
-        }).toThrow()
+        }).toThrowError()
     })
 })
 

@@ -18,7 +18,7 @@ describe.each([
     'GROUP BY price, amount',
     "GROUP BY LENGTH('test')",
     'GROUP BY SUM(amount)',
-    // 'GROUP BY price*5-LENGTH(name)', FIXME: Joi schema problem
+    'GROUP BY price*5-LENGTH(name)',
 ])('Valid GROUP BY-part of a query', (validCommand) => {
     describe(validCommand, () => {
         const command = splitCommandIntoArray(validCommand)
@@ -148,7 +148,7 @@ describe.each([
 
 describe.each([
     'SELECT * FROM Table WHERE price>5 order by price GROUP BY price;',
-    // "SELECT * FROM Table GROUP by price*7 WHERE name='test' order by name;", //FIXME: Additional input after base select part before where
+    "SELECT * FROM Table GROUP by price*7 WHERE name='test' order by name;",
     "SELECT * FROM Table WHERE price<10 AND name<>'sipuli' group BY SUM(price) order by;",
     'SELECT * FROM Table WHERE LENGTH(name)=6 ORDER BY price GROUP BY price, amount;', //TODO: Do we have to validate columns not to include sql keywords?
     'SELECT LENGTH(nimi) FROM Table WHERE amount>30 GROUP BY ORDER BY LENGTH(nimi);',
@@ -159,7 +159,7 @@ describe.each([
         test('fails validation after parsed to command object', () => {
             expect(() => {
                 parseCommand(command)
-            }).toThrow()
+            }).toThrowError()
         })
     })
 })
