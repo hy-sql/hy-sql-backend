@@ -4,6 +4,13 @@ const { parseInputFields } = require('./fieldsParser')
 const findIndexOfClosingBracket = require('./parserTools/findIndexOfClosingBracket')
 const SQLError = require('../models/SQLError')
 
+/**
+ * Parses and validates an INSERT INTO command object from the given array.
+ * Returns the validated command object or throws a validation error if the
+ * object fails validation.
+ * @param {string[]} fullCommandAsStringArray command as string array
+ * @returns {object} command object
+ */
 const parseCommand = (fullCommandAsStringArray) => {
     const indexOfValuesKeyword = fullCommandAsStringArray.findIndex(
         (e) => e.toUpperCase() === 'VALUES'
