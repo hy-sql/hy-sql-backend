@@ -301,6 +301,14 @@ class StateService {
               )
             : initialGroupedRows
 
+        if (command.groupBy) {
+            this.checkExistanceOfColumnsAsked(
+                command.groupBy.fields,
+                table,
+                columnsToReturn
+            )
+        }
+
         const groupedRowsWithNewFieldsAndFunctions = command.groupBy
             ? havingRows
                   .map((rowGroup) =>
@@ -311,6 +319,14 @@ class StateService {
                   )
                   .filter((row) => row.length > 0)
             : this.createRowsWithFunctionResults(selectedFields, havingRows)
+
+        if (command.orderBy) {
+            this.checkExistanceOfColumnsAsked(
+                command.orderBy.fields,
+                table,
+                columnsToReturn
+            )
+        }
 
         const aggregateFunctionRows = command.groupBy
             ? this.groupRowsBy(
@@ -761,6 +777,22 @@ class StateService {
         )
 
         return orderedRows
+    }
+
+    checkExistanceOfColumnsAsked(fields, table, selectedColumns) {
+        const existingColumns = table.columns.map((c) => c.name)
+
+        const allColumns = _.uniq(existingColumns.concat(selectedColumns))
+
+        const orderByFields = fields.map((f) => f.value)
+
+        orderByFields.forEach((field) => {
+            if (!_.includes(allColumns, field)) {
+                throw new SQLError(`no such column: ${field}`)
+            }
+        })
+
+        return
     }
 
     /**

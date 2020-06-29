@@ -16,8 +16,12 @@ const SQLError = require('../../models/SQLError')
  * const output = transformSelectInputArrayIntoFieldsArray(input)
  * output is [ 'name', 'price', 'LENGTH(name)*2+price' ]
  */
-const transformSelectInputArrayIntoFieldsArray = (selectInputArray) => {
-    const selectFieldsAsString = selectInputArray
+const transformSelectInputArrayIntoFieldsArray = (inputArray) => {
+    if (inputArray.length === 0) {
+        return inputArray
+    }
+
+    const selectFieldsAsString = inputArray
         .join(' ')
         .replace(containsFunctionWithWhiteSpacesPattern, (m) =>
             m.replace(/\s+/g, '')
@@ -87,6 +91,23 @@ const transformSplitConditionsIntoConditionsArray = (conditionsInputArray) => {
 const transformOrderByInputArrayIntoOrderByFieldsArray = (
     splitOrderByFields
 ) => {
+    if (splitOrderByFields.length === 0) {
+        return splitOrderByFields
+    }
+
+    const orderByFieldsAsStringWithoutAscDesc = splitOrderByFields
+        .join(' ')
+        .replace(containsFunctionWithWhiteSpacesPattern, (m) =>
+            m.replace(/\s+/g, '')
+        )
+        .replace(/ASC|DESC/gi, '')
+        .replace(/\s+,/g, (m) => m.replace(/\s+/g, ''))
+        .trim()
+
+    if (!fieldsSplitByComma(orderByFieldsAsStringWithoutAscDesc)) {
+        throw new SQLError('fields must be split by comma (,)')
+    }
+
     const orderByFieldsArray = splitOrderByFields
         .join(' ')
         .replace(containsFunctionWithWhiteSpacesPattern, (m) =>
