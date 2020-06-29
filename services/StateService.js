@@ -784,11 +784,18 @@ class StateService {
 
         const allColumns = _.uniq(existingColumns.concat(selectedColumns))
 
-        const orderByFields = fields.map((f) => f.value)
-
-        orderByFields.forEach((field) => {
-            if (!_.includes(allColumns, field)) {
-                throw new SQLError(`no such column: ${field}`)
+        fields.forEach((field) => {
+            if (
+                (field.type === 'stringFunction' ||
+                    field.type === 'aggregateFunction' ||
+                    field.type === 'expression') &&
+                !_.includes(allColumns, field.value)
+            ) {
+                throw new SQLError(
+                    'functions and expressions in order by not implemented yet'
+                )
+            } else if (!_.includes(allColumns, field.value)) {
+                throw new SQLError(`no such column: ${field.value}`)
             }
         })
 
